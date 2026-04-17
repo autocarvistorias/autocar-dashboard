@@ -547,33 +547,46 @@ tailwind.config = {
     .chart-host .apexcharts-datalabels text { font-size: 16px !important; }
   }
 
-  /* ── Segmented toggle (Evolução / Comparativo) ──────────────────────── */
-  .seg-toggle {
-    display: inline-flex;
-    background: #141414;
-    border: 1px solid #2a2a2a;
-    border-radius: 999px;
-    padding: 3px;
-    gap: 2px;
+  /* ── Loja chips (filtro de s\u00e9ries do gr\u00e1fico Vistorias por M\u00eas e Loja) ── */
+  .loja-chips-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 14px;
   }
-  .seg-btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 5px 11px; border-radius: 999px;
-    background: transparent; border: none; cursor: pointer;
-    color: #a3a3a3; font-size: 12px; font-weight: 700;
+  .loja-chip {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 7px 15px 7px 13px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1.5px solid #2a2a2a;
+    color: #8a8a8a;
     font-family: "Plus Jakarta Sans", sans-serif;
-    text-transform: none; letter-spacing: 0.2px;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer;
     transition: all .2s ease;
     white-space: nowrap;
+    letter-spacing: 0.2px;
+    user-select: none;
   }
-  .seg-btn .material-symbols-outlined { font-size: 14px; }
-  .seg-btn:hover { color: var(--gold); }
-  .seg-btn.active {
-    background: linear-gradient(135deg, #FFE45C 0%, #FFD60A 100%);
-    color: #000;
-    box-shadow: 0 0 12px rgba(255, 214, 10, 0.40);
+  .loja-chip::before {
+    content: ''; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--chip-color, #666);
+    box-shadow: 0 0 0 0 transparent;
+    transition: box-shadow .25s ease;
   }
-  .seg-btn.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+  .loja-chip:hover {
+    border-color: var(--chip-color, #444);
+    color: #e5e5e5;
+  }
+  .loja-chip.active {
+    background: color-mix(in srgb, var(--chip-color) 14%, #0a0a0a);
+    border-color: var(--chip-color);
+    color: #fff;
+  }
+  .loja-chip.active::before {
+    box-shadow: 0 0 10px var(--chip-color);
+  }
+  @media (min-width: 800px) { .loja-chip { font-size: 17px; } }
+  @media (min-width: 1440px){ .loja-chip { font-size: 18px; } }
 
   /* ── Mini-arcade (Auto Car Runner) ───────────────────────────────────── */
   #mini-arcade {
@@ -735,7 +748,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:01</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:25</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -753,7 +766,7 @@ tailwind.config = {
     </div>
     <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-outline-variant text-[11px] text-on-surface-variant">
       <span class="material-symbols-outlined" style="font-size:14px;color:var(--gold)">calendar_month</span>
-      <span id="period-badge" class="font-semibold text-white">Todo período</span>
+      <span id="period-badge" class="font-semibold text-white">Este ano</span>
     </div>
     <button id="filter-toggle" class="flex items-center gap-2 bg-surface-2 hover:bg-surface-3 border border-outline-variant px-3.5 py-2 rounded-full text-xs font-semibold transition">
       <span class="material-symbols-outlined" style="font-size:18px">tune</span>
@@ -768,8 +781,8 @@ tailwind.config = {
     <button class="period-btn" data-p="30d">30 dias</button>
     <button class="period-btn" data-p="mtd">Este mês</button>
     <button class="period-btn" data-p="90d">90 dias</button>
-    <button class="period-btn" data-p="ytd">Este ano</button>
-    <button class="period-btn active" data-p="all">Todo período</button>
+    <button class="period-btn active" data-p="ytd">Este ano</button>
+    <button class="period-btn" data-p="all">Todo período</button>
     <span class="hidden md:inline-block w-px h-6 bg-outline-variant mx-2"></span>
     <input type="date" id="f-from" onchange="onDateChange()">
     <span class="text-on-surface-variant text-xs">até</span>
@@ -808,17 +821,13 @@ tailwind.config = {
       <div class="chart-card card-fx">
         <div class="card-title">
           <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">timeline</span>Vistorias por Mês e Loja</span>
-          <span class="flex items-center gap-2">
-            <div class="seg-toggle" id="ch-vis-mode" role="tablist" aria-label="Modo do gráfico">
-              <button class="seg-btn active" data-mode="evolucao" role="tab" aria-selected="true">
-                <span class="material-symbols-outlined">stacked_line_chart</span>Evolução
-              </button>
-              <button class="seg-btn" data-mode="comparativo" role="tab" aria-selected="false">
-                <span class="material-symbols-outlined">compare_arrows</span>Comparativo
-              </button>
-            </div>
-            <span class="title-meta"><span class="live-dot"></span>Tempo real</span>
-          </span>
+          <span class="title-meta"><span class="live-dot"></span>Tempo real</span>
+        </div>
+        <div class="loja-chips-row" id="vismes-chips" role="group" aria-label="Séries visíveis">
+          <button class="loja-chip active" data-serie="Goiania"  style="--chip-color:#C8960C">Goiânia</button>
+          <button class="loja-chip active" data-serie="Prime"    style="--chip-color:#00BCD4">Prime</button>
+          <button class="loja-chip active" data-serie="Anapolis" style="--chip-color:#AB47BC">Anápolis</button>
+          <button class="loja-chip active" data-serie="Total"    style="--chip-color:#FFFFFF">Total</button>
         </div>
         <div id="ch-vis-mes" class="chart-host" style="min-height:380px"></div>
       </div>
@@ -1090,7 +1099,10 @@ const ABBR = v => {
 };
 
 // ══ State ═════════════════════════════════════════════════════════════════
-const S = { from:null, to:null, loja:'all', vistoriador:'all', status:'all' };
+// Estado inicial: filtro "Este ano" (YTD) já aplicado por padr\u00e3o.
+const _ytdNow  = new Date(); _ytdNow.setHours(23,59,59,999);
+const _ytdFrom = new Date(_ytdNow.getFullYear(), 0, 1);
+const S = { from:_ytdFrom, to:_ytdNow, loja:'all', vistoriador:'all', status:'all' };
 
 // Populate vistoriador dropdown
 (function(){
@@ -1242,50 +1254,84 @@ function baseChart(opts){
 }
 
 // ══ Anti-overlap dataLabels helpers ══════════════════════════════════════
-// Apex doesn't support per-series offsetY in line/area dataLabels. We push offsets
-// after each render via SVG transforms and recolor backgrounds with each series color
-// so even when labels touch, the brain still groups them by chip color.
-
-// Symmetric vertical "rails" by series count (px).
-function _labelOffsetY(seriesIndex, totalSeries){
-  const slots = {
-    1: [-14],
-    2: [-18, 18],
-    3: [-26, 0, 26],
-    4: [-32, -12, 12, 32],
-    5: [-36, -18, 0, 18, 36]
-  };
-  const arr = slots[totalSeries] || slots[4];
-  return arr[seriesIndex] ?? 0;
-}
+// Two-step processing after each chart render:
+//   1) Recolor each series' label backgrounds with the series color + contrast text
+//   2) Detect labels that share ~same X and push them vertically (centered spread)
+//      so none collide. All labels stay visible — they just migrate up/down as needed.
 
 // Light series → dark text; dark series → light text.
 function _labelTextColor(seriesColor){
-  const lights = ['#FFD60A', '#FFE25A', '#FFE45C', '#FFFFFF'];
+  const lights = ['#FFD60A', '#FFE25A', '#FFE45C', '#FFFFFF', '#C8960C'];
   return lights.includes((seriesColor||'').toUpperCase()) ? '#0a0a0a' : '#FFFFFF';
 }
 
-// Returns chart.events.{mounted,updated,animationEnd} that re-applies per-series
-// offsets + per-series background color to each label group in the SVG.
+// Measures each label's bbox in root coords, groups by X column, and pushes
+// colliding ones apart symmetrically around the column's midpoint.
+function _resolveLabelCollisions(root){
+  const labels = [];
+  const rootRect = root.getBoundingClientRect();
+  root.querySelectorAll('.apexcharts-datalabels g').forEach(g => {
+    // Reset any translate we applied on a previous pass — start from Apex's natural pos.
+    if (g.dataset.antiOvl === '1') { g.removeAttribute('transform'); delete g.dataset.antiOvl; }
+    const text = g.querySelector('text');
+    if (!text || !text.textContent.trim()) return;
+    const r = g.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return;
+    labels.push({
+      g,
+      cx: r.left + r.width/2 - rootRect.left,
+      top: r.top - rootRect.top,
+      h: r.height,
+      dy: 0
+    });
+  });
+  if (labels.length < 2) return;
+
+  // Group by X (tolerance = ~half column width).
+  labels.sort((a,b) => a.cx - b.cx);
+  const cols = [];
+  labels.forEach(l => {
+    const last = cols[cols.length-1];
+    if (last && Math.abs(l.cx - last.cx) < 18) last.items.push(l);
+    else cols.push({ cx: l.cx, items: [l] });
+  });
+
+  const PAD = 2;
+  cols.forEach(col => {
+    if (col.items.length < 2) return;
+    col.items.sort((a,b) => a.top - b.top);
+    // Downward pass: each label must sit at least PAD below its upper neighbour's bottom.
+    for (let i = 1; i < col.items.length; i++) {
+      const prev = col.items[i-1], curr = col.items[i];
+      const prevBot = prev.top + prev.dy + prev.h;
+      const currTop = curr.top + curr.dy;
+      const needed = (prevBot + PAD) - currTop;
+      if (needed > 0) curr.dy += needed;
+    }
+    // Re-center: shift whole column up by half the total displacement so labels
+    // split symmetrically above/below their natural positions.
+    const extra = col.items[col.items.length-1].dy;
+    if (extra > 0) {
+      const shift = -extra / 2;
+      col.items.forEach(l => l.dy += shift);
+    }
+  });
+
+  labels.forEach(l => {
+    if (Math.abs(l.dy) < 0.5) return;
+    l.g.setAttribute('transform', `translate(0 ${Math.round(l.dy)})`);
+    l.g.dataset.antiOvl = '1';
+  });
+}
+
+// chart.events that (a) recolor labels per series and (b) resolve vertical collisions.
 function perSeriesLabelEvents(seriesColors){
-  const total = seriesColors.length;
   function apply(chartContext){
     const root = chartContext && chartContext.el;
     if (!root) return;
-    const groups = root.querySelectorAll('.apexcharts-datalabels');
-    groups.forEach((group, seriesIndex) => {
-      if (seriesIndex >= total) return;
-      const offsetY = _labelOffsetY(seriesIndex, total);
-      const offsetX = (seriesIndex % 2 === 0) ? -3 : 3;
-      group.querySelectorAll('g').forEach(g => {
-        // Stack our translation onto whatever Apex set, without erasing it.
-        const cur = g.getAttribute('transform') || '';
-        const tag = `__shifted_${seriesIndex}`;
-        if (g.dataset.shifted) return;       // idempotent
-        g.dataset.shifted = tag;
-        g.setAttribute('transform', `${cur} translate(${offsetX} ${offsetY})`.trim());
-      });
-      // Recolor pill backgrounds with the series color.
+    // 1) Recolor per series
+    root.querySelectorAll('.apexcharts-datalabels').forEach((group, seriesIndex) => {
+      if (seriesIndex >= seriesColors.length) return;
       const fill = seriesColors[seriesIndex];
       group.querySelectorAll('rect').forEach(r => {
         r.setAttribute('fill', fill);
@@ -1293,21 +1339,13 @@ function perSeriesLabelEvents(seriesColors){
         r.setAttribute('stroke-width', '0.5');
         r.setAttribute('fill-opacity', '0.95');
       });
-      // Force text color for contrast.
       const txtColor = _labelTextColor(fill);
       group.querySelectorAll('text').forEach(t => t.setAttribute('fill', txtColor));
     });
+    // 2) Dynamic anti-overlap (rAF so layout settles first)
+    requestAnimationFrame(() => _resolveLabelCollisions(root));
   }
-  return {
-    mounted: apply,
-    updated: function(c){
-      // Apex regenerates the datalabel groups on update; clear our marker so apply runs again.
-      const root = c && c.el;
-      if (root) root.querySelectorAll('.apexcharts-datalabels g[data-shifted]').forEach(g => delete g.dataset.shifted);
-      apply(c);
-    },
-    animationEnd: apply
-  };
+  return { mounted: apply, updated: apply, animationEnd: apply };
 }
 
 // Pending charts deferred because their tab was hidden at creation time.
@@ -1509,37 +1547,63 @@ function spark(arr, dKey, valKey){
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//  Chart "Vistorias por Mês e Loja" — toggle Evolução / Comparativo
+//  Chart "Vistorias por Mês e Loja" — chips filtram séries dinamicamente
 // ══════════════════════════════════════════════════════════════════════════
-let _visMesMode = 'evolucao';   // 'evolucao' (stacked area + Total) | 'comparativo' (overlapping areas from 0 + Total)
-let _visMesLastData = null;     // cache so toggle re-renders instantly without re-filtering
+const _visActiveSeries = new Set(['Goiania','Prime','Anapolis','Total']);
+let _visMesLastData = null;
 
 function renderVisMesChart(vis){
   _visMesLastData = vis;
-  const lojas = ['Goiania','Prime','Anapolis'];
-  const lojaLabels = ['Goiânia','Prime','Anápolis'];
   const mesLoja = {};
-  vis.forEach(r=>{
-    if(!r._d) return;
+  vis.forEach(r => {
+    if (!r._d) return;
     const mk = r._d.getFullYear()+'-'+String(r._d.getMonth()+1).padStart(2,'0');
-    if(!mesLoja[mk]) mesLoja[mk]={Goiania:0,Prime:0,Anapolis:0};
-    if(mesLoja[mk][r.loja]!==undefined) mesLoja[mk][r.loja]++;
+    if (!mesLoja[mk]) mesLoja[mk] = { Goiania:0, Prime:0, Anapolis:0 };
+    if (mesLoja[mk][r.loja] !== undefined) mesLoja[mk][r.loja]++;
   });
   const mks = Object.keys(mesLoja).sort();
   const ml  = mks.map(monthLabel);
-
   if (!mks.length) { emptyState('ch-vis-mes', 'Sem dados no período'); return; }
 
   const totals = mks.map(k => mesLoja[k].Goiania + mesLoja[k].Prime + mesLoja[k].Anapolis);
-  const lojaSeries = lojas.map((l,i)=>({
-    name: lojaLabels[i],
-    type: 'area',
-    data: mks.map(k => mesLoja[k][l])
-  }));
 
-  // ApexCharts won't mix stacked-area with a non-stacked line in the same chart,
-  // so the two modes use entirely different configs.
-  const baseAxis = {
+  // Full catalog — filtered below by active chips.
+  const catalog = [
+    { key:'Goiania',  name:'Goiânia',     color: C.gold,   data: mks.map(k => mesLoja[k].Goiania),  isTotal:false },
+    { key:'Prime',    name:'Prime',       color: C.cyan,   data: mks.map(k => mesLoja[k].Prime),    isTotal:false },
+    { key:'Anapolis', name:'Anápolis',    color: C.purple, data: mks.map(k => mesLoja[k].Anapolis), isTotal:false },
+    { key:'Total',    name:'Total Geral', color:'#FFFFFF', data: totals,                            isTotal:true  }
+  ];
+  const active = catalog.filter(s => _visActiveSeries.has(s.key));
+
+  const series      = active.map(s => ({ name: s.name, type: s.isTotal ? 'line' : 'area', data: s.data }));
+  const colors      = active.map(s => s.color);
+  const strokeWidth = active.map(s => s.isTotal ? 3.5 : 2.5);
+  const dashArray   = active.map(s => s.isTotal ? 6   : 0);
+  const fillType    = active.map(s => s.isTotal ? 'solid' : 'gradient');
+  const fillOpacity = active.map(_ => 1);
+  const markerSize  = active.map(s => s.isTotal ? 7 : 5);
+
+  makeChart('ch-vis-mes', {
+    chart: {
+      type: 'line', height: 440, stacked: false,
+      events: perSeriesLabelEvents(colors)
+    },
+    series, colors,
+    stroke: { curve: 'smooth', width: strokeWidth, dashArray },
+    fill: { type: fillType, gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] }, opacity: fillOpacity },
+    dataLabels: {
+      enabled: true,
+      enabledOnSeries: active.map((_, i) => i),
+      formatter: function(val, opts){
+        const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+        const v = typeof real === 'number' ? real : val;
+        return v > 0 ? N(Math.round(v)) : '';
+      },
+      background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+    },
+    markers: { size: markerSize, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 10 } },
     xaxis: {
       categories: ml,
       axisBorder: { show: false }, axisTicks: { color: '#1f1f1f' },
@@ -1551,82 +1615,19 @@ function renderVisMesChart(vis){
     },
     legend: { position: 'top', horizontalAlign: 'left', fontWeight: 600, markers: { width: 12, height: 12, radius: 99 } },
     tooltip: { shared: true, intersect: false, y: { formatter: v => N(v) + ' vistorias' } }
-  };
-
-  if (_visMesMode === 'evolucao') {
-    // ── EVOLUÇÃO: 3 áreas empilhadas. Topo da pilha = total. Label da última série mostra o TOTAL.
-    makeChart('ch-vis-mes', Object.assign({
-      chart: { type: 'area', height: 400, stacked: true },
-      series: lojaSeries,
-      colors: [C.gold, C.cyan, C.purple],
-      stroke: { curve: 'smooth', width: 2.5 },
-      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.55, opacityTo: 0.05, stops: [0, 100] } },
-      dataLabels: {
-        enabled: true,
-        formatter: function(val, opts){
-          const w = opts.w, idx = opts.dataPointIndex;
-          // Top series carries the running total (badge dourado destacado);
-          // bottom and middle show their own contribution.
-          if (opts.seriesIndex === w.config.series.length - 1) {
-            return totals[idx] > 0 ? N(totals[idx]) : '';
-          }
-          const real = w.config.series[opts.seriesIndex].data[idx];
-          return real > 0 ? N(real) : '';
-        },
-        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 3, opacity: 0.92, borderWidth: 0 },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
-        offsetY: -2
-      },
-      markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } }
-    }, baseAxis));
-  } else {
-    // ── COMPARATIVO: 3 áreas partindo do 0 (sobrepostas) + linha branca tracejada do TOTAL.
-    // Todos os 4 labels ficam visíveis SEMPRE — distribuídos em 4 trilhos verticais
-    // com badges coloridos por série pra distinção mesmo quando se tocam.
-    const totalSeries = { name: 'Total Geral', type: 'line', data: totals };
-    const visColors = [C.gold, C.cyan, C.purple, '#FFFFFF'];
-    makeChart('ch-vis-mes', Object.assign({
-      chart: {
-        type: 'line', height: 440, stacked: false,
-        events: perSeriesLabelEvents(visColors)
-      },
-      series: [...lojaSeries, totalSeries],
-      colors: visColors,
-      stroke: { curve: 'smooth', width: [2.5, 2.5, 2.5, 3.5], dashArray: [0, 0, 0, 6] },
-      fill: {
-        type: ['gradient','gradient','gradient','solid'],
-        gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
-        opacity: [1, 1, 1, 1]
-      },
-      dataLabels: {
-        enabled: true,
-        enabledOnSeries: [0, 1, 2, 3],
-        formatter: function(val, opts){
-          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
-          const v = typeof real === 'number' ? real : val;
-          return v > 0 ? N(Math.round(v)) : '';
-        },
-        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
-      },
-      markers: { size: [5, 5, 5, 7], strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 10 } }
-    }, baseAxis));
-  }
+  });
 }
 
-// Toggle wiring — listens once. Calls render with cached data, no re-filtering.
-(function wireVisMesToggle(){
+// Chip wiring — toggle per série, always keep ≥1 active, re-render instantly.
+(function wireLojaChips(){
   document.addEventListener('click', e => {
-    const btn = e.target.closest('#ch-vis-mode .seg-btn');
-    if (!btn) return;
-    const mode = btn.dataset.mode;
-    if (mode === _visMesMode) return;
-    _visMesMode = mode;
-    document.querySelectorAll('#ch-vis-mode .seg-btn').forEach(b => {
-      const active = b.dataset.mode === mode;
-      b.classList.toggle('active', active);
-      b.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
+    const chip = e.target.closest('#vismes-chips .loja-chip');
+    if (!chip) return;
+    const key = chip.dataset.serie;
+    const isOn = chip.classList.contains('active');
+    if (isOn && _visActiveSeries.size <= 1) return;   // mínimo 1
+    if (isOn) { _visActiveSeries.delete(key); chip.classList.remove('active'); }
+    else      { _visActiveSeries.add(key);    chip.classList.add('active');    }
     if (_visMesLastData) renderVisMesChart(_visMesLastData);
   });
 })();
@@ -3118,6 +3119,7 @@ function initMiniArcade(container) {
 }
 
 // ══ INIT ══════════════════════════════════════════════════════════════════
+syncDateInputs();              // popula inputs com o range YTD default
 renderAll();
 initKpiTilt();
 initMiniArcade(document.getElementById('mini-arcade'));
