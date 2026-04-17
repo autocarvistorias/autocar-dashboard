@@ -189,7 +189,7 @@ tailwind.config = {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
   .kpi-card .label {
-    font-size: 13px; color: #c5c5c5; text-transform: uppercase;
+    font-size: 14px; color: #c5c5c5; text-transform: uppercase;
     letter-spacing: 1.2px; font-weight: 700;
   }
   .kpi-card .kpi-icon {
@@ -201,7 +201,7 @@ tailwind.config = {
   .kpi-card .kpi-icon .material-symbols-outlined { font-size: 18px; }
   .kpi-card .value {
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: clamp(22px, 2.0vw, 28px);
+    font-size: clamp(26px, 2.4vw, 36px);
     font-weight: 800; color: var(--accent, var(--gold));
     line-height: 1.05; word-break: keep-all; overflow-wrap: normal; letter-spacing: -0.5px;
     text-shadow: 0 0 22px var(--accent-glow, var(--gold-glow));
@@ -213,14 +213,14 @@ tailwind.config = {
     margin-top: 6px;
   }
   .kpi-card .trend {
-    font-size: 12.5px; font-weight: 700;
-    padding: 2px 8px; border-radius: 999px;
+    font-size: 13.5px; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px;
     display: inline-flex; align-items: center; gap: 3px;
     border: 1px solid currentColor;
   }
   .kpi-card .trend.up { color: #22c55e; background: rgba(34, 197, 94, 0.10); }
   .kpi-card .trend.down { color: #ef4444; background: rgba(239, 68, 68, 0.10); }
-  .kpi-card .sub { font-size: 12px; color: #9a9a9a; }
+  .kpi-card .sub { font-size: 13px; color: #9a9a9a; }
 
   .kpi-spark {
     position: absolute; right: 10px; top: 10px;
@@ -239,8 +239,8 @@ tailwind.config = {
   }
   .chart-card .card-title {
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 15px; font-weight: 700; color: #fff;
-    margin-bottom: 14px; padding-bottom: 12px;
+    font-size: 17px; font-weight: 700; color: #fff;
+    margin-bottom: 16px; padding-bottom: 14px;
     border-bottom: 1px solid #1f1f1f;
     text-transform: uppercase; letter-spacing: 1px;
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -289,15 +289,15 @@ tailwind.config = {
   .legend-chip.muted { opacity: 0.4; }
 
   /* ── Tables ────────────────────────────────────────────────────────────── */
-  .data-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 520px; }
   .data-table th {
-    background: #1a1a1a; color: var(--gold); padding: 12px 14px;
-    text-align: left; font-size: 12px; text-transform: uppercase;
+    background: #1a1a1a; color: var(--gold); padding: 13px 16px;
+    text-align: left; font-size: 13px; text-transform: uppercase;
     letter-spacing: 1px; white-space: nowrap; font-weight: 700;
     font-family: "Plus Jakarta Sans", sans-serif;
     border-bottom: 1px solid #262626;
   }
-  .data-table td { padding: 12px 14px; border-bottom: 1px solid #1f1f1f; color: #e4e4e4; white-space: nowrap; font-size: 14px; }
+  .data-table td { padding: 13px 16px; border-bottom: 1px solid #1f1f1f; color: #e4e4e4; white-space: nowrap; font-size: 15px; }
   .data-table tbody tr { transition: background .15s; }
   .data-table tr:hover td { background: rgba(255, 214, 10, 0.04); }
   .badge { padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;
@@ -323,9 +323,9 @@ tailwind.config = {
 
   /* ── Buttons & Filters ─────────────────────────────────────────────────── */
   .period-btn {
-    padding: 8px 16px; background: #1a1a1a; border: 1px solid #262626;
+    padding: 9px 18px; background: #1a1a1a; border: 1px solid #262626;
     color: #c5c5c5; border-radius: 9999px; cursor: pointer;
-    font-size: 13px; font-family: inherit; transition: all .18s;
+    font-size: 14px; font-family: inherit; transition: all .18s;
     white-space: nowrap; font-weight: 600; letter-spacing: .3px;
   }
   .period-btn:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
@@ -337,8 +337,8 @@ tailwind.config = {
 
   input[type=date], select.flt {
     background: #1a1a1a; border: 1px solid #262626; color: #e4e4e4;
-    border-radius: 9999px; padding: 8px 16px; font-size: 13px;
-    font-family: inherit; cursor: pointer; outline: none; min-height: 36px;
+    border-radius: 9999px; padding: 9px 18px; font-size: 14px;
+    font-family: inherit; cursor: pointer; outline: none; min-height: 38px;
     transition: all .18s;
   }
   *:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
@@ -369,12 +369,13 @@ tailwind.config = {
   #sidebar { background: linear-gradient(180deg, rgba(20,20,20,.98) 0%, rgba(10,10,10,.98) 100%);
              border-right: 1px solid #1f1f1f; backdrop-filter: blur(14px); }
   .sidenav-link {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px; color: #c5c5c5; border-radius: 12px;
-    transition: all .2s; cursor: pointer; font-weight: 500; font-size: 15px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 13px 16px; color: #c5c5c5; border-radius: 12px;
+    transition: all .2s; cursor: pointer; font-weight: 500; font-size: 16px;
     font-family: "Plus Jakarta Sans", sans-serif; user-select: none;
     position: relative;
   }
+  .sidenav-link .material-symbols-outlined { font-size: 22px; }
   .sidenav-link:hover { background: rgba(38, 38, 38, .8); color: #fff; }
   .sidenav-link.active {
     color: #FFD60A;
@@ -386,7 +387,6 @@ tailwind.config = {
     width: 3px; border-radius: 0 3px 3px 0;
     background: var(--gold); box-shadow: 0 0 8px var(--gold);
   }
-  .sidenav-link .material-symbols-outlined { font-size: 20px; }
   .sidenav-link.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
 
   /* ── Bottom nav (mobile) ───────────────────────────────────────────────── */
@@ -434,34 +434,74 @@ tailwind.config = {
 
   /* ── Apex axis labels (force readable size) ─────────────────────────── */
   .chart-host .apexcharts-xaxis text,
-  .chart-host .apexcharts-yaxis text,
-  .chart-host .apexcharts-legend-text { font-size: 13px !important; }
+  .chart-host .apexcharts-yaxis text { font-size: 15px !important; font-weight: 600 !important; fill: #c5c5c5 !important; }
+  .chart-host .apexcharts-legend-text { font-size: 15px !important; font-weight: 600 !important; }
   .chart-host .apexcharts-datalabel,
-  .chart-host .apexcharts-datalabels text { font-size: 12px !important; }
-  .chart-host .apexcharts-pie-label { font-size: 13px !important; font-weight: 800 !important; }
+  .chart-host .apexcharts-datalabels text { font-size: 14px !important; font-weight: 800 !important; }
+  .chart-host .apexcharts-pie-label { font-size: 15px !important; font-weight: 800 !important; }
+  .chart-host .apexcharts-tooltip,
+  .chart-host .apexcharts-tooltip-text { font-size: 14px !important; }
+  .chart-host .apexcharts-tooltip-title { font-size: 14px !important; }
+  .chart-host .apexcharts-radialbar-label { font-size: 14px !important; }
 
   /* ── Mobile typography overrides ────────────────────────────────────── */
   @media (max-width: 767px) {
     .kpi-card { min-height: 110px; padding: 14px 14px 12px; }
-    .kpi-card .label { font-size: 12px; letter-spacing: 1px; }
-    .kpi-card .value { font-size: clamp(20px, 5vw, 26px); }
-    .kpi-card .sub { font-size: 11.5px; }
-    .kpi-card .trend { font-size: 11.5px; }
+    .kpi-card .label { font-size: 13px; letter-spacing: 1px; }
+    .kpi-card .value { font-size: clamp(22px, 5.5vw, 28px); }
+    .kpi-card .sub { font-size: 12px; }
+    .kpi-card .trend { font-size: 12px; }
     .kpi-card .kpi-icon { width: 26px; height: 26px; }
     .kpi-card .kpi-icon .material-symbols-outlined { font-size: 16px; }
     .kpi-card .kpi-spark { width: 64px; height: 28px; }
     .chart-card { padding: 14px 14px; border-radius: 16px; }
-    .chart-card .card-title { font-size: 13.5px; letter-spacing: .8px; }
-    .data-table { font-size: 13px; }
-    .data-table th { font-size: 11px; padding: 10px 12px; }
-    .data-table td { font-size: 13px; padding: 11px 12px; }
-    .period-btn { font-size: 12px; padding: 7px 14px; }
+    .chart-card .card-title { font-size: 14px; letter-spacing: .8px; }
+    .data-table { font-size: 13.5px; }
+    .data-table th { font-size: 12px; padding: 10px 12px; }
+    .data-table td { font-size: 13.5px; padding: 11px 12px; }
+    .period-btn { font-size: 12.5px; padding: 7px 14px; }
     .sidenav-link { font-size: 14px; }
     .chart-host .apexcharts-xaxis text,
     .chart-host .apexcharts-yaxis text,
-    .chart-host .apexcharts-legend-text { font-size: 11.5px !important; }
+    .chart-host .apexcharts-legend-text { font-size: 12.5px !important; }
     .chart-host .apexcharts-datalabel,
-    .chart-host .apexcharts-datalabels text { font-size: 11px !important; }
+    .chart-host .apexcharts-datalabels text { font-size: 12px !important; }
+  }
+
+  /* ── Large displays (≥1600px) — bump tudo proporcionalmente ─────────── */
+  @media (min-width: 1600px) {
+    .kpi-card { min-height: 144px; padding: 18px 22px 16px; }
+    .kpi-card .label { font-size: 15px; }
+    .kpi-card .value { font-size: clamp(30px, 2.6vw, 40px); }
+    .kpi-card .sub { font-size: 14px; }
+    .kpi-card .trend { font-size: 14.5px; }
+    .kpi-card .kpi-icon { width: 34px; height: 34px; }
+    .kpi-card .kpi-icon .material-symbols-outlined { font-size: 20px; }
+    .chart-card .card-title { font-size: 18px; }
+    .data-table { font-size: 16px; }
+    .data-table th { font-size: 14px; padding: 14px 18px; }
+    .data-table td { font-size: 16px; padding: 14px 18px; }
+    .period-btn { font-size: 14px; padding: 9px 18px; }
+    .sidenav-link { font-size: 16px; }
+    .chart-host .apexcharts-xaxis text,
+    .chart-host .apexcharts-yaxis text,
+    .chart-host .apexcharts-legend-text { font-size: 16px !important; }
+    .chart-host .apexcharts-datalabel,
+    .chart-host .apexcharts-datalabels text { font-size: 15px !important; }
+    .chart-host .apexcharts-pie-label { font-size: 16px !important; }
+  }
+
+  /* ── Ultra-wide (≥1920px) ───────────────────────────────────────────── */
+  @media (min-width: 1920px) {
+    .kpi-card .value { font-size: clamp(34px, 2.4vw, 44px); }
+    .kpi-card .label { font-size: 16px; }
+    .kpi-card .sub { font-size: 15px; }
+    .chart-card .card-title { font-size: 19px; }
+    .chart-host .apexcharts-xaxis text,
+    .chart-host .apexcharts-yaxis text,
+    .chart-host .apexcharts-legend-text { font-size: 17px !important; }
+    .chart-host .apexcharts-datalabel,
+    .chart-host .apexcharts-datalabels text { font-size: 16px !important; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -503,7 +543,7 @@ tailwind.config = {
   </nav>
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 02:26</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 02:35</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -516,8 +556,8 @@ tailwind.config = {
       <span class="material-symbols-outlined">menu</span>
     </button>
     <div class="flex-1 min-w-0">
-      <h1 class="text-lg md:text-xl font-headline font-extrabold tracking-tight truncate" id="page-title">Operações</h1>
-      <p class="text-[11px] text-on-surface-variant truncate" id="page-subtitle">Visão geral das vistorias e desempenho</p>
+      <h1 class="text-xl md:text-2xl font-headline font-extrabold tracking-tight truncate" id="page-title">Operações</h1>
+      <p class="text-[13px] md:text-[14px] text-on-surface-variant truncate mt-0.5" id="page-subtitle">Visão geral das vistorias e desempenho</p>
     </div>
     <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-outline-variant text-[11px] text-on-surface-variant">
       <span class="material-symbols-outlined" style="font-size:14px;color:var(--gold)">calendar_month</span>
