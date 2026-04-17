@@ -504,6 +504,52 @@ tailwind.config = {
     .chart-host .apexcharts-datalabels text { font-size: 16px !important; }
   }
 
+  /* ── Mini-arcade (Auto Car Runner) ───────────────────────────────────── */
+  #mini-arcade {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #mini-arcade .ma-frame {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,214,10,0.08), #0a0a0a 70%);
+    border: 1px solid rgba(255,214,10,0.18);
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.02);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-arcade .ma-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 10px 4px;
+    font-size: 9.5px; letter-spacing: 0.08em; font-weight: 700;
+  }
+  #mini-arcade .ma-title { color: #FFD60A; opacity: 0.9; }
+  #mini-arcade .ma-score { color: #fff; opacity: 0.7; font-variant-numeric: tabular-nums; }
+  #mini-arcade .ma-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 10px 7px;
+    font-size: 9.5px; letter-spacing: 0.04em;
+  }
+  #mini-arcade .ma-hint { color: #FFD60A; animation: ma-pulse 2.2s ease-in-out infinite; }
+  #mini-arcade .ma-hint.playing { animation: none; color: rgba(255,255,255,0.55); }
+  #mini-arcade .ma-hi { color: rgba(255,255,255,0.45); font-variant-numeric: tabular-nums; }
+  #mini-arcade canvas {
+    flex: 1; width: 100%; display: block;
+    cursor: pointer; outline: none; touch-action: none;
+  }
+  #mini-arcade canvas:focus-visible { box-shadow: inset 0 0 0 2px #FFD60A; }
+  @keyframes ma-pulse {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
   }
@@ -524,7 +570,7 @@ tailwind.config = {
       <span class="live-dot"></span> Sistema Online
     </div>
   </div>
-  <nav class="flex-1 flex flex-col gap-1 px-3 overflow-y-auto">
+  <nav class="flex flex-col gap-1 px-3">
     <a class="sidenav-link active" data-tab="op">
       <span class="material-symbols-outlined">fact_check</span>Operações
     </a>
@@ -541,9 +587,27 @@ tailwind.config = {
       <span class="material-symbols-outlined">notifications_active</span>Cobrança
     </a>
   </nav>
+
+  <!-- Mini-arcade (fills the empty space between nav and footer) -->
+  <div class="flex-1 flex items-center justify-center px-3 py-4 min-h-0">
+    <div id="mini-arcade" role="region" aria-label="Mini game Auto Car Runner">
+      <div class="ma-frame">
+        <div class="ma-header">
+          <span class="ma-title">AUTO CAR RUNNER</span>
+          <span class="ma-score" id="ma-score">--</span>
+        </div>
+        <canvas id="ma-canvas" aria-label="Carro amarelo descendo a estrada. Clique para jogar."></canvas>
+        <div class="ma-footer">
+          <span class="ma-hint" id="ma-hint">Clique para jogar</span>
+          <span class="ma-hi" id="ma-hi">HI 0s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 02:40</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 02:50</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -2403,8 +2467,234 @@ document.querySelectorAll('.period-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>setPeriod(btn.dataset.p, btn));
 });
 
+// ══ MINI-ARCADE: Auto Car Runner ══════════════════════════════════════════
+function initMiniArcade(container) {
+  if (!container || container.dataset.maInit) return;
+  container.dataset.maInit = "1";
+
+  const canvas  = container.querySelector('#ma-canvas');
+  const scoreEl = container.querySelector('#ma-score');
+  const hintEl  = container.querySelector('#ma-hint');
+  const hiEl    = container.querySelector('#ma-hi');
+  const ctx     = canvas.getContext('2d');
+  const dpr     = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let W = 0, H = 0;
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    W = Math.max(160, Math.floor(r.width));
+    H = Math.max(160, Math.floor(r.height));
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const ro = new ResizeObserver(resize);
+  ro.observe(canvas);
+  resize();
+
+  const STATE = { AMBIENT: 0, PLAYING: 1, OVER: 2 };
+  let state = STATE.AMBIENT;
+  let highScore = parseFloat(localStorage.getItem('autocar_runner_hi') || '0') || 0;
+  hiEl.textContent = `HI ${highScore.toFixed(1)}s`;
+
+  let playerLane = 0.5, playerX = 0.5;
+  const PLAYER_W = 26, PLAYER_H = 44;
+
+  let roadOffset = 0, speed = 90;
+  const SPEED_AMBIENT = 60, SPEED_AMBIENT_REDUCED = 25;
+  let elapsed = 0, lastSpeedUp = 0;
+  let obstacles = [], traffic = [];
+  let spawnTimer = 0, trafficTimer = 0;
+  let leftPressed = false, rightPressed = false, touchStartX = 0;
+
+  let last = performance.now();
+  let raf = 0;
+
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    update(dt);
+    render();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function update(dt) {
+    playerX += (playerLane - playerX) * Math.min(1, dt * 12);
+
+    if (state === STATE.AMBIENT) {
+      const s = reduced ? SPEED_AMBIENT_REDUCED : SPEED_AMBIENT;
+      roadOffset = (roadOffset + s * dt) % 24;
+      playerLane = 0.5 + Math.sin(performance.now() / 900) * 0.06;
+      trafficTimer -= dt;
+      if (trafficTimer <= 0) {
+        trafficTimer = 1.8 + Math.random() * 2.5;
+        traffic.push({ x: Math.random()<0.5?0.18:0.82, y: -PLAYER_H, w: 22, h: 38, color: '#3a3a3a', speed: s + 20 });
+      }
+      traffic.forEach(o => o.y += o.speed * dt);
+      traffic = traffic.filter(o => o.y < H + 60);
+
+    } else if (state === STATE.PLAYING) {
+      elapsed += dt;
+      if (elapsed - lastSpeedUp >= 10) { lastSpeedUp = elapsed; speed += 18; }
+      roadOffset = (roadOffset + speed * dt) % 24;
+      if (leftPressed)  playerLane = Math.max(0.15, playerLane - dt * 2.6);
+      if (rightPressed) playerLane = Math.min(0.85, playerLane + dt * 2.6);
+
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnTimer = Math.max(0.45, 1.2 - elapsed * 0.012);
+        const lane = 0.2 + Math.random() * 0.6;
+        const palette = ['#e63946', '#ffffff', '#e63946', '#dddddd'];
+        obstacles.push({ x: lane, y: -PLAYER_H, w: PLAYER_W - 2, h: PLAYER_H - 4, color: palette[(Math.random()*palette.length)|0], speed });
+      }
+      obstacles.forEach(o => o.y += o.speed * dt);
+      obstacles = obstacles.filter(o => o.y < H + 60);
+
+      // AABB
+      const px = playerX * W - PLAYER_W / 2;
+      const py = H - PLAYER_H - 8;
+      for (const o of obstacles) {
+        const ox = o.x * W - o.w / 2;
+        if (px < ox + o.w && px + PLAYER_W > ox && py < o.y + o.h && py + PLAYER_H > o.y) { gameOver(); break; }
+      }
+      scoreEl.textContent = elapsed.toFixed(1) + 's';
+    }
+  }
+
+  function render() {
+    ctx.fillStyle = '#111'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(8, 0, 2, H); ctx.fillRect(W - 10, 0, 2, H);
+
+    ctx.fillStyle = '#FFD60A'; ctx.globalAlpha = 0.85;
+    const dashH = 14, gap = 10, period = dashH + gap;
+    for (let y = -period + roadOffset; y < H; y += period) {
+      const t = Math.max(0, Math.min(1, y / H));
+      const w = 2 + t * 1.5;
+      ctx.fillRect(W / 2 - w / 2, y, w, dashH);
+    }
+    ctx.globalAlpha = 1;
+
+    traffic.forEach(o => drawCar(o.x * W, o.y, o.w, o.h, o.color, false));
+    obstacles.forEach(o => drawCar(o.x * W, o.y, o.w, o.h, o.color, false));
+    drawCar(playerX * W, H - PLAYER_H - 8, PLAYER_W, PLAYER_H, null, true);
+
+    if (state === STATE.OVER) {
+      ctx.fillStyle = 'rgba(0,0,0,0.72)'; ctx.fillRect(0, 0, W, H);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#FFD60A'; ctx.font = 'bold 14px -apple-system, sans-serif';
+      ctx.fillText('GAME OVER', W / 2, H / 2 - 18);
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 11px -apple-system, sans-serif';
+      ctx.fillText(`${elapsed.toFixed(1)}s`, W / 2, H / 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '9px -apple-system, sans-serif';
+      ctx.fillText(`HI ${highScore.toFixed(1)}s`, W / 2, H / 2 + 14);
+      ctx.fillStyle = '#FFD60A';
+      ctx.fillText('Tap to restart', W / 2, H / 2 + 32);
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillText('ESC to exit', W / 2, H / 2 + 44);
+    }
+  }
+
+  function drawCar(cx, y, w, h, color, isPlayer) {
+    const x = cx - w / 2;
+    ctx.save();
+    if (isPlayer) {
+      ctx.shadowColor = '#FFD60A'; ctx.shadowBlur = 10;
+      const grad = ctx.createLinearGradient(x, y, x, y + h);
+      grad.addColorStop(0, '#FFE25A'); grad.addColorStop(0.5, '#FFD60A'); grad.addColorStop(1, '#C8960C');
+      ctx.fillStyle = grad;
+    } else { ctx.fillStyle = color || '#444'; }
+    roundRect(x, y, w, h, 4); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = isPlayer ? 'rgba(20,20,20,0.85)' : 'rgba(180,200,220,0.55)';
+    roundRect(x + 3, y + 6, w - 6, h * 0.28, 2); ctx.fill();
+    ctx.fillStyle = isPlayer ? 'rgba(20,20,20,0.55)' : 'rgba(255,255,255,0.08)';
+    roundRect(x + 3, y + h * 0.5, w - 6, h * 0.22, 2); ctx.fill();
+    if (isPlayer) {
+      ctx.fillStyle = '#fff8c4';
+      ctx.fillRect(x + 3, y + 1, 4, 2); ctx.fillRect(x + w - 7, y + 1, 4, 2);
+    }
+    ctx.restore();
+  }
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function startGame() {
+    state = STATE.PLAYING;
+    elapsed = 0; lastSpeedUp = 0; speed = 110;
+    obstacles = []; traffic = [];
+    playerLane = 0.5; playerX = 0.5; spawnTimer = 0.8;
+    hintEl.textContent = '← →   ESC sair';
+    hintEl.classList.add('playing');
+    canvas.focus();
+  }
+  function gameOver() {
+    state = STATE.OVER;
+    if (elapsed > highScore) {
+      highScore = elapsed;
+      localStorage.setItem('autocar_runner_hi', highScore.toFixed(2));
+    }
+    hiEl.textContent = `HI ${highScore.toFixed(1)}s`;
+    hintEl.textContent = 'Tap = jogar  ·  ESC = sair';
+  }
+  function exitToAmbient() {
+    state = STATE.AMBIENT;
+    obstacles = []; elapsed = 0; speed = 90;
+    scoreEl.textContent = '--';
+    hintEl.textContent = 'Clique para jogar';
+    hintEl.classList.remove('playing');
+  }
+
+  function onClick() { if (state === STATE.AMBIENT || state === STATE.OVER) startGame(); }
+  function onKey(e) {
+    if (e.key === 'ArrowLeft')  leftPressed  = (e.type === 'keydown');
+    if (e.key === 'ArrowRight') rightPressed = (e.type === 'keydown');
+    if (e.type === 'keydown' && e.key === 'Escape') {
+      if (state !== STATE.AMBIENT) exitToAmbient();
+    }
+    if (state === STATE.PLAYING && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) e.preventDefault();
+  }
+  function onTouchStart(e) {
+    if (state === STATE.AMBIENT || state === STATE.OVER) { startGame(); return; }
+    const t = e.changedTouches[0]; touchStartX = t.clientX;
+    const r = canvas.getBoundingClientRect();
+    if (t.clientX - r.left < r.width / 2) playerLane = Math.max(0.15, playerLane - 0.18);
+    else                                   playerLane = Math.min(0.85, playerLane + 0.18);
+  }
+  function onTouchMove(e) {
+    if (state !== STATE.PLAYING) return;
+    const t = e.changedTouches[0];
+    const dx = (t.clientX - touchStartX) / W;
+    playerLane = Math.max(0.15, Math.min(0.85, 0.5 + dx * 1.6));
+    e.preventDefault();
+  }
+
+  canvas.tabIndex = 0;
+  canvas.addEventListener('click', onClick);
+  canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+  canvas.addEventListener('touchmove',  onTouchMove,  { passive: false });
+  window.addEventListener('keydown', onKey);
+  window.addEventListener('keyup',   onKey);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && raf) { cancelAnimationFrame(raf); raf = 0; }
+    else if (!document.hidden && !raf) { last = performance.now(); raf = requestAnimationFrame(loop); }
+  });
+
+  raf = requestAnimationFrame(loop);
+}
+
 // ══ INIT ══════════════════════════════════════════════════════════════════
 renderAll();
+initMiniArcade(document.getElementById('mini-arcade'));
 </script>
 </body>
 </html>
