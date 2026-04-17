@@ -689,10 +689,85 @@ tailwind.config = {
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
   }
+
+  /* ── PIN gate (cosm\u00e9tico, client-side) ─────────────────────────────── */
+  .pin-gate {
+    position: fixed; inset: 0; z-index: 99999;
+    background: radial-gradient(ellipse at center, #141414 0%, #050505 75%);
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn .35s ease;
+    padding: 20px;
+  }
+  .pin-gate.fade-out { animation: pinFadeOut .45s ease forwards; }
+  @keyframes pinFadeOut { to { opacity: 0; visibility: hidden; } }
+  .pin-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0c0c0c 100%);
+    border: 1.5px solid #2a2a2a;
+    border-radius: 18px;
+    padding: 38px 36px 26px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.7), 0 0 0 1px rgba(255,214,10,0.08);
+    max-width: 380px; width: 100%;
+    text-align: center;
+  }
+  .pin-logo { font-size: 32px; color: var(--gold); margin-bottom: 4px; }
+  .pin-title {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 22px; font-weight: 800; color: #fff;
+    margin: 0 0 6px; letter-spacing: .3px;
+  }
+  .pin-subtitle { font-size: 14px; color: #8a8a8a; margin: 0 0 24px; font-weight: 500; }
+  .pin-boxes { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
+  .pin-boxes input {
+    width: 52px; height: 64px;
+    text-align: center;
+    font-size: 28px; font-weight: 800;
+    color: var(--gold);
+    background: #0a0a0a;
+    border: 1.5px solid #2a2a2a;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    caret-color: var(--gold);
+  }
+  .pin-boxes input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(255,214,10,.20);
+  }
+  .pin-err {
+    color: #EF4444; font-size: 13px; font-weight: 700;
+    height: 20px; opacity: 0; transition: opacity .2s;
+    letter-spacing: .3px;
+  }
+  .pin-err.show { opacity: 1; }
+  .pin-gate.shake .pin-boxes { animation: pinShake .45s cubic-bezier(.36,.07,.19,.97); }
+  @keyframes pinShake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-7px); }
+    40%, 60% { transform: translateX(7px); }
+  }
+  body.pin-locked { overflow: hidden; }
 </style>
 </head>
 
-<body class="bg-background text-white font-body">
+<body class="bg-background text-white font-body pin-locked">
+
+<!-- PIN gate -->
+<div id="pin-gate" class="pin-gate" role="dialog" aria-modal="true" aria-labelledby="pin-title">
+  <div class="pin-card">
+    <div class="pin-logo"><span class="material-symbols-outlined" style="font-size:36px;font-variation-settings:'FILL' 1">lock</span></div>
+    <h1 id="pin-title" class="pin-title">Grupo Auto Car Vistorias</h1>
+    <p class="pin-subtitle">Digite o PIN para acessar o dashboard</p>
+    <div class="pin-boxes" id="pin-boxes">
+      <input type="tel" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="D\u00edgito 1">
+      <input type="tel" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="D\u00edgito 2">
+      <input type="tel" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="D\u00edgito 3">
+      <input type="tel" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="D\u00edgito 4">
+    </div>
+    <div class="pin-err" id="pin-err" aria-live="polite">PIN incorreto</div>
+  </div>
+</div>
 
 <!-- Sidebar -->
 <aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col w-64 md:translate-x-0">
@@ -748,7 +823,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:25</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:43</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -893,6 +968,11 @@ tailwind.config = {
       </div>
       <div class="chart-card card-fx">
         <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">storefront</span>Receita por Loja</span></div>
+        <div class="loja-chips-row" id="recloja-chips" role="group" aria-label="Séries visíveis">
+          <button class="loja-chip active" data-serie="Goiania"  style="--chip-color:#C8960C">Goiânia</button>
+          <button class="loja-chip active" data-serie="Prime"    style="--chip-color:#00BCD4">Prime</button>
+          <button class="loja-chip active" data-serie="Anapolis" style="--chip-color:#AB47BC">Anápolis</button>
+        </div>
         <div id="ch-rec-loja" class="chart-host" style="min-height:320px"></div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -974,6 +1054,11 @@ tailwind.config = {
       </div>
       <div class="chart-card card-fx">
         <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">multiline_chart</span>Entradas, Saídas e Saldo</span></div>
+        <div class="loja-chips-row" id="fl-chips" role="group" aria-label="Séries visíveis">
+          <button class="loja-chip active" data-serie="Entradas" style="--chip-color:#10B981">Entradas</button>
+          <button class="loja-chip active" data-serie="Saidas"   style="--chip-color:#EF4444">Saídas</button>
+          <button class="loja-chip active" data-serie="Saldo"    style="--chip-color:#FFD60A">Saldo</button>
+        </div>
         <div id="ch-fl-linhas" class="chart-host" style="min-height:420px"></div>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1265,6 +1350,100 @@ function _labelTextColor(seriesColor){
   return lights.includes((seriesColor||'').toUpperCase()) ? '#0a0a0a' : '#FFFFFF';
 }
 
+// ── % helpers ────────────────────────────────────────────────────────────
+// Month-over-month % for each point. First point + prev-zero = "—" (no baseline).
+function computePctMeta(data){
+  return data.map((v, i) => {
+    if (i === 0) return { dir:'none', label:'—' };
+    const prev = data[i-1];
+    if (prev == null || prev === 0) return { dir:'none', label:'—' };
+    const pct = ((v - prev) / Math.abs(prev)) * 100;
+    const abs = Math.abs(pct);
+    const rounded = abs >= 10 ? Math.round(abs) : +abs.toFixed(1);
+    if (abs < 0.5) return { dir:'none', label:'—' };
+    return pct > 0
+      ? { dir:'up',   label:`\u25B2 ${rounded}%` }
+      : { dir:'down', label:`\u25BC ${rounded}%` };
+  });
+}
+
+// Year-over-year % for tooltip; null when <12 prior points available.
+function computeYoYMeta(data){
+  return data.map((v, i) => {
+    if (i < 12) return null;
+    const prev = data[i-12];
+    if (prev == null || prev === 0) return null;
+    return ((v - prev) / Math.abs(prev)) * 100;
+  });
+}
+
+// Colors for pct-badge (green/red/gray).
+function _pctColors(dir){
+  if (dir === 'up')   return { bg:'#10B981', fg:'#FFFFFF' };
+  if (dir === 'down') return { bg:'#EF4444', fg:'#FFFFFF' };
+  return { bg:'#525252', fg:'#FFFFFF' };
+}
+
+// Inject a small pct pill below each label <g> of a series.
+// Idempotent per label. Skipped when meta is null/empty for that point.
+function _injectPctBadges(root, pctMetaPerSeries){
+  if (!pctMetaPerSeries) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  root.querySelectorAll('.apexcharts-datalabels').forEach((group, sIdx) => {
+    const meta = pctMetaPerSeries[sIdx];
+    if (!meta) return;
+    const labelGroups = group.querySelectorAll('g');
+    labelGroups.forEach((labelG, pIdx) => {
+      if (labelG.dataset.pctInjected === '1') return;
+      const info = meta[pIdx];
+      if (!info) return;
+      const mainRect = labelG.querySelector('rect');
+      const mainText = labelG.querySelector('text');
+      if (!mainRect || !mainText || !mainText.textContent.trim()) return;
+
+      const mx = parseFloat(mainRect.getAttribute('x')) || 0;
+      const my = parseFloat(mainRect.getAttribute('y')) || 0;
+      const mw = parseFloat(mainRect.getAttribute('width')) || 0;
+      const mh = parseFloat(mainRect.getAttribute('height')) || 0;
+
+      const col = _pctColors(info.dir);
+      const badgeG = document.createElementNS(NS, 'g');
+      badgeG.setAttribute('class', 'pct-badge');
+
+      const text = document.createElementNS(NS, 'text');
+      text.setAttribute('x', mx + mw/2);
+      text.setAttribute('y', my + mh + 11);
+      text.setAttribute('font-size', '9');
+      text.setAttribute('font-weight', '800');
+      text.setAttribute('font-family', 'Plus Jakarta Sans, sans-serif');
+      text.setAttribute('fill', col.fg);
+      text.setAttribute('text-anchor', 'middle');
+      text.textContent = info.label;
+      badgeG.appendChild(text);
+      labelG.appendChild(badgeG);
+
+      // Measure then insert rect behind
+      let bbox;
+      try { bbox = text.getBBox(); } catch(_) { bbox = null; }
+      if (bbox && bbox.width > 0) {
+        const pad = { x: 4, y: 1 };
+        const rect = document.createElementNS(NS, 'rect');
+        rect.setAttribute('x', bbox.x - pad.x);
+        rect.setAttribute('y', bbox.y - pad.y);
+        rect.setAttribute('width',  bbox.width  + pad.x*2);
+        rect.setAttribute('height', bbox.height + pad.y*2);
+        rect.setAttribute('rx', 3);
+        rect.setAttribute('fill', col.bg);
+        rect.setAttribute('fill-opacity', '0.95');
+        rect.setAttribute('stroke', '#0a0a0a');
+        rect.setAttribute('stroke-width', '0.5');
+        badgeG.insertBefore(rect, text);
+      }
+      labelG.dataset.pctInjected = '1';
+    });
+  });
+}
+
 // Measures each label's bbox in root coords, groups by X column, and pushes
 // colliding ones apart symmetrically around the column's midpoint.
 function _resolveLabelCollisions(root){
@@ -1324,25 +1503,34 @@ function _resolveLabelCollisions(root){
   });
 }
 
-// chart.events that (a) recolor labels per series and (b) resolve vertical collisions.
-function perSeriesLabelEvents(seriesColors){
+// chart.events that: (1) recolor labels per series, (2) inject optional
+// pct-change badge below each label, (3) resolve vertical collisions.
+// pctMetaPerSeries: optional array per series — [sIdx][pIdx] = {dir,label} or null.
+function perSeriesLabelEvents(seriesColors, pctMetaPerSeries){
   function apply(chartContext){
     const root = chartContext && chartContext.el;
     if (!root) return;
-    // 1) Recolor per series
+    // 1) Recolor main label pills per series — but only on the MAIN rect,
+    //    not on our injected pct-badge rect (which already carries its own color).
     root.querySelectorAll('.apexcharts-datalabels').forEach((group, seriesIndex) => {
       if (seriesIndex >= seriesColors.length) return;
       const fill = seriesColors[seriesIndex];
-      group.querySelectorAll('rect').forEach(r => {
-        r.setAttribute('fill', fill);
-        r.setAttribute('stroke', '#0a0a0a');
-        r.setAttribute('stroke-width', '0.5');
-        r.setAttribute('fill-opacity', '0.95');
+      group.querySelectorAll('g').forEach(lg => {
+        // Skip badge internals
+        const mainRect = lg.querySelector(':scope > rect');
+        if (mainRect){
+          mainRect.setAttribute('fill', fill);
+          mainRect.setAttribute('stroke', '#0a0a0a');
+          mainRect.setAttribute('stroke-width', '0.5');
+          mainRect.setAttribute('fill-opacity', '0.95');
+        }
+        const mainText = lg.querySelector(':scope > text');
+        if (mainText) mainText.setAttribute('fill', _labelTextColor(fill));
       });
-      const txtColor = _labelTextColor(fill);
-      group.querySelectorAll('text').forEach(t => t.setAttribute('fill', txtColor));
     });
-    // 2) Dynamic anti-overlap (rAF so layout settles first)
+    // 2) Inject pct-badges (idempotent). Done before anti-overlap so bbox includes them.
+    _injectPctBadges(root, pctMetaPerSeries);
+    // 3) Anti-overlap on combined bbox (rAF so layout settles first)
     requestAnimationFrame(() => _resolveLabelCollisions(root));
   }
   return { mounted: apply, updated: apply, animationEnd: apply };
@@ -1549,7 +1737,6 @@ function spark(arr, dKey, valKey){
 // ══════════════════════════════════════════════════════════════════════════
 //  Chart "Vistorias por Mês e Loja" — chips filtram séries dinamicamente
 // ══════════════════════════════════════════════════════════════════════════
-const _visActiveSeries = new Set(['Goiania','Prime','Anapolis','Total']);
 let _visMesLastData = null;
 
 function renderVisMesChart(vis){
@@ -1567,14 +1754,14 @@ function renderVisMesChart(vis){
 
   const totals = mks.map(k => mesLoja[k].Goiania + mesLoja[k].Prime + mesLoja[k].Anapolis);
 
-  // Full catalog — filtered below by active chips.
   const catalog = [
     { key:'Goiania',  name:'Goiânia',     color: C.gold,   data: mks.map(k => mesLoja[k].Goiania),  isTotal:false },
     { key:'Prime',    name:'Prime',       color: C.cyan,   data: mks.map(k => mesLoja[k].Prime),    isTotal:false },
     { key:'Anapolis', name:'Anápolis',    color: C.purple, data: mks.map(k => mesLoja[k].Anapolis), isTotal:false },
     { key:'Total',    name:'Total Geral', color:'#FFFFFF', data: totals,                            isTotal:true  }
   ];
-  const active = catalog.filter(s => _visActiveSeries.has(s.key));
+  const active = catalog.filter(s => chipActive('vismes-chips', s.key));
+  if (!active.length) return;
 
   const series      = active.map(s => ({ name: s.name, type: s.isTotal ? 'line' : 'area', data: s.data }));
   const colors      = active.map(s => s.color);
@@ -1583,11 +1770,13 @@ function renderVisMesChart(vis){
   const fillType    = active.map(s => s.isTotal ? 'solid' : 'gradient');
   const fillOpacity = active.map(_ => 1);
   const markerSize  = active.map(s => s.isTotal ? 7 : 5);
+  const pctMeta     = active.map(s => computePctMeta(s.data));
+  const yoyMeta     = active.map(s => computeYoYMeta(s.data));
 
   makeChart('ch-vis-mes', {
     chart: {
-      type: 'line', height: 440, stacked: false,
-      events: perSeriesLabelEvents(colors)
+      type: 'line', height: 460, stacked: false,
+      events: perSeriesLabelEvents(colors, pctMeta)
     },
     series, colors,
     stroke: { curve: 'smooth', width: strokeWidth, dashArray },
@@ -1614,23 +1803,163 @@ function renderVisMesChart(vis){
       labels: { style: { colors: '#c5c5c5', fontSize: '12px' }, formatter: v => N(Math.round(v)) }
     },
     legend: { position: 'top', horizontalAlign: 'left', fontWeight: 600, markers: { width: 12, height: 12, radius: 99 } },
-    tooltip: { shared: true, intersect: false, y: { formatter: v => N(v) + ' vistorias' } }
+    tooltip: {
+      shared: true, intersect: false,
+      y: {
+        formatter: function(v, { seriesIndex, dataPointIndex }){
+          const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
+          const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
+          return N(v) + ' vistorias' + yoyTxt;
+        }
+      }
+    }
   });
 }
 
-// Chip wiring — toggle per série, always keep ≥1 active, re-render instantly.
-(function wireLojaChips(){
+// Generic chip wiring — each chip row registers a render fn in CHIP_RENDERERS.
+// The DOM is the state: a chip is active iff it has .active class.
+// Min 1 active per group enforced here.
+const CHIP_RENDERERS = {};
+function chipActive(rowId, serieKey){
+  return !!document.querySelector('#'+rowId+' .loja-chip[data-serie="'+serieKey+'"].active');
+}
+(function wireChips(){
   document.addEventListener('click', e => {
-    const chip = e.target.closest('#vismes-chips .loja-chip');
+    const chip = e.target.closest('.loja-chip');
     if (!chip) return;
-    const key = chip.dataset.serie;
+    const row = chip.closest('.loja-chips-row');
+    if (!row || !row.id) return;
+    const activeCount = row.querySelectorAll('.loja-chip.active').length;
     const isOn = chip.classList.contains('active');
-    if (isOn && _visActiveSeries.size <= 1) return;   // mínimo 1
-    if (isOn) { _visActiveSeries.delete(key); chip.classList.remove('active'); }
-    else      { _visActiveSeries.add(key);    chip.classList.add('active');    }
-    if (_visMesLastData) renderVisMesChart(_visMesLastData);
+    if (isOn && activeCount <= 1) return;    // mínimo 1
+    chip.classList.toggle('active');
+    const fn = CHIP_RENDERERS[row.id];
+    if (fn) fn();
   });
 })();
+CHIP_RENDERERS['vismes-chips'] = () => { if (_visMesLastData) renderVisMesChart(_visMesLastData); };
+
+// ── Receita por Loja ─────────────────────────────────────────────────────
+let _recLojaLast = null;
+function renderRecLojaChart(recMesLoja){
+  _recLojaLast = recMesLoja;
+  const mks = Object.keys(recMesLoja).sort();
+  if (!mks.length){
+    emptyState('ch-rec-loja', 'Preencha a coluna "loja" em Contas a Receber para ver este gráfico');
+    return;
+  }
+  const ml = mks.map(monthLabel);
+  const catalog = [
+    { key:'Goiania',  name:'Goiânia',  color: C.gold,   data: mks.map(k => +recMesLoja[k].Goiania.toFixed(2)) },
+    { key:'Prime',    name:'Prime',    color: C.cyan,   data: mks.map(k => +recMesLoja[k].Prime.toFixed(2)) },
+    { key:'Anapolis', name:'Anápolis', color: C.purple, data: mks.map(k => +recMesLoja[k].Anapolis.toFixed(2)) }
+  ];
+  const active = catalog.filter(s => chipActive('recloja-chips', s.key));
+  if (!active.length) return;
+  const series  = active.map(s => ({ name: s.name, data: s.data }));
+  const colors  = active.map(s => s.color);
+  const pctMeta = active.map(s => computePctMeta(s.data));
+  const yoyMeta = active.map(s => computeYoYMeta(s.data));
+
+  makeChart('ch-rec-loja', {
+    chart: { type: 'line', height: 400, events: perSeriesLabelEvents(colors, pctMeta) },
+    series, colors,
+    xaxis: {
+      categories: ml,
+      labels: { style: { colors: '#c5c5c5' }, rotate: mks.length > 8 ? -45 : 0 },
+      axisBorder: { show: false }, axisTicks: { show: false }
+    },
+    yaxis: { min: 0, labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
+    stroke: { curve: 'smooth', width: 3 },
+    markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } },
+    dataLabels: {
+      enabled: true,
+      enabledOnSeries: active.map((_, i) => i),
+      formatter: function(val, opts){
+        const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+        const v = typeof real === 'number' ? real : val;
+        return v > 0 ? ABBR(v) : '';
+      },
+      background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+    },
+    legend: { position: 'top', horizontalAlign: 'left' },
+    tooltip: {
+      shared: true,
+      y: {
+        formatter: function(v, { seriesIndex, dataPointIndex }){
+          const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
+          const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
+          return BRL(v) + yoyTxt;
+        }
+      }
+    }
+  });
+}
+CHIP_RENDERERS['recloja-chips'] = () => { if (_recLojaLast) renderRecLojaChart(_recLojaLast); };
+
+// ── Fluxo: Entradas / Saídas / Saldo ─────────────────────────────────────
+let _flLinhasLast = null;
+function renderFlLinhasChart(d){
+  _flLinhasLast = d;
+  const catalog = [
+    { key:'Entradas', name:'Entradas', color:'#10B981', type:'area', data:d.ent, solid:false },
+    { key:'Saidas',   name:'Saídas',   color:'#EF4444', type:'area', data:d.sai, solid:false },
+    { key:'Saldo',    name:'Saldo',    color: C.gold,   type:'line', data:d.sal, solid:true  }
+  ];
+  const active = catalog.filter(s => chipActive('fl-chips', s.key));
+  if (!active.length) return;
+  const series      = active.map(s => ({ name:s.name, type:s.type, data:s.data }));
+  const colors      = active.map(s => s.color);
+  const strokeWidth = active.map(s => s.solid ? 4 : 2.5);
+  const dashArray   = active.map(s => s.solid ? 4 : 0);
+  const fillType    = active.map(s => s.solid ? 'solid' : 'gradient');
+  const markerSize  = active.map(s => s.solid ? 7 : 5);
+  const pctMeta     = active.map(s => computePctMeta(s.data));
+  const yoyMeta     = active.map(s => computeYoYMeta(s.data));
+
+  makeChart('ch-fl-linhas', {
+    chart: { type: 'line', height: 480, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(colors, pctMeta) },
+    series, colors,
+    xaxis: {
+      categories: d.lbl, labels: { style: { colors: '#c5c5c5' }, rotate: d.lbl.length > 8 ? -45 : 0 },
+      axisBorder: { show: false }, axisTicks: { show: false }
+    },
+    yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
+    stroke: { curve: 'smooth', width: strokeWidth, dashArray },
+    fill: {
+      type: fillType,
+      gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
+      opacity: active.map(_ => 1)
+    },
+    markers: { size: markerSize, strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 10 } },
+    dataLabels: {
+      enabled: true, enabledOnSeries: active.map((_, i) => i),
+      formatter: function(val, opts){
+        const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+        const v = typeof real === 'number' ? real : val;
+        return v !== 0 ? ABBR(v) : '';
+      },
+      background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+    },
+    legend: { position: 'top', horizontalAlign: 'left' },
+    tooltip: {
+      shared: true,
+      y: {
+        formatter: function(v, { seriesIndex, dataPointIndex }){
+          const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
+          const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
+          return BRL(v) + yoyTxt;
+        }
+      }
+    },
+    annotations: {
+      yaxis: [{ y: 0, borderColor: '#525252', strokeDashArray: 3, label: { text: 'Equilíbrio', style: { color: '#a3a3a3', background: '#1a1a1a', fontSize: '10px' } } }]
+    }
+  });
+}
+CHIP_RENDERERS['fl-chips'] = () => { if (_flLinhasLast) renderFlLinhasChart(_flLinhasLast); };
 
 // ══════════════════════════════════════════════════════════════════════════
 //  OPERAÇÕES
@@ -1983,9 +2312,16 @@ function renderFat({rec}, prev){
   const rmy = rmk.map(k=>rm[k]);
 
   if (rmk.length){
+    const rmSeriesData = rmy.map(v => +v.toFixed(2));
+    const rmPct = [computePctMeta(rmSeriesData)];
+    const rmYoy = computeYoYMeta(rmSeriesData);
     makeChart('ch-rec-mes', {
-      chart: { type: 'area', height: 340, dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.gold } },
-      series: [{ name: 'Receita', data: rmy.map(v => +v.toFixed(2)) }],
+      chart: {
+        type: 'area', height: 380,
+        dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.gold },
+        events: perSeriesLabelEvents([C.gold], rmPct)
+      },
+      series: [{ name: 'Receita', data: rmSeriesData }],
       xaxis: {
         categories: rml,
         labels: { style: { colors: '#a3a3a3' }, rotate: rmk.length > 8 ? -45 : 0 },
@@ -2001,19 +2337,24 @@ function renderFat({rec}, prev){
       dataLabels: {
         enabled: true,
         formatter: v => ABBR(v),
-        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 0 },
-        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
-        offsetY: -8
+        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
       },
       markers: { size: 5, colors: [C.gold], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
       legend: { show: false },
-      tooltip: { y: { formatter: v => BRL(v) } }
+      tooltip: {
+        y: {
+          formatter: function(v, { dataPointIndex }){
+            const yoy = rmYoy[dataPointIndex];
+            const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
+            return BRL(v) + yoyTxt;
+          }
+        }
+      }
     });
   } else emptyState('ch-rec-mes', 'Sem receitas no período');
 
-  // ─── Receita por Loja (linhas múltiplas com data labels visíveis) ────────
-  const recLojas = ['Goiania','Prime','Anapolis'];
-  const recLojaLbls = ['Goiânia','Prime','Anápolis'];
+  // ─── Receita por Loja (linhas múltiplas com chips + pct + yoy) ───────────
   const recMesLoja = {};
   rec.forEach(r=>{
     if(!r._d||!r.loja) return;
@@ -2021,39 +2362,7 @@ function renderFat({rec}, prev){
     if(!recMesLoja[mk]) recMesLoja[mk] = { Goiania:0, Prime:0, Anapolis:0 };
     if(recMesLoja[mk][r.loja]!==undefined) recMesLoja[mk][r.loja] += r.valor_recebido||0;
   });
-  const rmlk = Object.keys(recMesLoja).sort();
-  if (rmlk.length){
-    const rmll = rmlk.map(monthLabel);
-    const recLojaColors = [C.gold, C.cyan, C.purple];
-    makeChart('ch-rec-loja', {
-      chart: { type: 'line', height: 380, events: perSeriesLabelEvents(recLojaColors) },
-      series: recLojas.map((l,i)=>({ name: recLojaLbls[i], data: rmlk.map(k=>+recMesLoja[k][l].toFixed(2)) })),
-      xaxis: {
-        categories: rmll,
-        labels: { style: { colors: '#c5c5c5' }, rotate: rmlk.length > 8 ? -45 : 0 },
-        axisBorder: { show: false }, axisTicks: { show: false }
-      },
-      yaxis: { min: 0, labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
-      colors: recLojaColors,
-      stroke: { curve: 'smooth', width: 3 },
-      markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } },
-      dataLabels: {
-        enabled: true,
-        enabledOnSeries: [0, 1, 2],
-        formatter: function(val, opts){
-          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
-          const v = typeof real === 'number' ? real : val;
-          return v > 0 ? ABBR(v) : '';
-        },
-        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
-      },
-      legend: { position: 'top', horizontalAlign: 'left' },
-      tooltip: { shared: true, y: { formatter: v => BRL(v) } }
-    });
-  } else {
-    emptyState('ch-rec-loja', 'Preencha a coluna "loja" em Contas a Receber para ver este gráfico');
-  }
+  renderRecLojaChart(recMesLoja);
 
   // ─── Particular vs Despachante (donut) ───────────────────────────────────
   const ct = groupSum(rec,'conta','valor_recebido');
@@ -2235,8 +2544,14 @@ function renderDep({pag, vis}, prev){
   const dmy = dmk.map(k => +dm[k].toFixed(2));
 
   if (dmk.length){
+    const dmPct = [computePctMeta(dmy)];
+    const dmYoy = computeYoYMeta(dmy);
     makeChart('ch-dep-mes', {
-      chart: { type: 'area', height: 340, dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.red } },
+      chart: {
+        type: 'area', height: 380,
+        dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.red },
+        events: perSeriesLabelEvents([C.red], dmPct)
+      },
       series: [{ name: 'Despesas', data: dmy }],
       xaxis: {
         categories: dml, labels: { style: { colors: '#a3a3a3' }, rotate: dmk.length > 8 ? -45 : 0 },
@@ -2250,13 +2565,21 @@ function renderDep({pag, vis}, prev){
         gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => ABBR(v), offsetY: -8,
-        background: { enabled: true, foreColor: '#fff', borderRadius: 4, padding: 4, opacity: 0.9, borderColor: C.red, borderWidth: 1 },
-        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true, formatter: v => ABBR(v),
+        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
       },
       markers: { size: 5, colors: [C.red], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
       legend: { show: false },
-      tooltip: { y: { formatter: v => BRL(v) } }
+      tooltip: {
+        y: {
+          formatter: function(v, { dataPointIndex }){
+            const yoy = dmYoy[dataPointIndex];
+            const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
+            return BRL(v) + yoyTxt;
+          }
+        }
+      }
     });
   } else emptyState('ch-dep-mes', 'Sem despesas no período');
 
@@ -2437,48 +2760,8 @@ function renderFl({pag, rec}, prev){
   kpi('kpi-fl-prox30', { label:'Vence em 30d', value:parseFloat(prox30.toFixed(2)), prev:null, sub:'a pagar nos próximos 30d', icon:'event_upcoming', isCurrency:true });
 
   // ─── Linhas: Entradas / Saídas / Saldo ───────────────────────────────────
-  if (allMes.length){
-    const flColors = [C.green, C.red, C.gold];
-    makeChart('ch-fl-linhas', {
-      chart: { type: 'line', height: 460, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(flColors) },
-      series: [
-        { name: 'Entradas', type: 'area', data: ent },
-        { name: 'Saídas',   type: 'area', data: sai },
-        { name: 'Saldo',    type: 'line', data: sal }
-      ],
-      xaxis: {
-        categories: lbl, labels: { style: { colors: '#c5c5c5' }, rotate: lbl.length > 8 ? -45 : 0 },
-        axisBorder: { show: false }, axisTicks: { show: false }
-      },
-      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
-      colors: flColors,
-      stroke: { curve: 'smooth', width: [2.5, 2.5, 4], dashArray: [0, 0, 4] },
-      fill: {
-        type: ['gradient','gradient','solid'],
-        gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
-        opacity: [1, 1, 1]
-      },
-      markers: {
-        size: [5, 5, 7], strokeColors: '#0a0a0a', strokeWidth: 2,
-        hover: { size: 10 }
-      },
-      dataLabels: {
-        enabled: true, enabledOnSeries: [0, 1, 2],
-        formatter: function(val, opts){
-          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
-          const v = typeof real === 'number' ? real : val;
-          return v !== 0 ? ABBR(v) : '';
-        },
-        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
-      },
-      legend: { position: 'top', horizontalAlign: 'left' },
-      tooltip: { shared: true, y: { formatter: v => BRL(v) } },
-      annotations: {
-        yaxis: [{ y: 0, borderColor: '#525252', strokeDashArray: 3, label: { text: 'Equilíbrio', style: { color: '#a3a3a3', background: '#1a1a1a', fontSize: '10px' } } }]
-      }
-    });
-  } else emptyState('ch-fl-linhas', 'Sem movimentações no período');
+  if (allMes.length) renderFlLinhasChart({ lbl, ent, sai, sal });
+  else emptyState('ch-fl-linhas', 'Sem movimentações no período');
 
   // ─── Receita vs Despesa (barras agrupadas) ───────────────────────────────
   if (allMes.length){
@@ -3117,6 +3400,61 @@ function initMiniArcade(container) {
 
   raf = requestAnimationFrame(loop);
 }
+
+// ══ PIN GATE (cosm\u00e9tico) ═══════════════════════════════════════════════
+(function pinGate(){
+  const gate = document.getElementById('pin-gate');
+  if (!gate) return;
+  if (sessionStorage.getItem('acv_auth') === '1') {
+    document.body.classList.remove('pin-locked');
+    gate.remove();
+    return;
+  }
+  const boxes = gate.querySelectorAll('#pin-boxes input');
+  const err   = document.getElementById('pin-err');
+  const PIN   = '4274';
+
+  setTimeout(() => boxes[0] && boxes[0].focus(), 50);
+
+  function clearAll(){ boxes.forEach(b => b.value = ''); boxes[0].focus(); }
+  function unlock(){
+    sessionStorage.setItem('acv_auth','1');
+    gate.classList.add('fade-out');
+    document.body.classList.remove('pin-locked');
+    setTimeout(() => gate.remove(), 450);
+  }
+  function onShake(){
+    gate.classList.add('shake');
+    err.classList.add('show');
+    setTimeout(() => gate.classList.remove('shake'), 500);
+    setTimeout(clearAll, 350);
+  }
+
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      box.value = box.value.replace(/\D/g, '').slice(0, 1);
+      err.classList.remove('show');
+      if (box.value && i < boxes.length - 1) boxes[i+1].focus();
+      const entered = Array.from(boxes).map(b => b.value).join('');
+      if (entered.length === 4) {
+        if (entered === PIN) unlock();
+        else onShake();
+      }
+    });
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && i > 0) boxes[i-1].focus();
+    });
+    box.addEventListener('paste', e => {
+      const txt = (e.clipboardData || window.clipboardData).getData('text') || '';
+      const digits = txt.replace(/\D/g, '').slice(0, 4);
+      if (digits.length === 4) {
+        e.preventDefault();
+        digits.split('').forEach((d, k) => { boxes[k].value = d; });
+        if (digits === PIN) unlock(); else onShake();
+      }
+    });
+  });
+})();
 
 // ══ INIT ══════════════════════════════════════════════════════════════════
 syncDateInputs();              // popula inputs com o range YTD default
