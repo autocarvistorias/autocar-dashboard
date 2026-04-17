@@ -126,6 +126,16 @@ tailwind.config = {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
   }
+  @keyframes kpi-ring {
+    0%   { box-shadow: 0 0 0 0 currentColor, 0 0 0 0 currentColor; opacity: .55; }
+    70%  { box-shadow: 0 0 0 10px transparent, 0 0 0 18px transparent; opacity: 0; }
+    100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; opacity: 0; }
+  }
+  @keyframes bgShift {
+    0%   { background-position:   0%   0%; }
+    50%  { background-position: 100%  50%; }
+    100% { background-position:  50% 100%; }
+  }
   @keyframes pulseDot {
     0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
     50%      { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
@@ -178,13 +188,37 @@ tailwind.config = {
     display: flex; flex-direction: column; justify-content: space-between;
     position: relative;
     animation: fadeInUp .55s ease both;
+    transform-style: preserve-3d;
+    perspective: 800px;
+    will-change: transform;
+    transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, border-color .25s ease;
+    isolation: isolate;
   }
+  /* Tilt active state — disables transition while mousemove for fluidity. */
+  .kpi-card.tilting { transition: transform .05s linear, box-shadow .25s ease; }
   .kpi-card::after {
     content: ''; position: absolute; left: 0; top: 16px; bottom: 16px;
     width: 4px; border-radius: 0 4px 4px 0;
     background: linear-gradient(180deg, var(--accent, var(--gold)), transparent);
     box-shadow: 0 0 12px var(--accent-glow, var(--gold-glow));
+    z-index: 2;
   }
+  /* Aurora gradient flowing on the card background */
+  .kpi-card::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: inherit; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(120% 80% at 0% 0%,    var(--accent, #FFD60A) 0%, transparent 55%),
+      radial-gradient(120% 80% at 100% 100%, var(--accent, #FFD60A) 0%, transparent 55%);
+    background-size: 200% 200%;
+    opacity: .07;
+    animation: bgShift 14s ease-in-out infinite alternate;
+    mix-blend-mode: screen;
+  }
+  /* All real content goes above the aurora layer */
+  .kpi-card > .kpi-head,
+  .kpi-card > .value,
+  .kpi-card > .kpi-foot { position: relative; z-index: 1; }
   .kpi-card .kpi-head {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
@@ -197,8 +231,17 @@ tailwind.config = {
     background: rgba(255, 214, 10, 0.10);
     color: var(--accent, var(--gold));
     border: 1px solid rgba(255, 214, 10, 0.18);
+    position: relative;
   }
-  .kpi-card .kpi-icon .material-symbols-outlined { font-size: 18px; }
+  /* Concentric ring pulses around the icon — colors via currentColor inherits accent. */
+  .kpi-card .kpi-icon::before,
+  .kpi-card .kpi-icon::after {
+    content: ''; position: absolute; inset: -2px; border-radius: 11px;
+    pointer-events: none; color: var(--accent, var(--gold));
+    animation: kpi-ring 3.4s cubic-bezier(.2,.6,.3,1) infinite;
+  }
+  .kpi-card .kpi-icon::after { animation-delay: 1.7s; }
+  .kpi-card .kpi-icon .material-symbols-outlined { font-size: 18px; position: relative; z-index: 1; }
   .kpi-card .value {
     font-family: "Plus Jakarta Sans", sans-serif;
     font-size: clamp(26px, 2.4vw, 36px);
@@ -504,6 +547,34 @@ tailwind.config = {
     .chart-host .apexcharts-datalabels text { font-size: 16px !important; }
   }
 
+  /* ── Segmented toggle (Evolução / Comparativo) ──────────────────────── */
+  .seg-toggle {
+    display: inline-flex;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .seg-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 999px;
+    background: transparent; border: none; cursor: pointer;
+    color: #a3a3a3; font-size: 12px; font-weight: 700;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    text-transform: none; letter-spacing: 0.2px;
+    transition: all .2s ease;
+    white-space: nowrap;
+  }
+  .seg-btn .material-symbols-outlined { font-size: 14px; }
+  .seg-btn:hover { color: var(--gold); }
+  .seg-btn.active {
+    background: linear-gradient(135deg, #FFE45C 0%, #FFD60A 100%);
+    color: #000;
+    box-shadow: 0 0 12px rgba(255, 214, 10, 0.40);
+  }
+  .seg-btn.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+
   /* ── Mini-arcade (Auto Car Runner) ───────────────────────────────────── */
   #mini-arcade {
     width: 100%;
@@ -664,7 +735,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 03:05</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:01</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -737,7 +808,17 @@ tailwind.config = {
       <div class="chart-card card-fx">
         <div class="card-title">
           <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">timeline</span>Vistorias por Mês e Loja</span>
-          <span class="title-meta"><span class="live-dot"></span>Tempo real</span>
+          <span class="flex items-center gap-2">
+            <div class="seg-toggle" id="ch-vis-mode" role="tablist" aria-label="Modo do gráfico">
+              <button class="seg-btn active" data-mode="evolucao" role="tab" aria-selected="true">
+                <span class="material-symbols-outlined">stacked_line_chart</span>Evolução
+              </button>
+              <button class="seg-btn" data-mode="comparativo" role="tab" aria-selected="false">
+                <span class="material-symbols-outlined">compare_arrows</span>Comparativo
+              </button>
+            </div>
+            <span class="title-meta"><span class="live-dot"></span>Tempo real</span>
+          </span>
         </div>
         <div id="ch-vis-mes" class="chart-host" style="min-height:380px"></div>
       </div>
@@ -1160,6 +1241,75 @@ function baseChart(opts){
   return merged;
 }
 
+// ══ Anti-overlap dataLabels helpers ══════════════════════════════════════
+// Apex doesn't support per-series offsetY in line/area dataLabels. We push offsets
+// after each render via SVG transforms and recolor backgrounds with each series color
+// so even when labels touch, the brain still groups them by chip color.
+
+// Symmetric vertical "rails" by series count (px).
+function _labelOffsetY(seriesIndex, totalSeries){
+  const slots = {
+    1: [-14],
+    2: [-18, 18],
+    3: [-26, 0, 26],
+    4: [-32, -12, 12, 32],
+    5: [-36, -18, 0, 18, 36]
+  };
+  const arr = slots[totalSeries] || slots[4];
+  return arr[seriesIndex] ?? 0;
+}
+
+// Light series → dark text; dark series → light text.
+function _labelTextColor(seriesColor){
+  const lights = ['#FFD60A', '#FFE25A', '#FFE45C', '#FFFFFF'];
+  return lights.includes((seriesColor||'').toUpperCase()) ? '#0a0a0a' : '#FFFFFF';
+}
+
+// Returns chart.events.{mounted,updated,animationEnd} that re-applies per-series
+// offsets + per-series background color to each label group in the SVG.
+function perSeriesLabelEvents(seriesColors){
+  const total = seriesColors.length;
+  function apply(chartContext){
+    const root = chartContext && chartContext.el;
+    if (!root) return;
+    const groups = root.querySelectorAll('.apexcharts-datalabels');
+    groups.forEach((group, seriesIndex) => {
+      if (seriesIndex >= total) return;
+      const offsetY = _labelOffsetY(seriesIndex, total);
+      const offsetX = (seriesIndex % 2 === 0) ? -3 : 3;
+      group.querySelectorAll('g').forEach(g => {
+        // Stack our translation onto whatever Apex set, without erasing it.
+        const cur = g.getAttribute('transform') || '';
+        const tag = `__shifted_${seriesIndex}`;
+        if (g.dataset.shifted) return;       // idempotent
+        g.dataset.shifted = tag;
+        g.setAttribute('transform', `${cur} translate(${offsetX} ${offsetY})`.trim());
+      });
+      // Recolor pill backgrounds with the series color.
+      const fill = seriesColors[seriesIndex];
+      group.querySelectorAll('rect').forEach(r => {
+        r.setAttribute('fill', fill);
+        r.setAttribute('stroke', '#0a0a0a');
+        r.setAttribute('stroke-width', '0.5');
+        r.setAttribute('fill-opacity', '0.95');
+      });
+      // Force text color for contrast.
+      const txtColor = _labelTextColor(fill);
+      group.querySelectorAll('text').forEach(t => t.setAttribute('fill', txtColor));
+    });
+  }
+  return {
+    mounted: apply,
+    updated: function(c){
+      // Apex regenerates the datalabel groups on update; clear our marker so apply runs again.
+      const root = c && c.el;
+      if (root) root.querySelectorAll('.apexcharts-datalabels g[data-shifted]').forEach(g => delete g.dataset.shifted);
+      apply(c);
+    },
+    animationEnd: apply
+  };
+}
+
 // Pending charts deferred because their tab was hidden at creation time.
 const PENDING = {};
 
@@ -1228,7 +1378,7 @@ function emptyState(id, msg){
 
 // ══ KPI updater ═══════════════════════════════════════════════════════════
 function kpi(id, opts){
-  const { label, value, prev, sub='', icon='analytics', isCurrency=false, sparkData=null, sparkColor=null } = opts;
+  const { label, value, prev, sub='', icon='analytics', isCurrency=false } = opts;
   const el = document.getElementById(id); if (!el) return;
 
   let trend = '';
@@ -1249,44 +1399,107 @@ function kpi(id, opts){
     else display = value;
   } else display = value;
 
-  el.innerHTML = `
-    <div class="kpi-head">
-      <span class="label">${label}</span>
-      <span class="kpi-icon"><span class="material-symbols-outlined">${icon}</span></span>
-    </div>
-    <div class="value"${fullTitle?` title="${fullTitle}"`:''}>${display}</div>
-    <div class="kpi-foot">
-      ${trend}
-      ${sub ? `<span class="sub">${sub}</span>` : ''}
-    </div>
-    ${sparkData ? `<div class="kpi-spark" id="${id}-spark"></div>` : ''}
-  `;
-
-  if (sparkData && sparkData.length > 1){
-    const sparkId = `${id}-spark`;
-    destroyChart(sparkId);
-    const color = sparkColor || getComputedStyle(el).getPropertyValue('--accent') || C.gold;
-    const sparkOpts = {
-      chart: {
-        type: 'area', height: 36, sparkline: { enabled: true },
-        animations: { enabled: true, easing: 'easeinout', speed: 700 },
-        background: 'transparent',
-      },
-      stroke: { curve: 'smooth', width: 2 },
-      series: [{ name: label, data: sparkData }],
-      colors: [color.trim()],
-      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] } },
-      tooltip: { enabled: false },
-    };
-    const sparkEl = document.getElementById(sparkId);
-    if (sparkEl && isVisible(sparkEl)) {
-      const sparkChart = new ApexCharts(sparkEl, sparkOpts);
-      sparkChart.render();
-      CHARTS[sparkId] = sparkChart;
-    } else if (sparkEl) {
-      PENDING[sparkId] = { kind: 'create', opts: sparkOpts, bare: true };
-    }
+  // Render structure once; subsequent calls only update text via animateValue (preserves DOM listeners).
+  const valueEl = el.querySelector('.value');
+  if (!valueEl) {
+    el.innerHTML = `
+      <div class="kpi-head">
+        <span class="label">${label}</span>
+        <span class="kpi-icon"><span class="material-symbols-outlined">${icon}</span></span>
+      </div>
+      <div class="value"${fullTitle?` title="${fullTitle}"`:''}>${display}</div>
+      <div class="kpi-foot">
+        ${trend}
+        ${sub ? `<span class="sub">${sub}</span>` : ''}
+      </div>
+    `;
+    // Animate from 0 on first render.
+    animateValue(el.querySelector('.value'), display);
+  } else {
+    // Update only the changing parts; keep DOM (and tilt listeners) intact.
+    el.querySelector('.label').textContent = label;
+    const footEl = el.querySelector('.kpi-foot');
+    if (footEl) footEl.innerHTML = `${trend}${sub ? `<span class="sub">${sub}</span>` : ''}`;
+    if (fullTitle) valueEl.title = fullTitle; else valueEl.removeAttribute('title');
+    animateValue(valueEl, display);
   }
+}
+
+// Animates the numeric portion of a string from 0 → target, preserving prefix/suffix (R$, %, k…).
+function animateValue(el, finalText) {
+  if (!el) return;
+  const newStr = String(finalText ?? '');
+  if (el.dataset.lastValue === newStr) return;
+  el.dataset.lastValue = newStr;
+
+  const match = newStr.match(/-?\d{1,3}(?:\.\d{3})*(?:,\d+)?|-?\d+(?:[.,]\d+)?/);
+  if (!match) { el.textContent = newStr; return; }
+
+  const rawNum = match[0];
+  const prefix = newStr.slice(0, match.index);
+  const suffix = newStr.slice(match.index + rawNum.length);
+  const ptBR   = /\.\d{3}|,\d/.test(rawNum);
+  const target = ptBR ? parseFloat(rawNum.replace(/\./g,'').replace(',','.'))
+                      : parseFloat(rawNum.replace(',','.'));
+  if (!isFinite(target)) { el.textContent = newStr; return; }
+
+  const decMatch = rawNum.match(/[,.](\d+)$/);
+  const decimals = decMatch && (ptBR ? rawNum.lastIndexOf(',') > rawNum.lastIndexOf('.') : true)
+    ? decMatch[1].length : 0;
+
+  const fmt = n => {
+    const s = decimals > 0 ? n.toFixed(decimals) : Math.round(n).toString();
+    if (!ptBR) return prefix + s + suffix;
+    const [intP, decP] = s.split('.');
+    const intFmt = intP.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return prefix + (decP ? intFmt + ',' + decP : intFmt) + suffix;
+  };
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = fmt(target); return;
+  }
+
+  const duration = 900;
+  const start = performance.now();
+  const ease = t => 1 - Math.pow(1 - t, 3);
+
+  el.classList.remove('counting'); void el.offsetWidth; el.classList.add('counting');
+  function frame(now){
+    const t = Math.min(1, (now - start) / duration);
+    el.textContent = fmt(target * ease(t));
+    if (t < 1) requestAnimationFrame(frame);
+    else el.textContent = fmt(target);
+  }
+  requestAnimationFrame(frame);
+}
+
+// 3D tilt on hover — single rAF queue, throttled, respects reduced-motion.
+function initKpiTilt() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const MAX = 6;
+  let raf = 0, pending = null;
+  function apply() {
+    raf = 0; if (!pending) return;
+    pending.card.style.transform = `rotateX(${pending.rx}deg) rotateY(${pending.ry}deg)`;
+    pending = null;
+  }
+  document.querySelectorAll('.kpi-card').forEach(card => {
+    if (card.dataset.tiltInit) return;
+    card.dataset.tiltInit = '1';
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top)  / r.height;
+      card.classList.add('tilting');
+      pending = { card, rx: (py - 0.5) * -MAX * 2, ry: (px - 0.5) *  MAX * 2 };
+      if (!raf) raf = requestAnimationFrame(apply);
+    });
+    card.addEventListener('mouseleave', () => {
+      card.classList.remove('tilting');
+      card.style.transform = '';
+      pending = null;
+    });
+  });
 }
 
 // Build a sparkline series from monthly data
@@ -1294,6 +1507,129 @@ function spark(arr, dKey, valKey){
   const m = byMonth(arr, dKey, valKey);
   return Object.keys(m).sort().map(k => +(+m[k]).toFixed(2));
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Chart "Vistorias por Mês e Loja" — toggle Evolução / Comparativo
+// ══════════════════════════════════════════════════════════════════════════
+let _visMesMode = 'evolucao';   // 'evolucao' (stacked area + Total) | 'comparativo' (overlapping areas from 0 + Total)
+let _visMesLastData = null;     // cache so toggle re-renders instantly without re-filtering
+
+function renderVisMesChart(vis){
+  _visMesLastData = vis;
+  const lojas = ['Goiania','Prime','Anapolis'];
+  const lojaLabels = ['Goiânia','Prime','Anápolis'];
+  const mesLoja = {};
+  vis.forEach(r=>{
+    if(!r._d) return;
+    const mk = r._d.getFullYear()+'-'+String(r._d.getMonth()+1).padStart(2,'0');
+    if(!mesLoja[mk]) mesLoja[mk]={Goiania:0,Prime:0,Anapolis:0};
+    if(mesLoja[mk][r.loja]!==undefined) mesLoja[mk][r.loja]++;
+  });
+  const mks = Object.keys(mesLoja).sort();
+  const ml  = mks.map(monthLabel);
+
+  if (!mks.length) { emptyState('ch-vis-mes', 'Sem dados no período'); return; }
+
+  const totals = mks.map(k => mesLoja[k].Goiania + mesLoja[k].Prime + mesLoja[k].Anapolis);
+  const lojaSeries = lojas.map((l,i)=>({
+    name: lojaLabels[i],
+    type: 'area',
+    data: mks.map(k => mesLoja[k][l])
+  }));
+
+  // ApexCharts won't mix stacked-area with a non-stacked line in the same chart,
+  // so the two modes use entirely different configs.
+  const baseAxis = {
+    xaxis: {
+      categories: ml,
+      axisBorder: { show: false }, axisTicks: { color: '#1f1f1f' },
+      labels: { style: { colors: '#c5c5c5', fontSize: '12px' }, rotate: -45, rotateAlways: ml.length > 8 }
+    },
+    yaxis: {
+      min: 0,
+      labels: { style: { colors: '#c5c5c5', fontSize: '12px' }, formatter: v => N(Math.round(v)) }
+    },
+    legend: { position: 'top', horizontalAlign: 'left', fontWeight: 600, markers: { width: 12, height: 12, radius: 99 } },
+    tooltip: { shared: true, intersect: false, y: { formatter: v => N(v) + ' vistorias' } }
+  };
+
+  if (_visMesMode === 'evolucao') {
+    // ── EVOLUÇÃO: 3 áreas empilhadas. Topo da pilha = total. Label da última série mostra o TOTAL.
+    makeChart('ch-vis-mes', Object.assign({
+      chart: { type: 'area', height: 400, stacked: true },
+      series: lojaSeries,
+      colors: [C.gold, C.cyan, C.purple],
+      stroke: { curve: 'smooth', width: 2.5 },
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.55, opacityTo: 0.05, stops: [0, 100] } },
+      dataLabels: {
+        enabled: true,
+        formatter: function(val, opts){
+          const w = opts.w, idx = opts.dataPointIndex;
+          // Top series carries the running total (badge dourado destacado);
+          // bottom and middle show their own contribution.
+          if (opts.seriesIndex === w.config.series.length - 1) {
+            return totals[idx] > 0 ? N(totals[idx]) : '';
+          }
+          const real = w.config.series[opts.seriesIndex].data[idx];
+          return real > 0 ? N(real) : '';
+        },
+        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 3, opacity: 0.92, borderWidth: 0 },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        offsetY: -2
+      },
+      markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } }
+    }, baseAxis));
+  } else {
+    // ── COMPARATIVO: 3 áreas partindo do 0 (sobrepostas) + linha branca tracejada do TOTAL.
+    // Todos os 4 labels ficam visíveis SEMPRE — distribuídos em 4 trilhos verticais
+    // com badges coloridos por série pra distinção mesmo quando se tocam.
+    const totalSeries = { name: 'Total Geral', type: 'line', data: totals };
+    const visColors = [C.gold, C.cyan, C.purple, '#FFFFFF'];
+    makeChart('ch-vis-mes', Object.assign({
+      chart: {
+        type: 'line', height: 440, stacked: false,
+        events: perSeriesLabelEvents(visColors)
+      },
+      series: [...lojaSeries, totalSeries],
+      colors: visColors,
+      stroke: { curve: 'smooth', width: [2.5, 2.5, 2.5, 3.5], dashArray: [0, 0, 0, 6] },
+      fill: {
+        type: ['gradient','gradient','gradient','solid'],
+        gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
+        opacity: [1, 1, 1, 1]
+      },
+      dataLabels: {
+        enabled: true,
+        enabledOnSeries: [0, 1, 2, 3],
+        formatter: function(val, opts){
+          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+          const v = typeof real === 'number' ? real : val;
+          return v > 0 ? N(Math.round(v)) : '';
+        },
+        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      },
+      markers: { size: [5, 5, 5, 7], strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 10 } }
+    }, baseAxis));
+  }
+}
+
+// Toggle wiring — listens once. Calls render with cached data, no re-filtering.
+(function wireVisMesToggle(){
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('#ch-vis-mode .seg-btn');
+    if (!btn) return;
+    const mode = btn.dataset.mode;
+    if (mode === _visMesMode) return;
+    _visMesMode = mode;
+    document.querySelectorAll('#ch-vis-mode .seg-btn').forEach(b => {
+      const active = b.dataset.mode === mode;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    if (_visMesLastData) renderVisMesChart(_visMesLastData);
+  });
+})();
 
 // ══════════════════════════════════════════════════════════════════════════
 //  OPERAÇÕES
@@ -1330,60 +1666,8 @@ function renderOp({vis}, prev){
     });
   });
 
-  // ─── Vistorias por Mês e Loja (área empilhada estilo Stakent) ────────────
-  const lojas = ['Goiania','Prime','Anapolis'];
-  const lojaLabels = ['Goiânia','Prime','Anápolis'];
-  const mesLoja = {};
-  vis.forEach(r=>{
-    if(!r._d) return;
-    const mk = r._d.getFullYear()+'-'+String(r._d.getMonth()+1).padStart(2,'0');
-    if(!mesLoja[mk]) mesLoja[mk]={Goiania:0,Prime:0,Anapolis:0};
-    if(mesLoja[mk][r.loja]!==undefined) mesLoja[mk][r.loja]++;
-  });
-  const mks = Object.keys(mesLoja).sort();
-  const ml  = mks.map(monthLabel);
-
-  if (mks.length){
-    makeChart('ch-vis-mes', {
-      chart: { type: 'area', height: 380, stacked: true },
-      series: lojas.map((l,i)=>({ name:lojaLabels[i], data: mks.map(k=>mesLoja[k][l]) })),
-      xaxis: {
-        categories: ml,
-        axisBorder: { show: false }, axisTicks: { color: '#1f1f1f' },
-        labels: { style: { colors: '#a3a3a3', fontSize: '11px' }, rotate: -45, rotateAlways: ml.length > 8 }
-      },
-      yaxis: {
-        labels: {
-          style: { colors: '#a3a3a3', fontSize: '11px' },
-          formatter: v => N(Math.round(v))
-        }
-      },
-      colors: [C.gold, C.cyan, C.purple],
-      stroke: { curve: 'smooth', width: 2.5 },
-      fill: {
-        type: 'gradient',
-        gradient: { shadeIntensity: 1, opacityFrom: 0.55, opacityTo: 0.05, stops: [0, 100] }
-      },
-      dataLabels: {
-        enabled: true,
-        enabledOnSeries: [0,1,2],
-        formatter: v => v > 0 ? v : '',
-        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 3, opacity: 0.9, borderWidth: 0 },
-        style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
-      },
-      markers: {
-        size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 8 }
-      },
-      legend: {
-        position: 'top', horizontalAlign: 'left', fontWeight: 600,
-        markers: { width: 12, height: 12, radius: 99 }
-      },
-      tooltip: {
-        shared: true, intersect: false,
-        y: { formatter: v => N(v) + ' vistorias' }
-      }
-    });
-  } else emptyState('ch-vis-mes', 'Sem dados no período');
+  // ─── Vistorias por Mês e Loja (Evolução stacked / Comparativo lado-a-lado) ─
+  renderVisMesChart(vis);
 
   // ─── Ranking Vistoriadores (barras horizontais com gradiente dourado) ────
   const vmap = groupSum(vis,'VISTORIADOR');
@@ -1739,23 +2023,29 @@ function renderFat({rec}, prev){
   const rmlk = Object.keys(recMesLoja).sort();
   if (rmlk.length){
     const rmll = rmlk.map(monthLabel);
+    const recLojaColors = [C.gold, C.cyan, C.purple];
     makeChart('ch-rec-loja', {
-      chart: { type: 'line', height: 320 },
+      chart: { type: 'line', height: 380, events: perSeriesLabelEvents(recLojaColors) },
       series: recLojas.map((l,i)=>({ name: recLojaLbls[i], data: rmlk.map(k=>+recMesLoja[k][l].toFixed(2)) })),
       xaxis: {
         categories: rmll,
-        labels: { style: { colors: '#a3a3a3' }, rotate: rmlk.length > 8 ? -45 : 0 },
+        labels: { style: { colors: '#c5c5c5' }, rotate: rmlk.length > 8 ? -45 : 0 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
-      colors: [C.gold, C.cyan, C.purple],
+      yaxis: { min: 0, labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
+      colors: recLojaColors,
       stroke: { curve: 'smooth', width: 3 },
-      markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 8 } },
+      markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } },
       dataLabels: {
         enabled: true,
-        formatter: v => v > 0 ? ABBR(v) : '',
-        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 3, opacity: 0.85, borderWidth: 0 },
-        style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabledOnSeries: [0, 1, 2],
+        formatter: function(val, opts){
+          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+          const v = typeof real === 'number' ? real : val;
+          return v > 0 ? ABBR(v) : '';
+        },
+        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
       },
       legend: { position: 'top', horizontalAlign: 'left' },
       tooltip: { shared: true, y: { formatter: v => BRL(v) } }
@@ -2147,34 +2437,39 @@ function renderFl({pag, rec}, prev){
 
   // ─── Linhas: Entradas / Saídas / Saldo ───────────────────────────────────
   if (allMes.length){
+    const flColors = [C.green, C.red, C.gold];
     makeChart('ch-fl-linhas', {
-      chart: { type: 'line', height: 420, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold } },
+      chart: { type: 'line', height: 460, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(flColors) },
       series: [
         { name: 'Entradas', type: 'area', data: ent },
         { name: 'Saídas',   type: 'area', data: sai },
         { name: 'Saldo',    type: 'line', data: sal }
       ],
       xaxis: {
-        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 8 ? -45 : 0 },
+        categories: lbl, labels: { style: { colors: '#c5c5c5' }, rotate: lbl.length > 8 ? -45 : 0 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
-      colors: [C.green, C.red, C.gold],
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
+      colors: flColors,
       stroke: { curve: 'smooth', width: [2.5, 2.5, 4], dashArray: [0, 0, 4] },
       fill: {
         type: ['gradient','gradient','solid'],
-        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] },
+        gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
         opacity: [1, 1, 1]
       },
       markers: {
-        size: [4, 4, 6], strokeColors: '#0a0a0a', strokeWidth: 2,
-        hover: { size: 9 }
+        size: [5, 5, 7], strokeColors: '#0a0a0a', strokeWidth: 2,
+        hover: { size: 10 }
       },
       dataLabels: {
-        enabled: true, enabledOnSeries: [2],
-        formatter: v => ABBR(v),
-        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 0 },
-        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true, enabledOnSeries: [0, 1, 2],
+        formatter: function(val, opts){
+          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+          const v = typeof real === 'number' ? real : val;
+          return v !== 0 ? ABBR(v) : '';
+        },
+        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
       },
       legend: { position: 'top', horizontalAlign: 'left' },
       tooltip: { shared: true, y: { formatter: v => BRL(v) } },
@@ -2824,6 +3119,7 @@ function initMiniArcade(container) {
 
 // ══ INIT ══════════════════════════════════════════════════════════════════
 renderAll();
+initKpiTilt();
 initMiniArcade(document.getElementById('mini-arcade'));
 </script>
 </body>
