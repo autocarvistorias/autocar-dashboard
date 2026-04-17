@@ -37,7 +37,7 @@ tailwind.config = {
         error: "#ef4444",
         loja_go: "#FFD60A",
         loja_pr: "#06b6d4",
-        loja_an: "#c084fc",
+        loja_an: "#AB47BC",
       },
       fontFamily: {
         headline: ['"Plus Jakarta Sans"', "sans-serif"],
@@ -64,7 +64,7 @@ tailwind.config = {
     --red: #ef4444;
     --orange: #f97316;
     --cyan: #06b6d4;
-    --purple: #c084fc;
+    --purple: #AB47BC;
   }
 
   *, *::before, *::after { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -189,8 +189,8 @@ tailwind.config = {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
   .kpi-card .label {
-    font-size: 10.5px; color: #a3a3a3; text-transform: uppercase;
-    letter-spacing: 1.5px; font-weight: 700;
+    font-size: 13px; color: #c5c5c5; text-transform: uppercase;
+    letter-spacing: 1.2px; font-weight: 700;
   }
   .kpi-card .kpi-icon {
     width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
@@ -201,25 +201,26 @@ tailwind.config = {
   .kpi-card .kpi-icon .material-symbols-outlined { font-size: 18px; }
   .kpi-card .value {
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: clamp(22px, 2.5vw, 32px);
+    font-size: clamp(22px, 2.0vw, 28px);
     font-weight: 800; color: var(--accent, var(--gold));
-    line-height: 1.05; word-break: break-word; letter-spacing: -0.6px;
+    line-height: 1.05; word-break: keep-all; overflow-wrap: normal; letter-spacing: -0.5px;
     text-shadow: 0 0 22px var(--accent-glow, var(--gold-glow));
     animation: countUp .5s ease both;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .kpi-card .kpi-foot {
     display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
     margin-top: 6px;
   }
   .kpi-card .trend {
-    font-size: 11.5px; font-weight: 700;
+    font-size: 12.5px; font-weight: 700;
     padding: 2px 8px; border-radius: 999px;
     display: inline-flex; align-items: center; gap: 3px;
     border: 1px solid currentColor;
   }
   .kpi-card .trend.up { color: #22c55e; background: rgba(34, 197, 94, 0.10); }
   .kpi-card .trend.down { color: #ef4444; background: rgba(239, 68, 68, 0.10); }
-  .kpi-card .sub { font-size: 11px; color: #737373; }
+  .kpi-card .sub { font-size: 12px; color: #9a9a9a; }
 
   .kpi-spark {
     position: absolute; right: 10px; top: 10px;
@@ -238,10 +239,10 @@ tailwind.config = {
   }
   .chart-card .card-title {
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 12.5px; font-weight: 700; color: #fff;
-    margin-bottom: 12px; padding-bottom: 12px;
+    font-size: 15px; font-weight: 700; color: #fff;
+    margin-bottom: 14px; padding-bottom: 12px;
     border-bottom: 1px solid #1f1f1f;
-    text-transform: uppercase; letter-spacing: 1.3px;
+    text-transform: uppercase; letter-spacing: 1px;
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
   .chart-card .card-title .title-glyph {
@@ -288,15 +289,15 @@ tailwind.config = {
   .legend-chip.muted { opacity: 0.4; }
 
   /* ── Tables ────────────────────────────────────────────────────────────── */
-  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 520px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
   .data-table th {
     background: #1a1a1a; color: var(--gold); padding: 12px 14px;
-    text-align: left; font-size: 10.5px; text-transform: uppercase;
-    letter-spacing: 1.2px; white-space: nowrap; font-weight: 700;
+    text-align: left; font-size: 12px; text-transform: uppercase;
+    letter-spacing: 1px; white-space: nowrap; font-weight: 700;
     font-family: "Plus Jakarta Sans", sans-serif;
     border-bottom: 1px solid #262626;
   }
-  .data-table td { padding: 11px 14px; border-bottom: 1px solid #1f1f1f; color: #d4d4d4; white-space: nowrap; }
+  .data-table td { padding: 12px 14px; border-bottom: 1px solid #1f1f1f; color: #e4e4e4; white-space: nowrap; font-size: 14px; }
   .data-table tbody tr { transition: background .15s; }
   .data-table tr:hover td { background: rgba(255, 214, 10, 0.04); }
   .badge { padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;
@@ -322,9 +323,9 @@ tailwind.config = {
 
   /* ── Buttons & Filters ─────────────────────────────────────────────────── */
   .period-btn {
-    padding: 7px 14px; background: #1a1a1a; border: 1px solid #262626;
-    color: #a3a3a3; border-radius: 9999px; cursor: pointer;
-    font-size: 12px; font-family: inherit; transition: all .18s;
+    padding: 8px 16px; background: #1a1a1a; border: 1px solid #262626;
+    color: #c5c5c5; border-radius: 9999px; cursor: pointer;
+    font-size: 13px; font-family: inherit; transition: all .18s;
     white-space: nowrap; font-weight: 600; letter-spacing: .3px;
   }
   .period-btn:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
@@ -335,11 +336,12 @@ tailwind.config = {
   }
 
   input[type=date], select.flt {
-    background: #1a1a1a; border: 1px solid #262626; color: #d4d4d4;
-    border-radius: 9999px; padding: 7px 14px; font-size: 12px;
-    font-family: inherit; cursor: pointer; outline: none; min-height: 34px;
+    background: #1a1a1a; border: 1px solid #262626; color: #e4e4e4;
+    border-radius: 9999px; padding: 8px 16px; font-size: 13px;
+    font-family: inherit; cursor: pointer; outline: none; min-height: 36px;
     transition: all .18s;
   }
+  *:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
   input[type=date]:focus, select.flt:focus { border-color: var(--gold); color: #fff; box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.15); }
   select.flt { padding-right: 28px; min-width: 140px; }
 
@@ -368,8 +370,8 @@ tailwind.config = {
              border-right: 1px solid #1f1f1f; backdrop-filter: blur(14px); }
   .sidenav-link {
     display: flex; align-items: center; gap: 12px;
-    padding: 11px 14px; color: #a3a3a3; border-radius: 12px;
-    transition: all .2s; cursor: pointer; font-weight: 500; font-size: 14px;
+    padding: 12px 14px; color: #c5c5c5; border-radius: 12px;
+    transition: all .2s; cursor: pointer; font-weight: 500; font-size: 15px;
     font-family: "Plus Jakarta Sans", sans-serif; user-select: none;
     position: relative;
   }
@@ -395,7 +397,7 @@ tailwind.config = {
   }
   .bnav-btn .material-symbols-outlined { font-size: 22px; }
   .bnav-btn .lbl {
-    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
   }
   .bnav-btn.active { color: var(--gold); }
   .bnav-btn.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
@@ -428,6 +430,38 @@ tailwind.config = {
   @keyframes shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+  }
+
+  /* ── Apex axis labels (force readable size) ─────────────────────────── */
+  .chart-host .apexcharts-xaxis text,
+  .chart-host .apexcharts-yaxis text,
+  .chart-host .apexcharts-legend-text { font-size: 13px !important; }
+  .chart-host .apexcharts-datalabel,
+  .chart-host .apexcharts-datalabels text { font-size: 12px !important; }
+  .chart-host .apexcharts-pie-label { font-size: 13px !important; font-weight: 800 !important; }
+
+  /* ── Mobile typography overrides ────────────────────────────────────── */
+  @media (max-width: 767px) {
+    .kpi-card { min-height: 110px; padding: 14px 14px 12px; }
+    .kpi-card .label { font-size: 12px; letter-spacing: 1px; }
+    .kpi-card .value { font-size: clamp(20px, 5vw, 26px); }
+    .kpi-card .sub { font-size: 11.5px; }
+    .kpi-card .trend { font-size: 11.5px; }
+    .kpi-card .kpi-icon { width: 26px; height: 26px; }
+    .kpi-card .kpi-icon .material-symbols-outlined { font-size: 16px; }
+    .kpi-card .kpi-spark { width: 64px; height: 28px; }
+    .chart-card { padding: 14px 14px; border-radius: 16px; }
+    .chart-card .card-title { font-size: 13.5px; letter-spacing: .8px; }
+    .data-table { font-size: 13px; }
+    .data-table th { font-size: 11px; padding: 10px 12px; }
+    .data-table td { font-size: 13px; padding: 11px 12px; }
+    .period-btn { font-size: 12px; padding: 7px 14px; }
+    .sidenav-link { font-size: 14px; }
+    .chart-host .apexcharts-xaxis text,
+    .chart-host .apexcharts-yaxis text,
+    .chart-host .apexcharts-legend-text { font-size: 11.5px !important; }
+    .chart-host .apexcharts-datalabel,
+    .chart-host .apexcharts-datalabels text { font-size: 11px !important; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -469,7 +503,7 @@ tailwind.config = {
   </nav>
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 02:00</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 02:26</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -536,7 +570,7 @@ tailwind.config = {
         <div class="kpi-card card-fx" id="kpi-media"></div>
         <div class="kpi-card card-fx" id="kpi-loja-go"></div>
         <div class="kpi-card card-fx" id="kpi-loja-pr" style="--accent:#06b6d4;--accent-glow:rgba(6,182,212,0.45)"></div>
-        <div class="kpi-card card-fx" id="kpi-loja-an" style="--accent:#c084fc;--accent-glow:rgba(192,132,252,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-loja-an" style="--accent:#AB47BC;--accent-glow:rgba(171,71,188,0.45)"></div>
       </div>
 
       <div class="chart-card card-fx">
@@ -784,7 +818,7 @@ const C = {
   green:'#22c55e', greenL:'#4ade80',
   red:'#ef4444', redL:'#f87171',
   orange:'#f97316', orangeL:'#fb923c',
-  cyan:'#06b6d4', purple:'#c084fc', lime:'#84cc16',
+  cyan:'#06b6d4', purple:'#AB47BC', lime:'#84cc16',
   white:'#FFFFFF', text:'#FFF', muted:'#a3a3a3', dim:'#525252',
 };
 const LOJA_COLORS = {Goiania:C.gold, Prime:C.cyan, Anapolis:C.purple, Geral:C.white};
@@ -879,6 +913,24 @@ function groupSum(arr, key, valKey){
   return m;
 }
 
+// Truncate string with ellipsis, respecting word boundaries when possible.
+function truncate(s, max){
+  if (s == null) return '';
+  s = String(s);
+  return s.length > max ? s.slice(0, max - 1) + '…' : s;
+}
+
+// Reduce a {label: value} map to top N entries + an "Other" bucket.
+function topN(map, n, otherLabel){
+  const keys = Object.keys(map).sort((a,b)=>map[b]-map[a]);
+  if (keys.length <= n) return map;
+  const out = {};
+  keys.slice(0, n).forEach(k => { out[k] = map[k]; });
+  const rest = keys.slice(n);
+  out[`${otherLabel||'Outros'} (${rest.length})`] = rest.reduce((s,k)=>s+map[k], 0);
+  return out;
+}
+
 // ══ ApexCharts base config ═══════════════════════════════════════════════
 // Animation defaults — keeps the "elegant entrance" + smooth transitions.
 const ANIM = {
@@ -890,38 +942,58 @@ const ANIM = {
 };
 
 function baseChart(opts){
-  return Object.assign({
-    chart: Object.assign({
-      background: 'transparent',
-      foreColor: '#a3a3a3',
-      fontFamily: 'Inter, system-ui, sans-serif',
-      animations: ANIM,
-      toolbar: { show: false },
-      zoom: { enabled: false },
-      dropShadow: { enabled: false },
-      redrawOnParentResize: true,
-    }, opts.chart || {}),
-    grid: Object.assign({
-      borderColor: '#1f1f1f', strokeDashArray: 3,
-      xaxis: { lines: { show: false } },
-      yaxis: { lines: { show: true } },
-      padding: { top: 6, right: 12, bottom: 0, left: 6 }
-    }, opts.grid || {}),
-    tooltip: Object.assign({
-      theme: 'dark', shared: true, intersect: false,
-      style: { fontSize: '12px', fontFamily: 'Inter' },
-    }, opts.tooltip || {}),
-    legend: Object.assign({
-      labels: { colors: '#d4d4d4' },
-      markers: { width: 10, height: 10, radius: 99 },
-      itemMargin: { horizontal: 10, vertical: 4 },
-      fontFamily: 'Inter', fontSize: '12px',
-    }, opts.legend || {}),
-    states: {
-      hover: { filter: { type: 'lighten', value: 0.06 } },
-      active: { filter: { type: 'darken', value: 0.15 } }
-    }
-  }, opts);
+  // Pie/donut/radialBar/polarArea don't support tooltip.shared — forcing it throws a console error.
+  const chartType = (opts.chart && opts.chart.type) || '';
+  const isPieLike = ['pie','donut','radialBar','polarArea','radar'].includes(chartType);
+  const mergedTooltip = Object.assign({
+    theme: 'dark',
+    shared: !isPieLike,
+    intersect: false,
+    style: { fontSize: '13px', fontFamily: 'Inter' },
+  }, opts.tooltip || {});
+  // Final safety: shared & intersect are mutually exclusive.
+  if (mergedTooltip.shared && mergedTooltip.intersect) mergedTooltip.intersect = false;
+  if (isPieLike) { mergedTooltip.shared = false; }
+
+  // Spread `opts` FIRST, then overwrite the keys we control. Otherwise opts.tooltip would
+  // wipe our carefully merged tooltip (and lose intersect:false), which throws the
+  // "tooltip.shared cannot be enabled when tooltip.intersect is true" error.
+  const merged = Object.assign({}, opts);
+  merged.chart = Object.assign({
+    background: 'transparent',
+    foreColor: '#c5c5c5',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    animations: ANIM,
+    toolbar: { show: false },
+    zoom: { enabled: false },
+    dropShadow: { enabled: false },
+    redrawOnParentResize: true,
+  }, opts.chart || {});
+  merged.grid = Object.assign({
+    borderColor: '#1f1f1f', strokeDashArray: 3,
+    xaxis: { lines: { show: false } },
+    yaxis: { lines: { show: true } },
+    padding: { top: 6, right: 12, bottom: 0, left: 6 }
+  }, opts.grid || {});
+  merged.legend = Object.assign({
+    labels: { colors: '#e0e0e0' },
+    markers: { width: 10, height: 10, radius: 99 },
+    itemMargin: { horizontal: 10, vertical: 4 },
+    fontFamily: 'Inter', fontSize: '13px',
+  }, opts.legend || {});
+  merged.tooltip = mergedTooltip;
+  merged.states = merged.states || {
+    hover: { filter: { type: 'lighten', value: 0.06 } },
+    active: { filter: { type: 'darken', value: 0.15 } }
+  };
+  return merged;
+}
+
+// Pending charts deferred because their tab was hidden at creation time.
+const PENDING = {};
+
+function isVisible(el){
+  return el && el.offsetParent !== null;
 }
 
 function makeChart(id, opts){
@@ -929,12 +1001,48 @@ function makeChart(id, opts){
   if (!el) return;
   if (CHARTS[id]) {
     // Smooth update: same chart instance, new data + options.
-    CHARTS[id].updateOptions(opts, true, true);
+    if (isVisible(el)) {
+      CHARTS[id].updateOptions(opts, true, true);
+    } else {
+      // Tab hidden → defer the update too, otherwise chart corrupts.
+      PENDING[id] = { kind: 'update', opts };
+    }
     return;
   }
-  const chart = new ApexCharts(el, baseChart(opts));
-  chart.render();
-  CHARTS[id] = chart;
+  if (!isVisible(el)) {
+    // Defer the first render until the tab becomes visible.
+    PENDING[id] = { kind: 'create', opts };
+    return;
+  }
+  try {
+    const chart = new ApexCharts(el, baseChart(opts));
+    chart.render();
+    CHARTS[id] = chart;
+  } catch (err) {
+    console.error('[chart-fail]', id, err && err.message ? err.message : err);
+  }
+}
+
+// Called by showTab() — flushes any pending creations/updates for the now-visible tab.
+function flushPendingCharts(){
+  Object.keys(PENDING).forEach(id => {
+    const el = document.querySelector('#'+id);
+    if (!el || !isVisible(el)) return;
+    const job = PENDING[id];
+    delete PENDING[id];
+    try {
+      if (job.kind === 'create') {
+        const conf = job.bare ? job.opts : baseChart(job.opts);
+        const chart = new ApexCharts(el, conf);
+        chart.render();
+        CHARTS[id] = chart;
+      } else if (CHARTS[id]) {
+        CHARTS[id].updateOptions(job.opts, true, true);
+      }
+    } catch (err) {
+      console.error('[chart-flush-fail]', id, err && err.message ? err.message : err);
+    }
+  });
 }
 
 function destroyChart(id){
@@ -959,11 +1067,13 @@ function kpi(id, opts){
     trend = `<span class="trend ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(delta).toFixed(1)}%</span>`;
   }
 
-  let display;
+  let display, fullTitle = '';
   if (value === null || value === undefined) display = '—';
   else if (typeof value === 'number'){
     const abs = Math.abs(value);
-    if (isCurrency || (!Number.isInteger(value) && abs > 0)) display = BRL(value);
+    // Currency >= 10k → abreviado para caber no card; full value vai pro title (hover).
+    if (isCurrency && abs >= 10000) { display = ABBR(value); fullTitle = BRL(value); }
+    else if (isCurrency || (!Number.isInteger(value) && abs > 0)) display = BRL(value);
     else if (abs >= 1000) display = N(value);
     else display = value;
   } else display = value;
@@ -973,7 +1083,7 @@ function kpi(id, opts){
       <span class="label">${label}</span>
       <span class="kpi-icon"><span class="material-symbols-outlined">${icon}</span></span>
     </div>
-    <div class="value">${display}</div>
+    <div class="value"${fullTitle?` title="${fullTitle}"`:''}>${display}</div>
     <div class="kpi-foot">
       ${trend}
       ${sub ? `<span class="sub">${sub}</span>` : ''}
@@ -985,7 +1095,7 @@ function kpi(id, opts){
     const sparkId = `${id}-spark`;
     destroyChart(sparkId);
     const color = sparkColor || getComputedStyle(el).getPropertyValue('--accent') || C.gold;
-    const sparkChart = new ApexCharts(document.getElementById(sparkId), {
+    const sparkOpts = {
       chart: {
         type: 'area', height: 36, sparkline: { enabled: true },
         animations: { enabled: true, easing: 'easeinout', speed: 700 },
@@ -994,14 +1104,17 @@ function kpi(id, opts){
       stroke: { curve: 'smooth', width: 2 },
       series: [{ name: label, data: sparkData }],
       colors: [color.trim()],
-      fill: {
-        type: 'gradient',
-        gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] }
-      },
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] } },
       tooltip: { enabled: false },
-    });
-    sparkChart.render();
-    CHARTS[sparkId] = sparkChart;
+    };
+    const sparkEl = document.getElementById(sparkId);
+    if (sparkEl && isVisible(sparkEl)) {
+      const sparkChart = new ApexCharts(sparkEl, sparkOpts);
+      sparkChart.render();
+      CHARTS[sparkId] = sparkChart;
+    } else if (sparkEl) {
+      PENDING[sparkId] = { kind: 'create', opts: sparkOpts, bare: true };
+    }
   }
 }
 
@@ -1108,19 +1221,19 @@ function renderOp({vis}, prev){
 
   if (vkeys.length){
     makeChart('ch-vistoriadores', {
-      chart: { type: 'bar', height: 400 },
+      chart: { type: 'bar', height: 420 },
       series: [{ name: 'Vistorias', data: vkeys.map(k=>vmap[k]) }],
       xaxis: {
         categories: vkeys.map(k=>k.split(' ')[0]+' '+k.split(' ').slice(-1)[0]),
-        labels: { style: { colors: '#a3a3a3', fontSize: '11px' } },
+        labels: { style: { colors: '#c5c5c5', fontSize: '12px' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      yaxis: { labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 } } },
       plotOptions: {
         bar: {
-          horizontal: true, borderRadius: 6, borderRadiusApplication: 'end',
-          barHeight: '70%', distributed: true,
-          dataLabels: { position: 'top' }
+          horizontal: true, borderRadius: 5, borderRadiusApplication: 'end',
+          barHeight: '78%', distributed: true,
+          dataLabels: { position: 'bottom' }
         }
       },
       colors: vkeys.map((_,i)=> i===0 ? C.gold : i<3 ? C.goldL : C.goldD),
@@ -1129,13 +1242,17 @@ function renderOp({vis}, prev){
         gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.55, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true,
-        formatter: (v) => v + (vTotal ? `   ${(v/vTotal*100).toFixed(1)}%` : ''),
-        offsetX: 8,
-        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true, textAnchor: 'start', offsetX: 12,
+        formatter: function(val, opts){
+          const real = opts && opts.w && opts.w.config.series[opts.seriesIndex || 0].data[opts.dataPointIndex];
+          const v = typeof real === 'number' ? real : val;
+          return vTotal ? `${N(v)}  ·  ${(v/vTotal*100).toFixed(1)}%` : N(v);
+        },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
-      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 8, right: 32 } },
       tooltip: { y: { formatter: v => N(v) + ' vistorias' } }
     });
   } else emptyState('ch-vistoriadores', 'Sem vistoriadores no período');
@@ -1213,8 +1330,8 @@ function renderOp({vis}, prev){
       dataLabels: {
         enabled: true,
         formatter: (val, op) => N(op.w.config.series[op.seriesIndex]),
-        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] },
-        dropShadow: { enabled: false }
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
         pie: {
@@ -1285,15 +1402,15 @@ function renderOp({vis}, prev){
   const fpkeys = Object.keys(fpmap).filter(k=>k!=='null'&&k!=='Outros').sort((a,b)=>fpmap[b]-fpmap[a]);
   if (fpkeys.length){
     makeChart('ch-forma-pag-vis', {
-      chart: { type: 'bar', height: 280 },
+      chart: { type: 'bar', height: 320 },
       series: [{ name: 'Vistorias', data: fpkeys.map(k=>fpmap[k]) }],
       xaxis: {
-        categories: fpkeys, labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } },
+        categories: fpkeys, labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#a3a3a3' } } },
+      yaxis: { labels: { style: { colors: '#c5c5c5' } } },
       plotOptions: {
-        bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '65%', distributed: true, dataLabels: { position: 'top' } }
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'bottom' } }
       },
       colors: PALETTE.slice(0, fpkeys.length),
       fill: {
@@ -1301,11 +1418,16 @@ function renderOp({vis}, prev){
         gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => N(v), offsetX: 8,
-        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true, textAnchor: 'start', offsetX: 12,
+        formatter: function(val, opts){
+          const real = opts && opts.w && opts.w.config.series[opts.seriesIndex || 0].data[opts.dataPointIndex];
+          return N(typeof real === 'number' ? real : val);
+        },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
-      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 8, right: 32 } },
       tooltip: { y: { formatter: v => N(v) + ' vistorias' } }
     });
   } else emptyState('ch-forma-pag-vis', 'Sem dados');
@@ -1485,7 +1607,8 @@ function renderFat({rec}, prev){
       dataLabels: {
         enabled: true,
         formatter: v => v.toFixed(1) + '%',
-        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
         pie: {
@@ -1516,7 +1639,8 @@ function renderFat({rec}, prev){
       stroke: { width: 2, colors: ['#0a0a0a'] },
       dataLabels: {
         enabled: true, formatter: v => v.toFixed(1)+'%',
-        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
         pie: {
@@ -1547,7 +1671,8 @@ function renderFat({rec}, prev){
       stroke: { width: 2, colors: ['#0a0a0a'] },
       dataLabels: {
         enabled: true, formatter: v => v.toFixed(1)+'%',
-        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
         pie: { donut: { size: '62%',
@@ -1568,15 +1693,16 @@ function renderFat({rec}, prev){
   const ckeys = Object.keys(cm).sort((a,b)=>cm[b]-cm[a]).slice(0,15);
   if (ckeys.length){
     makeChart('ch-top-clientes', {
-      chart: { type: 'bar', height: 460 },
+      chart: { type: 'bar', height: 580 },
       series: [{ name: 'Receita', data: ckeys.map(k => +cm[k].toFixed(2)) }],
       xaxis: {
-        categories: ckeys, labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
+        categories: ckeys.map(s => truncate(s, 32)),
+        labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5', fontSize: '12px' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      yaxis: { labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 } } },
       plotOptions: {
-        bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'top' } }
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '78%', distributed: true, dataLabels: { position: 'bottom' } }
       },
       colors: ckeys.map((_,i) => i===0 ? C.gold : i<3 ? C.goldL : C.goldD),
       fill: {
@@ -1584,11 +1710,13 @@ function renderFat({rec}, prev){
         gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => BRL(v), offsetX: 8,
-        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true, textAnchor: 'start', offsetX: 12,
+        formatter: v => ABBR(v),
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
-      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 8, right: 32 } },
       tooltip: { y: { formatter: v => BRL(v) } }
     });
   } else emptyState('ch-top-clientes', 'Sem clientes no período');
@@ -1670,20 +1798,22 @@ function renderDep({pag, vis}, prev){
     });
   } else emptyState('ch-dep-mes', 'Sem despesas no período');
 
-  // ─── Despesas por Categoria ──────────────────────────────────────────────
+  // ─── Despesas por Categoria (top 12 + Outros) ────────────────────────────
   const cat = groupSum(pag.filter(r=>r.conta), 'conta', 'valor');
-  const cks = Object.keys(cat).sort((a,b)=>cat[a]-cat[b]); // asc — barras crescem para cima
+  const catGrouped = topN(cat, 12, 'Outras categorias');
+  const cks = Object.keys(catGrouped).sort((a,b)=>catGrouped[a]-catGrouped[b]); // asc — maiores em cima
   if (cks.length){
     makeChart('ch-dep-cat', {
-      chart: { type: 'bar', height: 540 },
-      series: [{ name: 'Despesas', data: cks.map(k => +cat[k].toFixed(2)) }],
+      chart: { type: 'bar', height: 560 },
+      series: [{ name: 'Despesas', data: cks.map(k => +catGrouped[k].toFixed(2)) }],
       xaxis: {
-        categories: cks, labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
+        categories: cks.map(s => truncate(s, 28)),
+        labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5', fontSize: '12px' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '11.5px', fontWeight: 600 } } },
+      yaxis: { labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 }, maxWidth: 220 } },
       plotOptions: {
-        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '78%', distributed: true, dataLabels: { position: 'top' } }
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '78%', distributed: true, dataLabels: { position: 'bottom' } }
       },
       colors: cks.map((_,i) => i===cks.length-1 ? C.gold : i>=cks.length-3 ? C.goldL : C.goldD),
       fill: {
@@ -1691,11 +1821,13 @@ function renderDep({pag, vis}, prev){
         gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => BRL(v), offsetX: 8,
-        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true, textAnchor: 'start', offsetX: 12,
+        formatter: v => ABBR(v),
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
-      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 8, right: 32 } },
       tooltip: { y: { formatter: v => BRL(v) } }
     });
   } else emptyState('ch-dep-cat', 'Sem categorias no período');
@@ -1704,12 +1836,13 @@ function renderDep({pag, vis}, prev){
   const lj = groupSum(pag, 'loja', 'valor');
   const lk = Object.keys(lj).filter(k => k && k !== 'null');
   if (lk.length){
+    const lojaVals = lk.map(k => +lj[k].toFixed(2));
     makeChart('ch-dep-loja', {
-      chart: { type: 'bar', height: 240 },
-      series: [{ name: 'Despesas', data: lk.map(k => +lj[k].toFixed(2)) }],
+      chart: { type: 'bar', height: 260 },
+      series: [{ name: 'Despesas', data: lojaVals }],
       xaxis: {
         categories: lk.map(l => lojaLabel(l)),
-        labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 700 } },
+        labels: { style: { colors: '#e4e4e4', fontSize: '13px', fontWeight: 700 } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { show: false },
@@ -1722,8 +1855,14 @@ function renderDep({pag, vis}, prev){
         gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => ABBR(v), offsetY: -22,
-        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true,
+        // Read the raw numeric value back from the config to bypass any percent transform.
+        formatter: function(val, opts){
+          const real = opts && opts.w && opts.w.config.series[opts.seriesIndex || 0].data[opts.dataPointIndex];
+          return ABBR(typeof real === 'number' ? real : val);
+        },
+        offsetY: -24,
+        style: { colors: ['#fff'], fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
       },
       legend: { show: false },
       grid: { yaxis: { lines: { show: false } } },
@@ -1741,7 +1880,8 @@ function renderDep({pag, vis}, prev){
       stroke: { width: 2, colors: ['#0a0a0a'] },
       dataLabels: {
         enabled: true, formatter: v => v.toFixed(1)+'%',
-        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
         pie: { donut: { size: '60%',
@@ -1915,7 +2055,7 @@ function renderFl({pag, rec}, prev){
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
       colors: sal.map(s => s>=0 ? C.green : C.red),
       plotOptions: {
-        bar: { borderRadius: 6, columnWidth: '55%', distributed: true, dataLabels: { position: 'top' }, colors: { ranges: [{ from: -1e12, to: 0, color: C.red }, { from: 0, to: 1e12, color: C.green }] } }
+        bar: { borderRadius: 6, columnWidth: '55%', distributed: true, dataLabels: { position: 'top' } }
       },
       fill: {
         type: 'gradient',
@@ -2033,11 +2173,16 @@ function renderCob(){
         gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => BRL(v), offsetX: 8,
-        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        enabled: true, textAnchor: 'start', offsetX: 12,
+        formatter: function(val, opts){
+          const real = opts && opts.w && opts.w.config.series[opts.seriesIndex || 0].data[opts.dataPointIndex];
+          return ABBR(typeof real === 'number' ? real : val);
+        },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
-      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 8, right: 32 } },
       tooltip: { y: { formatter: v => BRL(v) } }
     });
   } else emptyState('ch-cob-porcliente', 'Nenhum devedor');
@@ -2145,14 +2290,9 @@ function showTab(name){
   }
   document.body.classList.remove('drawer-open');
   window.scrollTo({top:0, behavior:'smooth'});
-  // Reflow ApexCharts inside the just-shown tab.
+  // Render any chart that was deferred because its tab was hidden.
   setTimeout(() => {
-    Object.keys(CHARTS).forEach(id => {
-      const el = document.getElementById(id);
-      if (el && el.offsetParent !== null) {
-        try { CHARTS[id].render(); } catch(_) {}
-      }
-    });
+    flushPendingCharts();
     window.dispatchEvent(new Event('resize'));
   }, 80);
 }
