@@ -4,13 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#0a0a0a">
-<title>Dashboard Auto Car Vistoria</title>
+<title>Dashboard Auto Car Vistorias</title>
+
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
 <script>
@@ -20,20 +22,20 @@ tailwind.config = {
     extend: {
       colors: {
         background: "#0a0a0a",
-        surface: "#171717",
-        "surface-2": "#1f1f1f",
+        surface: "#141414",
+        "surface-2": "#1c1c1c",
         "surface-3": "#262626",
         "outline": "#737373",
-        "outline-variant": "#404040",
+        "outline-variant": "#2a2a2a",
         "on-surface-variant": "#a3a3a3",
-        primary: "#facc15",
+        primary: "#FFD60A",
         "primary-dim": "#eab308",
-        "primary-soft": "#fde047",
-        secondary: "#facc15",
+        "primary-soft": "#FFE45C",
+        secondary: "#FFD60A",
         success: "#22c55e",
         warning: "#f97316",
         error: "#ef4444",
-        loja_go: "#facc15",
+        loja_go: "#FFD60A",
         loja_pr: "#06b6d4",
         loja_an: "#c084fc",
       },
@@ -47,160 +49,340 @@ tailwind.config = {
 </script>
 
 <style>
+  :root {
+    --gold: #FFD60A;
+    --gold-soft: #FFE45C;
+    --gold-deep: #B8860B;
+    --gold-glow: rgba(255, 214, 10, 0.45);
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --surface-3: #262626;
+    --outline: #2a2a2a;
+    --muted: #a3a3a3;
+    --green: #22c55e;
+    --red: #ef4444;
+    --orange: #f97316;
+    --cyan: #06b6d4;
+    --purple: #c084fc;
+  }
+
   *, *::before, *::after { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-  html, body { background: #0a0a0a; color: #fff; }
-  body { font-family: Inter, system-ui, sans-serif; min-height: 100vh; overflow-x: hidden; }
+  html, body { background: var(--bg); color: #fff; }
+  body {
+    font-family: Inter, system-ui, sans-serif; min-height: 100vh; overflow-x: hidden;
+    background:
+      radial-gradient(ellipse 60% 40% at 8% -5%, rgba(255, 214, 10, 0.10), transparent 60%),
+      radial-gradient(ellipse 50% 35% at 95% 110%, rgba(255, 214, 10, 0.06), transparent 60%),
+      var(--bg);
+  }
   h1, h2, h3, h4, h5, h6, .font-headline { font-family: "Plus Jakarta Sans", sans-serif; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; user-select: none; }
 
+  /* ── Brand fallback (no logo file) ─────────────────────────────────────── */
+  .brand-mark {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .brand-bolt {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, #FFE45C 0%, #FFD60A 50%, #B8860B 100%);
+    display: grid; place-items: center; color: #0a0a0a;
+    box-shadow: 0 0 18px rgba(255, 214, 10, 0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .brand-bolt .material-symbols-outlined { font-size: 22px; font-variation-settings: 'FILL' 1, 'wght' 700; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1; }
+  .brand-line1 {
+    font-family: "Plus Jakarta Sans", sans-serif; font-weight: 900; font-size: 16px;
+    color: #fff; letter-spacing: 0.5px;
+  }
+  .brand-line2 {
+    font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 10px;
+    color: var(--gold); letter-spacing: 4px; margin-top: 2px;
+  }
+  .logo-img { filter: drop-shadow(0 0 14px rgba(255, 214, 10, 0.3)); }
+
   /* ── Animations ────────────────────────────────────────────────────────── */
-  @keyframes glow-pulse {
-    0%, 100% { filter: drop-shadow(0 0 2px rgba(250, 204, 21, 0.2)); transform: scale(1); }
-    50% { filter: drop-shadow(0 0 14px rgba(250, 204, 21, 0.55)); transform: scale(1.02); }
+  @keyframes glowPulse {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 214, 10, 0.30)); }
+    50%      { filter: drop-shadow(0 0 18px rgba(255, 214, 10, 0.65)); }
   }
   @keyframes scan {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(400%); }
+    0% { transform: translateY(-120%); }
+    100% { transform: translateY(420%); }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  .logo-glow { animation: glow-pulse 4s ease-in-out infinite; }
+  @keyframes shine {
+    0%   { transform: translateX(-100%) skewX(-20deg); }
+    100% { transform: translateX(220%)  skewX(-20deg); }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ringRotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes pulseDot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+    50%      { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  }
 
-  /* Card hover effect with scanning line */
+  .logo-glow { animation: glowPulse 4.5s ease-in-out infinite; }
+
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 999px; background: #22c55e;
+    animation: pulseDot 2s ease-in-out infinite; display: inline-block;
+  }
+
+  /* ── Card foundation ───────────────────────────────────────────────────── */
   .card-fx {
     position: relative; overflow: hidden;
-    transition: border-color .35s ease, box-shadow .35s ease, transform .2s ease;
+    transition: border-color .35s ease, box-shadow .35s ease, transform .25s ease;
+    will-change: transform;
+  }
+  .card-fx::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: inherit; pointer-events: none;
+    background: radial-gradient(80% 60% at 50% 0%, rgba(255,214,10,0.05), transparent 70%);
+    opacity: 0; transition: opacity .35s;
   }
   .card-fx::after {
     content: ''; position: absolute; top: 0; left: 0;
-    width: 100%; height: 25%;
-    background: linear-gradient(to bottom, transparent, rgba(250, 204, 21, 0.10), transparent);
+    width: 100%; height: 30%;
+    background: linear-gradient(to bottom, transparent, rgba(255, 214, 10, 0.10), transparent);
     opacity: 0; pointer-events: none; z-index: 1;
   }
   .card-fx:hover {
-    border-color: rgba(250, 204, 21, 0.45);
-    box-shadow: 0 0 24px -4px rgba(250, 204, 21, 0.18);
+    border-color: rgba(255, 214, 10, 0.55);
+    box-shadow:
+      0 0 30px -6px rgba(255, 214, 10, 0.22),
+      0 8px 30px -10px rgba(0, 0, 0, 0.55);
+    transform: translateY(-2px);
   }
-  .card-fx:hover::after {
-    opacity: 1; animation: scan 2.5s linear infinite;
-  }
+  .card-fx:hover::before { opacity: 1; }
+  .card-fx:hover::after { opacity: 1; animation: scan 2.5s linear infinite; }
 
-  /* ── KPI card (JS writes .label/.value/.trend/.sub inside) ─────────────── */
+  /* ── KPI card ──────────────────────────────────────────────────────────── */
   .kpi-card {
-    background: #171717;
-    border: 1px solid #404040;
-    border-left: 4px solid #facc15;
-    border-radius: 1rem;
-    padding: 1.1rem 1.25rem;
-    min-height: 120px;
-    display: flex; flex-direction: column; justify-content: center;
+    background:
+      linear-gradient(135deg, rgba(255, 214, 10, 0.04) 0%, transparent 50%),
+      linear-gradient(180deg, #161616 0%, #101010 100%);
+    border: 1px solid #2a2a2a;
+    border-radius: 18px;
+    padding: 16px 18px 14px;
+    min-height: 132px;
+    display: flex; flex-direction: column; justify-content: space-between;
     position: relative;
+    animation: fadeInUp .55s ease both;
+  }
+  .kpi-card::after {
+    content: ''; position: absolute; left: 0; top: 16px; bottom: 16px;
+    width: 4px; border-radius: 0 4px 4px 0;
+    background: linear-gradient(180deg, var(--accent, var(--gold)), transparent);
+    box-shadow: 0 0 12px var(--accent-glow, var(--gold-glow));
+  }
+  .kpi-card .kpi-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
   .kpi-card .label {
-    font-size: 11px; color: #a3a3a3; text-transform: uppercase;
-    letter-spacing: 1.2px; font-weight: 600;
+    font-size: 10.5px; color: #a3a3a3; text-transform: uppercase;
+    letter-spacing: 1.5px; font-weight: 700;
   }
+  .kpi-card .kpi-icon {
+    width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+    background: rgba(255, 214, 10, 0.10);
+    color: var(--accent, var(--gold));
+    border: 1px solid rgba(255, 214, 10, 0.18);
+  }
+  .kpi-card .kpi-icon .material-symbols-outlined { font-size: 18px; }
   .kpi-card .value {
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: clamp(20px, 2.4vw, 30px);
-    font-weight: 800; color: #facc15; margin: 8px 0 4px;
-    line-height: 1.1; word-break: break-word; letter-spacing: -0.5px;
+    font-size: clamp(22px, 2.5vw, 32px);
+    font-weight: 800; color: var(--accent, var(--gold));
+    line-height: 1.05; word-break: break-word; letter-spacing: -0.6px;
+    text-shadow: 0 0 22px var(--accent-glow, var(--gold-glow));
+    animation: countUp .5s ease both;
+  }
+  .kpi-card .kpi-foot {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    margin-top: 6px;
   }
   .kpi-card .trend {
-    font-size: 12px; font-weight: 600; margin-top: 4px;
+    font-size: 11.5px; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 3px;
+    border: 1px solid currentColor;
   }
-  .kpi-card .trend.up { color: #22c55e; }
-  .kpi-card .trend.down { color: #ef4444; }
-  .kpi-card .sub { font-size: 11px; color: #737373; margin-top: 4px; }
+  .kpi-card .trend.up { color: #22c55e; background: rgba(34, 197, 94, 0.10); }
+  .kpi-card .trend.down { color: #ef4444; background: rgba(239, 68, 68, 0.10); }
+  .kpi-card .sub { font-size: 11px; color: #737373; }
+
+  .kpi-spark {
+    position: absolute; right: 10px; top: 10px;
+    width: 86px; height: 36px; opacity: 0.85;
+    pointer-events: none;
+  }
 
   /* ── Chart card ────────────────────────────────────────────────────────── */
   .chart-card {
-    background: #171717;
-    border: 1px solid #404040;
-    border-radius: 1.25rem;
-    padding: 1.25rem;
+    background:
+      linear-gradient(180deg, #161616 0%, #101010 100%);
+    border: 1px solid #2a2a2a;
+    border-radius: 20px;
+    padding: 18px 20px;
+    animation: fadeInUp .6s ease both;
   }
   .chart-card .card-title {
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 13px; font-weight: 700; color: #facc15;
-    margin-bottom: 14px; padding-bottom: 10px;
-    border-bottom: 1px solid #262626;
-    text-transform: uppercase; letter-spacing: 1px;
+    font-size: 12.5px; font-weight: 700; color: #fff;
+    margin-bottom: 12px; padding-bottom: 12px;
+    border-bottom: 1px solid #1f1f1f;
+    text-transform: uppercase; letter-spacing: 1.3px;
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
+  .chart-card .card-title .title-glyph {
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+  }
+  .chart-card .card-title .title-meta {
+    font-size: 10.5px; color: var(--muted); font-weight: 600; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .chart-host { width: 100%; min-height: 240px; }
+  .chart-host .apexcharts-tooltip {
+    background: #0e0e0e !important; border: 1px solid var(--gold) !important;
+    box-shadow: 0 8px 28px rgba(255, 214, 10, 0.18) !important;
+    color: #fff !important; border-radius: 10px !important;
+    padding: 4px 0 !important;
+  }
+  .chart-host .apexcharts-tooltip-title {
+    background: #1a1a1a !important; border-bottom: 1px solid #262626 !important;
+    color: var(--gold) !important; font-weight: 700 !important;
+    font-family: "Plus Jakarta Sans", sans-serif !important; padding: 6px 10px !important;
+  }
+  .chart-host .apexcharts-tooltip-series-group { padding: 2px 10px !important; }
+  .chart-host .apexcharts-xaxistooltip, .chart-host .apexcharts-yaxistooltip {
+    background: #0e0e0e !important; border: 1px solid #262626 !important;
+    color: var(--gold) !important; font-weight: 700 !important;
+  }
+  .chart-host .apexcharts-legend-text { color: #d4d4d4 !important; font-family: Inter !important; }
+  .chart-host .apexcharts-text { fill: #a3a3a3; }
+  .chart-host .apexcharts-datalabel { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+
+  .legend-chips {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;
+  }
+  .legend-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #181818; border: 1px solid #262626;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11.5px; color: #d4d4d4; cursor: pointer;
+    transition: all .2s; user-select: none;
+  }
+  .legend-chip .dot { width: 8px; height: 8px; border-radius: 999px; }
+  .legend-chip:hover { border-color: var(--gold); color: #fff; }
+  .legend-chip.muted { opacity: 0.4; }
 
   /* ── Tables ────────────────────────────────────────────────────────────── */
   .data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 520px; }
   .data-table th {
-    background: #262626; color: #facc15; padding: 12px 14px;
-    text-align: left; font-size: 11px; text-transform: uppercase;
-    letter-spacing: 1px; white-space: nowrap; font-weight: 700;
+    background: #1a1a1a; color: var(--gold); padding: 12px 14px;
+    text-align: left; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: 1.2px; white-space: nowrap; font-weight: 700;
     font-family: "Plus Jakarta Sans", sans-serif;
+    border-bottom: 1px solid #262626;
   }
-  .data-table td { padding: 11px 14px; border-bottom: 1px solid #262626; color: #d4d4d4; white-space: nowrap; }
-  .data-table tr:hover td { background: rgba(38, 38, 38, 0.5); }
-  .badge { padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; }
-  .badge-pago    { background: rgba(34, 197, 94, .15); color: #22c55e; }
-  .badge-apagar  { background: rgba(239, 68, 68, .15); color: #ef4444; }
-  .badge-aberto  { background: rgba(249, 115, 22, .15); color: #f97316; }
+  .data-table td { padding: 11px 14px; border-bottom: 1px solid #1f1f1f; color: #d4d4d4; white-space: nowrap; }
+  .data-table tbody tr { transition: background .15s; }
+  .data-table tr:hover td { background: rgba(255, 214, 10, 0.04); }
+  .badge { padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;
+           display: inline-flex; align-items: center; gap: 4px; }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+  .badge-pago    { background: rgba(34, 197, 94, .12); color: #22c55e; }
+  .badge-apagar  { background: rgba(239, 68, 68, .12); color: #ef4444; }
+  .badge-aberto  { background: rgba(249, 115, 22, .12); color: #f97316; }
 
   .tbl-wrap {
-    overflow: auto; max-height: 420px;
-    border: 1px solid #262626; border-radius: 12px;
+    overflow: auto; max-height: 460px;
+    border: 1px solid #1f1f1f; border-radius: 14px;
     -webkit-overflow-scrolling: touch;
   }
   .tbl-wrap.tbl-lg { max-height: 1200px; }
   .tbl-wrap thead th { position: sticky; top: 0; z-index: 2; }
 
-  .empty { text-align: center; padding: 40px; color: #525252; font-size: 14px; }
+  .empty {
+    text-align: center; padding: 48px 20px; color: #525252; font-size: 13px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .empty .material-symbols-outlined { font-size: 32px; color: #2a2a2a; }
 
   /* ── Buttons & Filters ─────────────────────────────────────────────────── */
   .period-btn {
-    padding: 7px 14px; background: #1f1f1f; border: 1px solid #404040;
+    padding: 7px 14px; background: #1a1a1a; border: 1px solid #262626;
     color: #a3a3a3; border-radius: 9999px; cursor: pointer;
-    font-size: 12px; font-family: inherit; transition: all .15s;
-    white-space: nowrap; font-weight: 500;
+    font-size: 12px; font-family: inherit; transition: all .18s;
+    white-space: nowrap; font-weight: 600; letter-spacing: .3px;
   }
-  .period-btn:hover { border-color: #facc15; color: #facc15; }
+  .period-btn:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
   .period-btn.active {
-    background: rgba(250, 204, 21, .15); border-color: #facc15;
-    color: #facc15; font-weight: 700;
+    background: linear-gradient(135deg, #FFE45C 0%, #FFD60A 100%);
+    border-color: var(--gold); color: #000; font-weight: 800;
+    box-shadow: 0 0 16px rgba(255, 214, 10, 0.45);
   }
 
   input[type=date], select.flt {
-    background: #1f1f1f; border: 1px solid #404040; color: #d4d4d4;
+    background: #1a1a1a; border: 1px solid #262626; color: #d4d4d4;
     border-radius: 9999px; padding: 7px 14px; font-size: 12px;
     font-family: inherit; cursor: pointer; outline: none; min-height: 34px;
+    transition: all .18s;
   }
-  input[type=date]:focus, select.flt:focus { border-color: #facc15; color: #fff; }
+  input[type=date]:focus, select.flt:focus { border-color: var(--gold); color: #fff; box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.15); }
   select.flt { padding-right: 28px; min-width: 140px; }
 
   .export-btn {
-    padding: 6px 14px; background: rgba(250, 204, 21, .12);
-    border: 1px solid #facc15; color: #facc15; border-radius: 9999px;
+    padding: 6px 14px; background: rgba(255, 214, 10, .10);
+    border: 1px solid var(--gold); color: var(--gold); border-radius: 9999px;
     cursor: pointer; font-size: 11px; font-family: inherit;
-    font-weight: 700; transition: all .15s; text-transform: uppercase;
+    font-weight: 700; transition: all .18s; text-transform: uppercase;
     letter-spacing: .5px; display: inline-flex; align-items: center; gap: 4px;
+    position: relative; overflow: hidden;
   }
-  .export-btn:hover { background: #facc15; color: #000; }
+  .export-btn::before {
+    content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 35%;
+    background: linear-gradient(90deg, transparent, rgba(255, 214, 10, 0.4), transparent);
+    transform: translateX(-150%);
+  }
+  .export-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 18px rgba(255, 214, 10, 0.5); }
+  .export-btn:hover::before { animation: shine 1s ease; }
 
   /* ── Tab content ───────────────────────────────────────────────────────── */
   .tab-content { display: none; }
-  .tab-content.active { display: block; animation: fadeIn .3s ease; }
+  .tab-content.active { display: block; animation: fadeInUp .4s ease; }
 
   /* ── Sidebar nav (desktop) ─────────────────────────────────────────────── */
+  #sidebar { background: linear-gradient(180deg, rgba(20,20,20,.98) 0%, rgba(10,10,10,.98) 100%);
+             border-right: 1px solid #1f1f1f; backdrop-filter: blur(14px); }
   .sidenav-link {
     display: flex; align-items: center; gap: 12px;
     padding: 11px 14px; color: #a3a3a3; border-radius: 12px;
     transition: all .2s; cursor: pointer; font-weight: 500; font-size: 14px;
     font-family: "Plus Jakarta Sans", sans-serif; user-select: none;
+    position: relative;
   }
   .sidenav-link:hover { background: rgba(38, 38, 38, .8); color: #fff; }
   .sidenav-link.active {
-    color: #facc15; background: rgba(250, 204, 21, .1);
-    font-weight: 700; box-shadow: inset 3px 0 0 #facc15;
+    color: #FFD60A;
+    background: linear-gradient(90deg, rgba(255, 214, 10, .14) 0%, rgba(255, 214, 10, 0) 100%);
+    font-weight: 700;
+  }
+  .sidenav-link.active::before {
+    content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 3px; border-radius: 0 3px 3px 0;
+    background: var(--gold); box-shadow: 0 0 8px var(--gold);
   }
   .sidenav-link .material-symbols-outlined { font-size: 20px; }
   .sidenav-link.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
@@ -215,16 +397,16 @@ tailwind.config = {
   .bnav-btn .lbl {
     font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
   }
-  .bnav-btn.active { color: #facc15; }
+  .bnav-btn.active { color: var(--gold); }
   .bnav-btn.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
 
   /* ── Scrollbar ─────────────────────────────────────────────────────────── */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: #0a0a0a; }
-  ::-webkit-scrollbar-thumb { background: #404040; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #facc15; }
+  ::-webkit-scrollbar-thumb { background: #262626; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-  /* ── Mobile drawer (sidebar overlay) ───────────────────────────────────── */
+  /* ── Mobile drawer ─────────────────────────────────────────────────────── */
   #drawer-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.6);
     z-index: 49; opacity: 0; pointer-events: none; transition: opacity .25s;
@@ -236,6 +418,18 @@ tailwind.config = {
     body.drawer-open #sidebar { transform: translateX(0); }
   }
 
+  /* Loading shimmer for charts */
+  .chart-skeleton {
+    width: 100%; height: 240px; border-radius: 12px;
+    background: linear-gradient(90deg, #161616 0%, #1f1f1f 50%, #161616 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite linear;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
   }
@@ -244,14 +438,17 @@ tailwind.config = {
 
 <body class="bg-background text-white font-body">
 
-<!-- Sidebar (desktop + mobile drawer) -->
-<aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col bg-surface/95 backdrop-blur-xl w-64 border-r border-outline-variant md:translate-x-0">
-  <div class="p-5 flex items-center justify-center logo-glow min-h-[88px]">
-    <div class="text-primary font-headline font-extrabold text-lg">AUTO CAR</div>
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col w-64 md:translate-x-0">
+  <div class="px-5 pt-6 pb-4 flex items-center logo-glow min-h-[88px]">
+    <div class="brand-mark"><div class="brand-bolt"><span class="material-symbols-outlined">bolt</span></div><div class="brand-text"><span class="brand-line1">AUTO CAR</span><span class="brand-line2">VISTORIAS</span></div></div>
   </div>
-  <div class="px-4 mb-4">
-    <div class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Grupo</div>
+  <div class="px-5 pb-4">
+    <div class="text-[10px] uppercase tracking-[3px] text-on-surface-variant font-bold">Grupo</div>
     <div class="text-sm font-headline font-bold text-white mt-0.5">Auto Car Vistorias</div>
+    <div class="mt-3 inline-flex items-center gap-2 text-[10.5px] uppercase tracking-widest text-green-400 font-bold">
+      <span class="live-dot"></span> Sistema Online
+    </div>
   </div>
   <nav class="flex-1 flex flex-col gap-1 px-3 overflow-y-auto">
     <a class="sidenav-link active" data-tab="op">
@@ -270,18 +467,17 @@ tailwind.config = {
       <span class="material-symbols-outlined">notifications_active</span>Cobrança
     </a>
   </nav>
-  <div class="p-4 text-xs border-t border-outline-variant">
-    <p class="text-on-surface-variant opacity-70">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline">17/04/2026 00:45</p>
+  <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
+    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 02:00</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
 
-<!-- Main wrapper -->
 <div class="md:ml-64 min-h-screen flex flex-col">
 
   <!-- Top bar -->
-  <header class="bg-surface/80 backdrop-blur-xl sticky top-0 z-30 border-b border-outline-variant px-4 md:px-6 py-3.5 flex items-center gap-3">
+  <header class="bg-surface/70 backdrop-blur-xl sticky top-0 z-30 border-b border-outline-variant px-4 md:px-6 py-3.5 flex items-center gap-3">
     <button id="menu-toggle" class="md:hidden text-white p-1" aria-label="Menu">
       <span class="material-symbols-outlined">menu</span>
     </button>
@@ -289,14 +485,18 @@ tailwind.config = {
       <h1 class="text-lg md:text-xl font-headline font-extrabold tracking-tight truncate" id="page-title">Operações</h1>
       <p class="text-[11px] text-on-surface-variant truncate" id="page-subtitle">Visão geral das vistorias e desempenho</p>
     </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-outline-variant text-[11px] text-on-surface-variant">
+      <span class="material-symbols-outlined" style="font-size:14px;color:var(--gold)">calendar_month</span>
+      <span id="period-badge" class="font-semibold text-white">Todo período</span>
+    </div>
     <button id="filter-toggle" class="flex items-center gap-2 bg-surface-2 hover:bg-surface-3 border border-outline-variant px-3.5 py-2 rounded-full text-xs font-semibold transition">
       <span class="material-symbols-outlined" style="font-size:18px">tune</span>
       <span class="hidden sm:inline">Filtros</span>
     </button>
   </header>
 
-  <!-- Filter bar (collapsible) -->
-  <div id="filter-bar" class="hidden bg-surface border-b border-outline-variant px-4 md:px-6 py-3 flex flex-wrap gap-2 items-center">
+  <!-- Filter bar -->
+  <div id="filter-bar" class="hidden bg-surface/80 backdrop-blur-xl border-b border-outline-variant px-4 md:px-6 py-3 flex flex-wrap gap-2 items-center">
     <span class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mr-1">Período</span>
     <button class="period-btn" data-p="7d">7 dias</button>
     <button class="period-btn" data-p="30d">30 dias</button>
@@ -325,37 +525,68 @@ tailwind.config = {
     </select>
   </div>
 
-  <!-- Main canvas -->
   <main class="flex-1 p-4 md:p-6 pb-24 md:pb-8 overflow-x-hidden">
 
     <!-- ════════ OPERAÇÕES ════════ -->
     <section id="op" class="tab-content active space-y-5">
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4">
         <div class="kpi-card card-fx" id="kpi-total"></div>
-        <div class="kpi-card card-fx" id="kpi-aprov" style="border-left-color:#22c55e"></div>
-        <div class="kpi-card card-fx" id="kpi-pend"  style="border-left-color:#f97316"></div>
+        <div class="kpi-card card-fx" id="kpi-aprov" style="--accent:#22c55e;--accent-glow:rgba(34,197,94,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-pend"  style="--accent:#f97316;--accent-glow:rgba(249,115,22,0.45)"></div>
         <div class="kpi-card card-fx" id="kpi-media"></div>
-        <div class="kpi-card card-fx" id="kpi-loja-go" style="border-left-color:#facc15"></div>
-        <div class="kpi-card card-fx" id="kpi-loja-pr" style="border-left-color:#06b6d4"></div>
-        <div class="kpi-card card-fx" id="kpi-loja-an" style="border-left-color:#c084fc"></div>
+        <div class="kpi-card card-fx" id="kpi-loja-go"></div>
+        <div class="kpi-card card-fx" id="kpi-loja-pr" style="--accent:#06b6d4;--accent-glow:rgba(6,182,212,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-loja-an" style="--accent:#c084fc;--accent-glow:rgba(192,132,252,0.45)"></div>
       </div>
-      <div class="chart-card card-fx"><div id="ch-vis-mes"></div></div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="chart-card card-fx"><div id="ch-vistoriadores"></div></div>
-        <div class="chart-card card-fx"><div id="ch-weekday"></div></div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="chart-card card-fx"><div id="ch-status"></div></div>
-        <div class="chart-card card-fx"><div id="ch-tipo"></div></div>
-        <div class="chart-card card-fx"><div id="ch-taxa-aprov"></div></div>
-      </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="chart-card card-fx"><div id="ch-forma-pag-vis"></div></div>
-        <div class="chart-card card-fx"><div id="ch-taxa-vis"></div></div>
-      </div>
+
       <div class="chart-card card-fx">
         <div class="card-title">
-          <span class="flex items-center gap-2"><span class="material-symbols-outlined" style="font-size:18px">receipt_long</span>Relatório de Vistorias</span>
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">timeline</span>Vistorias por Mês e Loja</span>
+          <span class="title-meta"><span class="live-dot"></span>Tempo real</span>
+        </div>
+        <div id="ch-vis-mes" class="chart-host" style="min-height:380px"></div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">leaderboard</span>Ranking de Vistoriadores</span></div>
+          <div id="ch-vistoriadores" class="chart-host" style="min-height:400px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">date_range</span>Vistorias por Dia da Semana</span></div>
+          <div id="ch-weekday" class="chart-host" style="min-height:380px"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">verified</span>Status</span></div>
+          <div id="ch-status" class="chart-host" style="min-height:300px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">category</span>Tipo de Serviço</span></div>
+          <div id="ch-tipo" class="chart-host" style="min-height:300px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">verified_user</span>Taxa de Aprovação por Loja</span></div>
+          <div id="ch-taxa-aprov" class="chart-host" style="min-height:300px"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">credit_card</span>Forma de Pagamento</span></div>
+          <div id="ch-forma-pag-vis" class="chart-host" style="min-height:280px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">person_search</span>Aprovação por Vistoriador</span></div>
+          <div id="ch-taxa-vis" class="chart-host" style="min-height:400px"></div>
+        </div>
+      </div>
+
+      <div class="chart-card card-fx">
+        <div class="card-title">
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">receipt_long</span>Relatório de Vistorias</span>
           <button class="export-btn" onclick="exportXlsx('op')"><span class="material-symbols-outlined" style="font-size:14px">download</span>Exportar</button>
         </div>
         <div class="tbl-wrap"><div id="tbl-op"></div></div>
@@ -366,22 +597,40 @@ tailwind.config = {
     <section id="fat" class="tab-content space-y-5">
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
         <div class="kpi-card card-fx" id="kpi-rec-total"></div>
-        <div class="kpi-card card-fx" id="kpi-rec-pago"   style="border-left-color:#22c55e"></div>
-        <div class="kpi-card card-fx" id="kpi-rec-aberto" style="border-left-color:#f97316"></div>
+        <div class="kpi-card card-fx" id="kpi-rec-pago"   style="--accent:#22c55e;--accent-glow:rgba(34,197,94,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-rec-aberto" style="--accent:#f97316;--accent-glow:rgba(249,115,22,0.45)"></div>
         <div class="kpi-card card-fx" id="kpi-ticket"></div>
         <div class="kpi-card card-fx" id="kpi-n-rec"></div>
       </div>
-      <div class="chart-card card-fx"><div id="ch-rec-mes"></div></div>
-      <div class="chart-card card-fx"><div id="ch-rec-loja"></div></div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="chart-card card-fx"><div id="ch-rec-tipo"></div></div>
-        <div class="chart-card card-fx"><div id="ch-rec-metodo"></div></div>
-        <div class="chart-card card-fx"><div id="ch-rec-status"></div></div>
+      <div class="chart-card card-fx">
+        <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">show_chart</span>Receita Mensal</span></div>
+        <div id="ch-rec-mes" class="chart-host" style="min-height:340px"></div>
       </div>
-      <div class="chart-card card-fx"><div id="ch-top-clientes"></div></div>
+      <div class="chart-card card-fx">
+        <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">storefront</span>Receita por Loja</span></div>
+        <div id="ch-rec-loja" class="chart-host" style="min-height:320px"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">groups</span>Particular vs Despachante</span></div>
+          <div id="ch-rec-tipo" class="chart-host" style="min-height:300px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">payments</span>Forma de Recebimento</span></div>
+          <div id="ch-rec-metodo" class="chart-host" style="min-height:300px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">task_alt</span>Status do Recebimento</span></div>
+          <div id="ch-rec-status" class="chart-host" style="min-height:300px"></div>
+        </div>
+      </div>
+      <div class="chart-card card-fx">
+        <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">military_tech</span>Top Clientes / Despachantes</span></div>
+        <div id="ch-top-clientes" class="chart-host" style="min-height:460px"></div>
+      </div>
       <div class="chart-card card-fx">
         <div class="card-title">
-          <span class="flex items-center gap-2"><span class="material-symbols-outlined" style="font-size:18px">paid</span>Relatório de Recebimentos</span>
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">paid</span>Relatório de Recebimentos</span>
           <button class="export-btn" onclick="exportXlsx('fat')"><span class="material-symbols-outlined" style="font-size:14px">download</span>Exportar</button>
         </div>
         <div class="tbl-wrap"><div id="tbl-fat"></div></div>
@@ -392,27 +641,37 @@ tailwind.config = {
     <section id="dep" class="tab-content space-y-5">
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <div class="kpi-card card-fx" id="kpi-dep-total"></div>
-        <div class="kpi-card card-fx" id="kpi-dep-pago"   style="border-left-color:#22c55e"></div>
-        <div class="kpi-card card-fx" id="kpi-dep-apagar" style="border-left-color:#ef4444"></div>
+        <div class="kpi-card card-fx" id="kpi-dep-pago"   style="--accent:#22c55e;--accent-glow:rgba(34,197,94,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-dep-apagar" style="--accent:#ef4444;--accent-glow:rgba(239,68,68,0.45)"></div>
         <div class="kpi-card card-fx" id="kpi-custo-vis"></div>
       </div>
-      <div class="chart-card card-fx"><div id="ch-dep-mes"></div></div>
+      <div class="chart-card card-fx">
+        <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">trending_down</span>Evolução Mensal de Despesas</span></div>
+        <div id="ch-dep-mes" class="chart-host" style="min-height:340px"></div>
+      </div>
       <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
-        <div class="chart-card card-fx"><div id="ch-dep-cat"></div></div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">pie_chart</span>Despesas por Categoria</span></div>
+          <div id="ch-dep-cat" class="chart-host" style="min-height:540px"></div>
+        </div>
         <div class="space-y-4">
-          <div class="chart-card card-fx"><div id="ch-dep-loja"></div></div>
-          <div class="chart-card card-fx"><div id="ch-dep-status"></div></div>
+          <div class="chart-card card-fx">
+            <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">storefront</span>Por Loja</span></div>
+            <div id="ch-dep-loja" class="chart-host" style="min-height:240px"></div>
+          </div>
+          <div class="chart-card card-fx">
+            <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">fact_check</span>Status</span></div>
+            <div id="ch-dep-status" class="chart-host" style="min-height:240px"></div>
+          </div>
         </div>
       </div>
       <div class="chart-card card-fx">
-        <div class="card-title">
-          <span class="flex items-center gap-2"><span class="material-symbols-outlined" style="font-size:18px">event_upcoming</span>Próximos Vencimentos</span>
-        </div>
+        <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">event_upcoming</span>Próximos Vencimentos</span></div>
         <div class="tbl-wrap"><div id="tbl-vencimentos"></div></div>
       </div>
       <div class="chart-card card-fx">
         <div class="card-title">
-          <span class="flex items-center gap-2"><span class="material-symbols-outlined" style="font-size:18px">request_quote</span>Relatório de Despesas</span>
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">request_quote</span>Relatório de Despesas</span>
           <button class="export-btn" onclick="exportXlsx('dep')"><span class="material-symbols-outlined" style="font-size:14px">download</span>Exportar</button>
         </div>
         <div class="tbl-wrap"><div id="tbl-dep"></div></div>
@@ -422,20 +681,29 @@ tailwind.config = {
     <!-- ════════ FLUXO FINANCEIRO ════════ -->
     <section id="fl" class="tab-content space-y-5">
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-        <div class="kpi-card card-fx" id="kpi-fl-ent"   style="border-left-color:#22c55e"></div>
-        <div class="kpi-card card-fx" id="kpi-fl-sai"   style="border-left-color:#ef4444"></div>
+        <div class="kpi-card card-fx" id="kpi-fl-ent"   style="--accent:#22c55e;--accent-glow:rgba(34,197,94,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-fl-sai"   style="--accent:#ef4444;--accent-glow:rgba(239,68,68,0.45)"></div>
         <div class="kpi-card card-fx" id="kpi-fl-saldo"></div>
         <div class="kpi-card card-fx" id="kpi-fl-margem"></div>
-        <div class="kpi-card card-fx" id="kpi-fl-prox30" style="border-left-color:#f97316"></div>
+        <div class="kpi-card card-fx" id="kpi-fl-prox30" style="--accent:#f97316;--accent-glow:rgba(249,115,22,0.45)"></div>
       </div>
-      <div class="chart-card card-fx"><div id="ch-fl-linhas"></div></div>
+      <div class="chart-card card-fx">
+        <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">multiline_chart</span>Entradas, Saídas e Saldo</span></div>
+        <div id="ch-fl-linhas" class="chart-host" style="min-height:420px"></div>
+      </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="chart-card card-fx"><div id="ch-fl-barras"></div></div>
-        <div class="chart-card card-fx"><div id="ch-fl-saldo"></div></div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">bar_chart</span>Receita vs Despesa por Mês</span></div>
+          <div id="ch-fl-barras" class="chart-host" style="min-height:340px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">account_balance_wallet</span>Saldo por Mês</span></div>
+          <div id="ch-fl-saldo" class="chart-host" style="min-height:340px"></div>
+        </div>
       </div>
       <div class="chart-card card-fx">
         <div class="card-title">
-          <span class="flex items-center gap-2"><span class="material-symbols-outlined" style="font-size:18px">account_balance</span>Relatório de Fluxo</span>
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">account_balance</span>Relatório de Fluxo</span>
           <button class="export-btn" onclick="exportXlsx('fl')"><span class="material-symbols-outlined" style="font-size:14px">download</span>Exportar</button>
         </div>
         <div class="tbl-wrap"><div id="tbl-fl"></div></div>
@@ -445,8 +713,8 @@ tailwind.config = {
     <!-- ════════ COBRANÇA ════════ -->
     <section id="cob" class="tab-content space-y-5">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <div class="kpi-card card-fx" id="kpi-cob-total" style="border-left-color:#ef4444"></div>
-        <div class="kpi-card card-fx" id="kpi-cob-qtd"   style="border-left-color:#f97316"></div>
+        <div class="kpi-card card-fx" id="kpi-cob-total" style="--accent:#ef4444;--accent-glow:rgba(239,68,68,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-cob-qtd"   style="--accent:#f97316;--accent-glow:rgba(249,115,22,0.45)"></div>
         <div class="kpi-card card-fx" id="kpi-cob-ticket"></div>
         <div class="kpi-card card-fx" id="kpi-cob-maior"></div>
       </div>
@@ -466,12 +734,18 @@ tailwind.config = {
         </div>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="chart-card card-fx"><div id="ch-cob-evolucao"></div></div>
-        <div class="chart-card card-fx"><div id="ch-cob-porcliente"></div></div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">trending_up</span>Inadimplência por Mês</span></div>
+          <div id="ch-cob-evolucao" class="chart-host" style="min-height:320px"></div>
+        </div>
+        <div class="chart-card card-fx">
+          <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">person_alert</span>Top Devedores</span></div>
+          <div id="ch-cob-porcliente" class="chart-host" style="min-height:320px"></div>
+        </div>
       </div>
       <div class="chart-card card-fx">
         <div class="card-title">
-          <span class="flex items-center gap-2"><span class="material-symbols-outlined" style="font-size:18px">notifications_active</span>Recebimentos em Aberto</span>
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">notifications_active</span>Recebimentos em Aberto</span>
           <button class="export-btn" onclick="exportXlsx('cob')"><span class="material-symbols-outlined" style="font-size:14px">download</span>Exportar</button>
         </div>
         <div class="tbl-wrap tbl-lg"><div id="tbl-cob"></div></div>
@@ -481,23 +755,13 @@ tailwind.config = {
   </main>
 </div>
 
-<!-- Bottom nav (mobile) -->
+<!-- Bottom nav -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-2xl rounded-t-2xl border-t border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] flex justify-around items-stretch px-1 pb-2 pt-1">
-  <button class="bnav-btn active" data-tab="op">
-    <span class="material-symbols-outlined">fact_check</span><span class="lbl">Oper.</span>
-  </button>
-  <button class="bnav-btn" data-tab="fat">
-    <span class="material-symbols-outlined">trending_up</span><span class="lbl">Receita</span>
-  </button>
-  <button class="bnav-btn" data-tab="dep">
-    <span class="material-symbols-outlined">payments</span><span class="lbl">Desp.</span>
-  </button>
-  <button class="bnav-btn" data-tab="fl">
-    <span class="material-symbols-outlined">swap_horiz</span><span class="lbl">Fluxo</span>
-  </button>
-  <button class="bnav-btn" data-tab="cob">
-    <span class="material-symbols-outlined">notifications_active</span><span class="lbl">Cobr.</span>
-  </button>
+  <button class="bnav-btn active" data-tab="op"><span class="material-symbols-outlined">fact_check</span><span class="lbl">Oper.</span></button>
+  <button class="bnav-btn" data-tab="fat"><span class="material-symbols-outlined">trending_up</span><span class="lbl">Receita</span></button>
+  <button class="bnav-btn" data-tab="dep"><span class="material-symbols-outlined">payments</span><span class="lbl">Desp.</span></button>
+  <button class="bnav-btn" data-tab="fl"><span class="material-symbols-outlined">swap_horiz</span><span class="lbl">Fluxo</span></button>
+  <button class="bnav-btn" data-tab="cob"><span class="material-symbols-outlined">notifications_active</span><span class="lbl">Cobr.</span></button>
 </nav>
 
 <script>
@@ -514,30 +778,30 @@ _PAG.forEach(r => {
 });
 _REC.forEach(r => { r._d = parseDate(r.data_pagamento); });
 
-// ══ Colors ════════════════════════════════════════════════════════════════
+// ══ Colors / Palette ══════════════════════════════════════════════════════
 const C = {
-  gold:'#facc15', goldL:'#fde047', goldD:'#a16207',
-  green:'#22c55e', red:'#ef4444', orange:'#f97316',
+  gold:'#FFD60A', goldL:'#FFE45C', goldD:'#B8860B', goldDeep:'#8a6608',
+  green:'#22c55e', greenL:'#4ade80',
+  red:'#ef4444', redL:'#f87171',
+  orange:'#f97316', orangeL:'#fb923c',
   cyan:'#06b6d4', purple:'#c084fc', lime:'#84cc16',
-  dark:'#171717', plot:'#0f0f0f',
-  text:'#FFF', muted:'#a3a3a3',
+  white:'#FFFFFF', text:'#FFF', muted:'#a3a3a3', dim:'#525252',
 };
-const LOJA_COLORS = {Goiania:C.gold, Prime:C.cyan, Anapolis:C.purple, Geral:'#FFFFFF'};
-const PALETTE = [C.gold, C.cyan, C.purple, C.green, C.red, C.orange, C.lime];
-const CFG = {responsive:true, displayModeBar:false};
+const LOJA_COLORS = {Goiania:C.gold, Prime:C.cyan, Anapolis:C.purple, Geral:C.white};
+const PALETTE = [C.gold, C.cyan, C.purple, C.greenL, C.orangeL, C.redL, C.lime];
 
-function L(extra={}) {
-  return Object.assign({
-    plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)',
-    font:{color:C.text, family:'Inter, system-ui, sans-serif', size:13},
-    title:{font:{color:C.gold, size:14, family:'"Plus Jakarta Sans", sans-serif'}},
-    xaxis:{gridcolor:'#262626', linecolor:'#262626', tickfont:{color:C.muted, size:12}, zeroline:false},
-    yaxis:{gridcolor:'#262626', linecolor:'#262626', tickfont:{color:C.muted, size:12}, zeroline:false},
-    legend:{bgcolor:'rgba(0,0,0,0)', font:{color:'#d4d4d4', size:12}},
-    margin:{t:48, l:10, r:10, b:40},
-    hoverlabel:{bgcolor:'#171717', font:{color:C.text, size:13, family:'Inter'}, bordercolor:C.gold},
-  }, extra);
-}
+// Stores chart instances so we can update (smooth transitions) instead of recreate.
+const CHARTS = {};
+
+// ══ Formatters ════════════════════════════════════════════════════════════
+const BRL = v => 'R$ ' + (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const N   = v => (v||0).toLocaleString('pt-BR');
+const ABBR = v => {
+  const a = Math.abs(v||0);
+  if (a >= 1e6) return 'R$' + (v/1e6).toFixed(1) + 'M';
+  if (a >= 1e3) return 'R$' + (v/1e3).toFixed(1) + 'k';
+  return 'R$' + (v||0).toFixed(0);
+};
 
 // ══ State ═════════════════════════════════════════════════════════════════
 const S = { from:null, to:null, loja:'all', vistoriador:'all', status:'all' };
@@ -593,10 +857,6 @@ function getPrev(){
   };
 }
 
-// ══ Formatters ════════════════════════════════════════════════════════════
-const BRL = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const N   = v => v.toLocaleString('pt-BR');
-
 function byMonth(arr, dKey, valKey){
   const m = {};
   arr.forEach(r => {
@@ -619,47 +879,141 @@ function groupSum(arr, key, valKey){
   return m;
 }
 
-function momAnnotations(labels, vals){
-  const momX=[], momY=[], momTxt=[], momClr=[];
-  vals.forEach((v,i) => {
-    if (i===0 || !vals[i-1]) return;
-    const p = ((v-vals[i-1])/Math.abs(vals[i-1])*100);
-    momX.push(labels[i]);
-    momY.push(v);
-    momTxt.push(`${p>=0?'▲':'▼'}${Math.abs(p).toFixed(1)}%`);
-    momClr.push(p>=0 ? C.green : C.red);
-  });
-  return {momX, momY, momTxt, momClr};
+// ══ ApexCharts base config ═══════════════════════════════════════════════
+// Animation defaults — keeps the "elegant entrance" + smooth transitions.
+const ANIM = {
+  enabled: true,
+  easing: 'easeinout',
+  speed: 900,
+  animateGradually: { enabled: true, delay: 110 },
+  dynamicAnimation: { enabled: true, speed: 480 }
+};
+
+function baseChart(opts){
+  return Object.assign({
+    chart: Object.assign({
+      background: 'transparent',
+      foreColor: '#a3a3a3',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      animations: ANIM,
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      dropShadow: { enabled: false },
+      redrawOnParentResize: true,
+    }, opts.chart || {}),
+    grid: Object.assign({
+      borderColor: '#1f1f1f', strokeDashArray: 3,
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: true } },
+      padding: { top: 6, right: 12, bottom: 0, left: 6 }
+    }, opts.grid || {}),
+    tooltip: Object.assign({
+      theme: 'dark', shared: true, intersect: false,
+      style: { fontSize: '12px', fontFamily: 'Inter' },
+    }, opts.tooltip || {}),
+    legend: Object.assign({
+      labels: { colors: '#d4d4d4' },
+      markers: { width: 10, height: 10, radius: 99 },
+      itemMargin: { horizontal: 10, vertical: 4 },
+      fontFamily: 'Inter', fontSize: '12px',
+    }, opts.legend || {}),
+    states: {
+      hover: { filter: { type: 'lighten', value: 0.06 } },
+      active: { filter: { type: 'darken', value: 0.15 } }
+    }
+  }, opts);
+}
+
+function makeChart(id, opts){
+  const el = document.querySelector('#'+id);
+  if (!el) return;
+  if (CHARTS[id]) {
+    // Smooth update: same chart instance, new data + options.
+    CHARTS[id].updateOptions(opts, true, true);
+    return;
+  }
+  const chart = new ApexCharts(el, baseChart(opts));
+  chart.render();
+  CHARTS[id] = chart;
+}
+
+function destroyChart(id){
+  if (CHARTS[id]) { CHARTS[id].destroy(); delete CHARTS[id]; }
+}
+
+function emptyState(id, msg){
+  destroyChart(id);
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = `<div class="empty"><span class="material-symbols-outlined">inbox</span>${msg}</div>`;
 }
 
 // ══ KPI updater ═══════════════════════════════════════════════════════════
-function kpi(id, label, val, prevVal, sub='', color=C.gold, isCurrency=false){
-  const el = document.getElementById(id);
-  if (!el) return;
+function kpi(id, opts){
+  const { label, value, prev, sub='', icon='analytics', isCurrency=false, sparkData=null, sparkColor=null } = opts;
+  const el = document.getElementById(id); if (!el) return;
+
   let trend = '';
-  if (prevVal!==null && prevVal!==undefined && prevVal!==0 && val!==null){
-    const delta = ((val-prevVal)/Math.abs(prevVal))*100;
+  if (prev !== null && prev !== undefined && prev !== 0 && value !== null && typeof value === 'number'){
+    const delta = ((value-prev)/Math.abs(prev))*100;
     const up = delta >= 0;
-    trend = `<div class="trend ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(delta).toFixed(1)}% vs per. ant.</div>`;
+    trend = `<span class="trend ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(delta).toFixed(1)}%</span>`;
   }
+
   let display;
-  if (val===null) display='—';
-  else if (typeof val==='number'){
-    const abs = Math.abs(val);
-    if (isCurrency || (!Number.isInteger(val) && abs>0))
-      display = BRL(val);
-    else if (abs>=1000)
-      display = N(val);
-    else display = val;
-  } else display = val;
-  el.innerHTML =
-    `<div class="label">${label}</div>`+
-    `<div class="value" style="color:${color}">${display}</div>`+
-    trend+
-    (sub?`<div class="sub">${sub}</div>`:'');
+  if (value === null || value === undefined) display = '—';
+  else if (typeof value === 'number'){
+    const abs = Math.abs(value);
+    if (isCurrency || (!Number.isInteger(value) && abs > 0)) display = BRL(value);
+    else if (abs >= 1000) display = N(value);
+    else display = value;
+  } else display = value;
+
+  el.innerHTML = `
+    <div class="kpi-head">
+      <span class="label">${label}</span>
+      <span class="kpi-icon"><span class="material-symbols-outlined">${icon}</span></span>
+    </div>
+    <div class="value">${display}</div>
+    <div class="kpi-foot">
+      ${trend}
+      ${sub ? `<span class="sub">${sub}</span>` : ''}
+    </div>
+    ${sparkData ? `<div class="kpi-spark" id="${id}-spark"></div>` : ''}
+  `;
+
+  if (sparkData && sparkData.length > 1){
+    const sparkId = `${id}-spark`;
+    destroyChart(sparkId);
+    const color = sparkColor || getComputedStyle(el).getPropertyValue('--accent') || C.gold;
+    const sparkChart = new ApexCharts(document.getElementById(sparkId), {
+      chart: {
+        type: 'area', height: 36, sparkline: { enabled: true },
+        animations: { enabled: true, easing: 'easeinout', speed: 700 },
+        background: 'transparent',
+      },
+      stroke: { curve: 'smooth', width: 2 },
+      series: [{ name: label, data: sparkData }],
+      colors: [color.trim()],
+      fill: {
+        type: 'gradient',
+        gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] }
+      },
+      tooltip: { enabled: false },
+    });
+    sparkChart.render();
+    CHARTS[sparkId] = sparkChart;
+  }
 }
 
-// ══ OPERAÇÕES ═════════════════════════════════════════════════════════════
+// Build a sparkline series from monthly data
+function spark(arr, dKey, valKey){
+  const m = byMonth(arr, dKey, valKey);
+  return Object.keys(m).sort().map(k => +(+m[k]).toFixed(2));
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  OPERAÇÕES
+// ══════════════════════════════════════════════════════════════════════════
 function renderOp({vis}, prev){
   const total = vis.length;
   const aprov = vis.filter(r=>r.STATUS==='APROVADO').length;
@@ -668,21 +1022,31 @@ function renderOp({vis}, prev){
   const media  = months.size ? Math.round(total/months.size) : 0;
   const pv = prev?.vis;
 
-  kpi('kpi-total','Total de Vistorias', total, pv?.length, 'no período');
-  kpi('kpi-aprov','Aprovadas', aprov, pv?.filter(r=>r.STATUS==='APROVADO').length,
-      total?`${(aprov/total*100).toFixed(1)}% do total`:'', C.green);
-  kpi('kpi-pend','Pendentes DETRAN', pend,
-      pv?(pv.length-pv.filter(r=>r.STATUS==='APROVADO').length):null,
-      total?`${(pend/total*100).toFixed(1)}% do total`:'', C.orange);
-  kpi('kpi-media','Média / Mês', media, null, 'vistorias');
+  kpi('kpi-total', { label:'Total de Vistorias', value:total, prev:pv?.length, sub:'no período', icon:'fact_check',
+                     sparkData: spark(vis,'_d',null) });
+  kpi('kpi-aprov', { label:'Aprovadas', value:aprov, prev:pv?.filter(r=>r.STATUS==='APROVADO').length,
+                     sub: total?`${(aprov/total*100).toFixed(1)}% do total`:'', icon:'verified',
+                     sparkData: spark(vis.filter(r=>r.STATUS==='APROVADO'),'_d',null), sparkColor: C.green });
+  kpi('kpi-pend', { label:'Pendentes DETRAN', value:pend,
+                    prev: pv ? (pv.length - pv.filter(r=>r.STATUS==='APROVADO').length) : null,
+                    sub: total?`${(pend/total*100).toFixed(1)}% do total`:'', icon:'pending',
+                    sparkData: spark(vis.filter(r=>r.STATUS!=='APROVADO'),'_d',null), sparkColor: C.orange });
+  kpi('kpi-media', { label:'Média / Mês', value:media, prev:null, sub:'vistorias', icon:'insights' });
+
   const lojaMap={go:'Goiania',pr:'Prime',an:'Anapolis'};
   const lojaLbl={go:'Goiânia',pr:'Prime',an:'Anápolis'};
-  const lojaClr={go:C.gold,pr:C.cyan,an:C.purple};
+  const lojaIcon={go:'store',pr:'storefront',an:'apartment'};
+  const lojaCol={go:C.gold, pr:C.cyan, an:C.purple};
   Object.keys(lojaMap).forEach(k=>{
     const l=lojaMap[k], cnt=vis.filter(r=>r.loja===l).length;
-    kpi('kpi-loja-'+k, lojaLbl[k], cnt, pv?pv.filter(r=>r.loja===l).length:null, 'vistorias', lojaClr[k]);
+    kpi('kpi-loja-'+k, {
+      label:lojaLbl[k], value:cnt, prev: pv?pv.filter(r=>r.loja===l).length:null,
+      sub:'vistorias', icon: lojaIcon[k],
+      sparkData: spark(vis.filter(r=>r.loja===l),'_d',null), sparkColor: lojaCol[k]
+    });
   });
 
+  // ─── Vistorias por Mês e Loja (área empilhada estilo Stakent) ────────────
   const lojas = ['Goiania','Prime','Anapolis'];
   const lojaLabels = ['Goiânia','Prime','Anápolis'];
   const mesLoja = {};
@@ -694,131 +1058,305 @@ function renderOp({vis}, prev){
   });
   const mks = Object.keys(mesLoja).sort();
   const ml  = mks.map(monthLabel);
-  const mTotals = mks.map(k=>Object.values(mesLoja[k]).reduce((s,v)=>s+v,0));
-  const {momX,momY,momTxt,momClr} = momAnnotations(ml, mTotals);
-  const lojaTextPos = {Goiania:'bottom center', Prime:'top center', Anapolis:'bottom center'};
-  Plotly.react('ch-vis-mes',
-    [...lojas.map((l,i)=>({
-      type:'scatter', name:lojaLabels[i], x:ml, y:mks.map(k=>mesLoja[k][l]),
-      mode:'lines+markers+text', line:{color:LOJA_COLORS[l],width:2.5},
-      marker:{size:7,color:LOJA_COLORS[l]},
-      text:mks.map(k=>mesLoja[k][l]>0?mesLoja[k][l]:''),
-      textposition:lojaTextPos[l], textfont:{size:11,color:LOJA_COLORS[l]},
-      hovertemplate:'%{x} — '+lojaLabels[i]+': <b>%{y}</b><extra></extra>'
-    })),
-    {type:'scatter', name:'Total Geral', x:ml, y:mTotals, mode:'lines+markers+text',
-     line:{color:LOJA_COLORS.Geral,width:3.5,dash:'dot'}, marker:{size:9,color:LOJA_COLORS.Geral},
-     text:mTotals, textposition:'top center', textfont:{size:12,color:LOJA_COLORS.Geral},
-     hovertemplate:'%{x} Total: <b>%{y}</b><extra></extra>'},
-    {type:'scatter', x:momX, y:momY.map(v=>v*1.25), mode:'text',
-     text:momTxt, textfont:{size:12,color:momClr}, showlegend:false, hoverinfo:'none'}],
-    L({title:{text:'Vistorias por Mês e Loja',font:{color:C.gold,size:14}},
-       height:420, showlegend:true,
-       legend:{orientation:'h',y:1.05,x:0,font:{size:13}},
-       yaxis:{...L().yaxis, rangemode:'tozero', showticklabels:false},
-       xaxis:{...L().xaxis, tickangle:mks.length>8?-45:0}}), CFG);
 
+  if (mks.length){
+    makeChart('ch-vis-mes', {
+      chart: { type: 'area', height: 380, stacked: true },
+      series: lojas.map((l,i)=>({ name:lojaLabels[i], data: mks.map(k=>mesLoja[k][l]) })),
+      xaxis: {
+        categories: ml,
+        axisBorder: { show: false }, axisTicks: { color: '#1f1f1f' },
+        labels: { style: { colors: '#a3a3a3', fontSize: '11px' }, rotate: -45, rotateAlways: ml.length > 8 }
+      },
+      yaxis: {
+        labels: {
+          style: { colors: '#a3a3a3', fontSize: '11px' },
+          formatter: v => N(Math.round(v))
+        }
+      },
+      colors: [C.gold, C.cyan, C.purple],
+      stroke: { curve: 'smooth', width: 2.5 },
+      fill: {
+        type: 'gradient',
+        gradient: { shadeIntensity: 1, opacityFrom: 0.55, opacityTo: 0.05, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true,
+        enabledOnSeries: [0,1,2],
+        formatter: v => v > 0 ? v : '',
+        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 3, opacity: 0.9, borderWidth: 0 },
+        style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
+      },
+      markers: {
+        size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 8 }
+      },
+      legend: {
+        position: 'top', horizontalAlign: 'left', fontWeight: 600,
+        markers: { width: 12, height: 12, radius: 99 }
+      },
+      tooltip: {
+        shared: true, intersect: false,
+        y: { formatter: v => N(v) + ' vistorias' }
+      }
+    });
+  } else emptyState('ch-vis-mes', 'Sem dados no período');
+
+  // ─── Ranking Vistoriadores (barras horizontais com gradiente dourado) ────
   const vmap = groupSum(vis,'VISTORIADOR');
   const vkeys = Object.keys(vmap).sort((a,b)=>vmap[b]-vmap[a]).slice(0,10);
   const vTotal = vkeys.reduce((s,k)=>s+vmap[k],0);
-  Plotly.react('ch-vistoriadores',
-    [{type:'bar', orientation:'h',
-      x:vkeys.map(k=>vmap[k]), y:vkeys,
-      marker:{color:vkeys.map((_,i)=>i===0?C.gold:i<3?C.goldL:C.goldD)},
-      text:vkeys.map(k=>`${vmap[k]}  (${vTotal?((vmap[k]/vTotal)*100).toFixed(1)+'%':'—'})`),
-      textposition:'auto', cliponaxis:false, textfont:{size:13,color:'#000'},
-      hovertemplate:'%{y}: %{x}<extra></extra>'}],
-    L({title:{text:'Ranking de Vistoriadores',font:{color:C.gold,size:14}}, height:400,
-       xaxis:{...L().xaxis,showgrid:false,range:[0,Math.max(...Object.values(vmap))*1.4]},
-       yaxis:{...L().yaxis,automargin:true,autorange:'reversed',tickfont:{size:13}},
-       margin:{t:48,l:10,r:20,b:40}}), CFG);
 
+  if (vkeys.length){
+    makeChart('ch-vistoriadores', {
+      chart: { type: 'bar', height: 400 },
+      series: [{ name: 'Vistorias', data: vkeys.map(k=>vmap[k]) }],
+      xaxis: {
+        categories: vkeys.map(k=>k.split(' ')[0]+' '+k.split(' ').slice(-1)[0]),
+        labels: { style: { colors: '#a3a3a3', fontSize: '11px' } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      plotOptions: {
+        bar: {
+          horizontal: true, borderRadius: 6, borderRadiusApplication: 'end',
+          barHeight: '70%', distributed: true,
+          dataLabels: { position: 'top' }
+        }
+      },
+      colors: vkeys.map((_,i)=> i===0 ? C.gold : i<3 ? C.goldL : C.goldD),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.55, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: (v) => v + (vTotal ? `   ${(v/vTotal*100).toFixed(1)}%` : ''),
+        offsetX: 8,
+        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      tooltip: { y: { formatter: v => N(v) + ' vistorias' } }
+    });
+  } else emptyState('ch-vistoriadores', 'Sem vistoriadores no período');
+
+  // ─── Dia da Semana (barras verticais com dataLabels visíveis) ────────────
   const diasSemana=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   const wdCounts=[0,0,0,0,0,0,0];
   vis.forEach(r=>{ if(r._d) wdCounts[r._d.getDay()]++; });
   const wdMax=Math.max(...wdCounts);
-  Plotly.react('ch-weekday',
-    [{type:'bar', x:diasSemana, y:wdCounts,
-      marker:{color:wdCounts.map((v,i)=>v===wdMax?C.gold:i===0?'#262626':C.goldD)},
-      text:wdCounts, textposition:'outside', textfont:{size:13,color:'#FFF'},
-      hovertemplate:'%{x}: %{y}<extra></extra>'}],
-    L({title:{text:'Vistorias por Dia da Semana',font:{color:C.gold,size:14}},
-       height:380, showlegend:false,
-       xaxis:{...L().xaxis,showgrid:false},
-       yaxis:{...L().yaxis,showgrid:false,showticklabels:false}}), CFG);
 
-  Plotly.react('ch-status',
-    [{type:'pie', hole:.6, labels:['Aprovado','Pendente DETRAN'], values:[aprov,pend],
-      marker:{colors:[C.green,C.orange]}, textinfo:'percent',
-      textfont:{size:14,color:'#000'}, hovertemplate:'%{label}: %{value}<extra></extra>'}],
-    L({title:{text:'Status',font:{color:C.gold,size:14}}, height:300,
-       legend:{orientation:'h',y:-.05,font:{size:12}}}), CFG);
+  makeChart('ch-weekday', {
+    chart: { type: 'bar', height: 380 },
+    series: [{ name: 'Vistorias', data: wdCounts }],
+    xaxis: {
+      categories: diasSemana,
+      labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 700 } },
+      axisBorder: { show: false }, axisTicks: { show: false }
+    },
+    yaxis: { show: false },
+    plotOptions: {
+      bar: { borderRadius: 8, columnWidth: '55%', distributed: true, dataLabels: { position: 'top' } }
+    },
+    colors: wdCounts.map((v,i)=> v===wdMax ? C.gold : i===0 ? '#262626' : C.goldD),
+    fill: {
+      type: 'gradient',
+      gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
+    },
+    dataLabels: {
+      enabled: true, offsetY: -22,
+      style: { colors: ['#fff'], fontSize: '13px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+    },
+    legend: { show: false },
+    grid: { yaxis: { lines: { show: false } } },
+    tooltip: { y: { formatter: v => N(v) + ' vistorias' } }
+  });
 
+  // ─── Status (radial) ─────────────────────────────────────────────────────
+  const taxaAprov = total ? +(aprov/total*100).toFixed(1) : 0;
+  makeChart('ch-status', {
+    chart: { type: 'radialBar', height: 300 },
+    series: [taxaAprov],
+    plotOptions: {
+      radialBar: {
+        startAngle: -135, endAngle: 135, hollow: { size: '62%', background: 'transparent' },
+        track: { background: '#1f1f1f', strokeWidth: '100%' },
+        dataLabels: {
+          name: { show: true, fontSize: '11px', color: '#a3a3a3', offsetY: 70, fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
+          value: {
+            show: true, fontSize: '34px', color: '#fff', offsetY: 8,
+            fontFamily: 'Plus Jakarta Sans', fontWeight: 800,
+            formatter: v => v + '%'
+          }
+        }
+      }
+    },
+    fill: {
+      type: 'gradient',
+      gradient: { shade: 'dark', type: 'horizontal', gradientToColors: [C.goldL], stops: [0, 100] }
+    },
+    stroke: { lineCap: 'round' },
+    colors: [C.green],
+    labels: ['Aprovadas']
+  });
+
+  // ─── Tipo de Serviço (donut com valores visíveis) ────────────────────────
   const tipo = groupSum(vis,'TIPO');
   const tkeys = Object.keys(tipo).sort((a,b)=>tipo[b]-tipo[a]);
-  Plotly.react('ch-tipo',
-    [{type:'bar', orientation:'h', x:tkeys.map(k=>tipo[k]), y:tkeys,
-      marker:{color:PALETTE.slice(0,tkeys.length)}, text:tkeys.map(k=>tipo[k]),
-      textposition:'auto', cliponaxis:false, textfont:{size:13,color:'#000'},
-      hovertemplate:'%{y}: %{x}<extra></extra>'}],
-    L({title:{text:'Tipo de Serviço',font:{color:C.gold,size:14}}, height:300,
-       xaxis:{...L().xaxis,showgrid:false,range:[0,Math.max(...Object.values(tipo))*1.3]},
-       yaxis:{...L().yaxis,automargin:true,autorange:'reversed',tickfont:{size:13}},
-       margin:{t:48,l:10,r:20,b:40}}), CFG);
+  if (tkeys.length){
+    makeChart('ch-tipo', {
+      chart: { type: 'donut', height: 300 },
+      series: tkeys.map(k=>tipo[k]),
+      labels: tkeys,
+      colors: PALETTE.slice(0, tkeys.length),
+      stroke: { width: 2, colors: ['#0a0a0a'] },
+      dataLabels: {
+        enabled: true,
+        formatter: (val, op) => N(op.w.config.series[op.seriesIndex]),
+        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] },
+        dropShadow: { enabled: false }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '62%',
+            labels: {
+              show: true,
+              total: {
+                show: true, label: 'Total', fontSize: '11px', color: '#a3a3a3',
+                fontFamily: 'Plus Jakarta Sans', fontWeight: 700,
+                formatter: w => N(w.globals.seriesTotals.reduce((a,b)=>a+b,0))
+              },
+              value: { fontSize: '24px', color: '#FFD60A', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+            }
+          }
+        }
+      },
+      legend: { position: 'bottom', formatter: (l, op) => `${l}: ${N(op.w.globals.series[op.seriesIndex])}` },
+      tooltip: { y: { formatter: v => N(v) + ' vistorias' } }
+    });
+  } else emptyState('ch-tipo', 'Sem tipos no período');
 
+  // ─── Taxa de Aprovação por Loja ──────────────────────────────────────────
   const taxaData={};
   vis.forEach(r=>{
     if(!taxaData[r.loja]) taxaData[r.loja]={t:0,a:0};
     taxaData[r.loja].t++; if(r.STATUS==='APROVADO') taxaData[r.loja].a++;
   });
-  const tl=Object.keys(taxaData).filter(l=>l&&l!=='Outros');
-  const tlbl=tl.map(l=>lojaLabel(l));
-  const taxas=tl.map(l=>taxaData[l].t?+(taxaData[l].a/taxaData[l].t*100).toFixed(1):0);
-  Plotly.react('ch-taxa-aprov',
-    [{type:'bar', x:tlbl, y:taxas,
-      marker:{color:tl.map(l=>LOJA_COLORS[l]||C.goldD)},
-      text:taxas.map(t=>t+'%'), textposition:'outside', textfont:{size:14,color:'#FFF'},
-      hovertemplate:'%{x}: %{text}<extra></extra>'}],
-    L({title:{text:'Taxa de Aprovação por Loja (%)',font:{color:C.gold,size:14}}, height:300,
-       yaxis:{...L().yaxis,range:[80,104],showticklabels:false}, showlegend:false}), CFG);
+  const tl = Object.keys(taxaData).filter(l=>l && l!=='Outros');
+  const tlbl = tl.map(l=>lojaLabel(l));
+  const taxas = tl.map(l => taxaData[l].t ? +(taxaData[l].a/taxaData[l].t*100).toFixed(1) : 0);
 
-  const fpmap=groupSum(vis,'FORMAPAGAMENTO');
-  const fpkeys=Object.keys(fpmap).filter(k=>k!=='null'&&k!=='Outros');
-  Plotly.react('ch-forma-pag-vis',
-    [{type:'bar', orientation:'h', x:fpkeys.map(k=>fpmap[k]), y:fpkeys,
-      marker:{color:PALETTE.slice(0,fpkeys.length)},
-      text:fpkeys.map(k=>fpmap[k]), textposition:'auto', cliponaxis:false, textfont:{size:13,color:'#000'},
-      hovertemplate:'%{y}: %{x}<extra></extra>'}],
-    L({title:{text:'Forma de Pagamento — Vistorias',font:{color:C.gold,size:14}}, height:240,
-       xaxis:{...L().xaxis,showgrid:false,range:[0,Math.max(...Object.values(fpmap))*1.3]},
-       yaxis:{...L().yaxis,automargin:true,autorange:'reversed',tickfont:{size:13}},
-       margin:{t:48,l:10,r:20,b:40}}), CFG);
+  if (tl.length){
+    makeChart('ch-taxa-aprov', {
+      chart: { type: 'bar', height: 300 },
+      series: [{ name: 'Aprovação', data: taxas }],
+      xaxis: {
+        categories: tlbl,
+        labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 700 } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { min: 80, max: 100, labels: { formatter: v => v.toFixed(0) + '%', style: { colors: '#a3a3a3' } } },
+      plotOptions: {
+        bar: { borderRadius: 10, columnWidth: '55%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      colors: tl.map(l => LOJA_COLORS[l] || C.goldD),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.7, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, offsetY: -22,
+        formatter: v => v + '%',
+        style: { colors: ['#fff'], fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      annotations: {
+        yaxis: [
+          { y: 95, borderColor: C.green, strokeDashArray: 4, label: { text: 'Meta 95%', style: { color: '#000', background: C.green, fontWeight: 700, fontSize: '10px' } } }
+        ]
+      },
+      tooltip: { y: { formatter: v => v + '% aprovação' } }
+    });
+  } else emptyState('ch-taxa-aprov', 'Sem dados');
 
+  // ─── Forma de Pagamento ──────────────────────────────────────────────────
+  const fpmap = groupSum(vis,'FORMAPAGAMENTO');
+  const fpkeys = Object.keys(fpmap).filter(k=>k!=='null'&&k!=='Outros').sort((a,b)=>fpmap[b]-fpmap[a]);
+  if (fpkeys.length){
+    makeChart('ch-forma-pag-vis', {
+      chart: { type: 'bar', height: 280 },
+      series: [{ name: 'Vistorias', data: fpkeys.map(k=>fpmap[k]) }],
+      xaxis: {
+        categories: fpkeys, labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { style: { colors: '#a3a3a3' } } },
+      plotOptions: {
+        bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '65%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      colors: PALETTE.slice(0, fpkeys.length),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => N(v), offsetX: 8,
+        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      tooltip: { y: { formatter: v => N(v) + ' vistorias' } }
+    });
+  } else emptyState('ch-forma-pag-vis', 'Sem dados');
+
+  // ─── Aprovação por Vistoriador ───────────────────────────────────────────
   const visAprov={};
   vis.forEach(r=>{
-    const n=r.VISTORIADOR||'Desconhecido';
-    if(!visAprov[n]) visAprov[n]={t:0,a:0};
+    const n = r.VISTORIADOR || 'Desconhecido';
+    if (!visAprov[n]) visAprov[n] = { t:0, a:0 };
     visAprov[n].t++;
-    if(r.STATUS==='APROVADO') visAprov[n].a++;
+    if (r.STATUS==='APROVADO') visAprov[n].a++;
   });
-  const vaKeys=Object.keys(visAprov).filter(k=>visAprov[k].t>=5)
+  const vaKeys = Object.keys(visAprov).filter(k=>visAprov[k].t>=5)
     .sort((a,b)=>(visAprov[b].a/visAprov[b].t)-(visAprov[a].a/visAprov[a].t));
-  const vaTaxas=vaKeys.map(k=>+(visAprov[k].a/visAprov[k].t*100).toFixed(1));
-  const vaLabels=vaKeys.map(k=>k.split(' ')[0]+' '+k.split(' ').slice(-1)[0]);
-  Plotly.react('ch-taxa-vis',
-    [{type:'bar', orientation:'h', x:vaTaxas, y:vaLabels,
-      marker:{color:vaTaxas.map(t=>t>=97?C.green:t>=93?C.orange:C.red)},
-      text:vaTaxas.map(t=>t+'%'), textposition:'auto', cliponaxis:false, textfont:{size:12,color:'#000'},
-      hovertemplate:'%{y}: <b>%{x}%</b><extra></extra>'}],
-    L({title:{text:'Aprovação por Vistoriador (%)',font:{color:C.gold,size:14}}, height:400,
-       xaxis:{...L().xaxis,range:[85,102],showgrid:false},
-       yaxis:{...L().yaxis,automargin:true,autorange:'reversed',tickfont:{size:12}},
-       shapes:[{type:'line',x0:97,x1:97,y0:-0.5,y1:vaKeys.length-0.5,
-                line:{color:C.green,width:1.5,dash:'dot'}},
-               {type:'line',x0:93,x1:93,y0:-0.5,y1:vaKeys.length-0.5,
-                line:{color:C.orange,width:1.5,dash:'dot'}}],
-       margin:{t:48,l:10,r:20,b:40}}), CFG);
+  const vaTaxas = vaKeys.map(k => +(visAprov[k].a/visAprov[k].t*100).toFixed(1));
+  const vaLabels = vaKeys.map(k => k.split(' ')[0]+' '+k.split(' ').slice(-1)[0]);
 
+  if (vaKeys.length){
+    makeChart('ch-taxa-vis', {
+      chart: { type: 'bar', height: 400 },
+      series: [{ name: 'Aprovação', data: vaTaxas }],
+      xaxis: {
+        categories: vaLabels, min: 85, max: 102,
+        labels: { formatter: v => v.toFixed(0)+'%', style: { colors: '#a3a3a3' } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      plotOptions: {
+        bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      colors: vaTaxas.map(t => t>=97 ? C.green : t>=93 ? C.orange : C.red),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => v + '%', offsetX: 8,
+        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      annotations: {
+        xaxis: [
+          { x: 97, borderColor: C.green, strokeDashArray: 4, label: { text: 'Excelente 97%', style: { color: '#000', background: C.green, fontWeight: 700, fontSize: '10px' } } },
+          { x: 93, borderColor: C.orange, strokeDashArray: 4, label: { text: 'Mínimo 93%', style: { color: '#000', background: C.orange, fontWeight: 700, fontSize: '10px' } } }
+        ]
+      },
+      tooltip: { y: { formatter: v => v + '% aprovação' } }
+    });
+  } else emptyState('ch-taxa-vis', 'Necessário ≥5 vistorias por vistoriador');
+
+  // ─── Tabela ──────────────────────────────────────────────────────────────
   const opRows = vis.slice(0,200).map(r=>`<tr>
     <td>${r._d?r._d.toLocaleDateString('pt-BR'):'—'}</td>
     <td>${r.VISTORIADOR||'—'}</td>
@@ -829,10 +1367,12 @@ function renderOp({vis}, prev){
   </tr>`).join('');
   document.getElementById('tbl-op').innerHTML = opRows.length
     ? `<table class="data-table"><thead><tr><th>Data</th><th>Vistoriador</th><th>Loja</th><th>Tipo</th><th>Status</th><th>Forma Pgto</th></tr></thead><tbody>${opRows}</tbody></table><p style="color:#666;font-size:11px;padding:8px 14px">Mostrando até 200 registros. Exporte para ver todos.</p>`
-    : '<div class="empty">Sem dados no período</div>';
+    : '<div class="empty"><span class="material-symbols-outlined">inbox</span>Sem dados no período</div>';
 }
 
-// ══ FATURAMENTO ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
+//  FATURAMENTO
+// ══════════════════════════════════════════════════════════════════════════
 function renderFat({rec}, prev){
   const total  = rec.reduce((s,r)=>s+(r.valor_recebido||0),0);
   const pago   = rec.filter(r=>r.status_pagamento==='Pago').reduce((s,r)=>s+(r.valor_recebido||0),0);
@@ -841,118 +1381,237 @@ function renderFat({rec}, prev){
   const pr = prev?.rec;
   const pt = pr?.reduce((s,r)=>s+(r.valor_recebido||0),0);
 
-  kpi('kpi-rec-total','Receita Total', total, pt, '', C.gold, true);
-  kpi('kpi-rec-pago','Recebido', pago,
-      pr?.filter(r=>r.status_pagamento==='Pago').reduce((s,r)=>s+(r.valor_recebido||0),0),
-      total?`${(pago/total*100).toFixed(1)}% do total`:'', C.green, true);
-  kpi('kpi-rec-aberto','Em Aberto', aberto, null,
-      total?`${(aberto/total*100).toFixed(1)}% do total`:'', C.orange, true);
-  kpi('kpi-ticket','Ticket Médio', parseFloat(ticket.toFixed(2)), null, `${rec.length} recebimentos`, C.gold, true);
-  kpi('kpi-n-rec','Recebimentos', rec.length, pr?.length, 'no período');
+  kpi('kpi-rec-total', { label:'Receita Total', value:total, prev:pt, sub:'período', icon:'paid', isCurrency:true,
+                         sparkData: spark(rec,'_d','valor_recebido') });
+  kpi('kpi-rec-pago', { label:'Recebido', value:pago,
+                        prev: pr?.filter(r=>r.status_pagamento==='Pago').reduce((s,r)=>s+(r.valor_recebido||0),0),
+                        sub: total?`${(pago/total*100).toFixed(1)}% do total`:'',
+                        icon:'check_circle', isCurrency:true,
+                        sparkData: spark(rec.filter(r=>r.status_pagamento==='Pago'),'_d','valor_recebido'),
+                        sparkColor: C.green });
+  kpi('kpi-rec-aberto', { label:'Em Aberto', value:aberto, prev:null,
+                          sub: total?`${(aberto/total*100).toFixed(1)}% do total`:'',
+                          icon:'pending_actions', isCurrency:true,
+                          sparkData: spark(rec.filter(r=>r.status_pagamento==='Em Aberto'),'_d','valor_recebido'),
+                          sparkColor: C.orange });
+  kpi('kpi-ticket', { label:'Ticket Médio', value:parseFloat(ticket.toFixed(2)), prev:null,
+                      sub:`${rec.length} recebimentos`, icon:'receipt', isCurrency:true });
+  kpi('kpi-n-rec', { label:'Recebimentos', value:rec.length, prev:pr?.length, sub:'no período', icon:'list_alt' });
 
+  // ─── Receita Mensal (área com gradiente) ─────────────────────────────────
   const rm = byMonth(rec,'_d','valor_recebido');
   const rmk = Object.keys(rm).sort();
   const rml = rmk.map(monthLabel);
   const rmy = rmk.map(k=>rm[k]);
-  const {momX:rx,momY:ry,momTxt:rt,momClr:rc} = momAnnotations(rml, rmy);
-  Plotly.react('ch-rec-mes',
-    [{type:'scatter', name:'Receita', x:rml, y:rmy, mode:'lines+markers+text',
-      line:{color:C.gold,width:3}, marker:{size:9,color:C.gold},
-      text:rmy.map(v=>`R$${(v/1000).toFixed(1)}k`), textposition:'top center',
-      textfont:{size:12,color:C.gold},
-      hovertemplate:'%{x}: <b>R$ %{y:,.2f}</b><extra></extra>'},
-     {type:'scatter', x:rx, y:ry.map(v=>v*1.3), mode:'text',
-      text:rt, textfont:{size:12,color:rc}, showlegend:false, hoverinfo:'none'}],
-    L({title:{text:'Receita Mensal',font:{color:C.gold,size:14}}, height:360,
-       yaxis:{...L().yaxis,showticklabels:false,rangemode:'tozero'},
-       showlegend:false}), CFG);
 
-  const recLojas=['Goiania','Prime','Anapolis'];
-  const recLojaLbls=['Goiânia','Prime','Anápolis'];
-  const recMesLoja={};
+  if (rmk.length){
+    makeChart('ch-rec-mes', {
+      chart: { type: 'area', height: 340, dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.gold } },
+      series: [{ name: 'Receita', data: rmy.map(v => +v.toFixed(2)) }],
+      xaxis: {
+        categories: rml,
+        labels: { style: { colors: '#a3a3a3' }, rotate: rmk.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      colors: [C.gold],
+      stroke: { curve: 'smooth', width: 3 },
+      fill: {
+        type: 'gradient',
+        gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: v => ABBR(v),
+        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 0 },
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
+        offsetY: -8
+      },
+      markers: { size: 5, colors: [C.gold], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
+      legend: { show: false },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-rec-mes', 'Sem receitas no período');
+
+  // ─── Receita por Loja (linhas múltiplas com data labels visíveis) ────────
+  const recLojas = ['Goiania','Prime','Anapolis'];
+  const recLojaLbls = ['Goiânia','Prime','Anápolis'];
+  const recMesLoja = {};
   rec.forEach(r=>{
     if(!r._d||!r.loja) return;
-    const mk=r._d.getFullYear()+'-'+String(r._d.getMonth()+1).padStart(2,'0');
-    if(!recMesLoja[mk]) recMesLoja[mk]={Goiania:0,Prime:0,Anapolis:0};
-    if(recMesLoja[mk][r.loja]!==undefined) recMesLoja[mk][r.loja]+=r.valor_recebido||0;
+    const mk = r._d.getFullYear()+'-'+String(r._d.getMonth()+1).padStart(2,'0');
+    if(!recMesLoja[mk]) recMesLoja[mk] = { Goiania:0, Prime:0, Anapolis:0 };
+    if(recMesLoja[mk][r.loja]!==undefined) recMesLoja[mk][r.loja] += r.valor_recebido||0;
   });
-  const rmlk=Object.keys(recMesLoja).sort();
-  if(rmlk.length>0){
-    const rmll=rmlk.map(monthLabel);
-    const recLojaTextPos2 = {Goiania:'bottom center', Prime:'top center', Anapolis:'bottom center'};
-    Plotly.react('ch-rec-loja',
-      recLojas.map((l,i)=>({
-        type:'scatter', name:recLojaLbls[i], x:rmll,
-        y:rmlk.map(k=>recMesLoja[k][l]),
-        mode:'lines+markers+text', line:{color:LOJA_COLORS[l],width:2.5}, marker:{size:7,color:LOJA_COLORS[l]},
-        text:rmlk.map(k=>recMesLoja[k][l]>0?`R$${(recMesLoja[k][l]/1000).toFixed(1)}k`:''),
-        textposition:recLojaTextPos2[l], textfont:{size:11,color:LOJA_COLORS[l]},
-        hovertemplate:'%{x} — '+recLojaLbls[i]+': <b>R$ %{y:,.2f}</b><extra></extra>'
-      })),
-      L({title:{text:'Receita por Loja',font:{color:C.gold,size:14}},
-         height:300, showlegend:true, legend:{orientation:'h',y:1.05,x:0,font:{size:13}},
-         yaxis:{...L().yaxis,showticklabels:false,rangemode:'tozero'},
-         xaxis:{...L().xaxis,tickangle:rmlk.length>8?-45:0}}), CFG);
+  const rmlk = Object.keys(recMesLoja).sort();
+  if (rmlk.length){
+    const rmll = rmlk.map(monthLabel);
+    makeChart('ch-rec-loja', {
+      chart: { type: 'line', height: 320 },
+      series: recLojas.map((l,i)=>({ name: recLojaLbls[i], data: rmlk.map(k=>+recMesLoja[k][l].toFixed(2)) })),
+      xaxis: {
+        categories: rmll,
+        labels: { style: { colors: '#a3a3a3' }, rotate: rmlk.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      colors: [C.gold, C.cyan, C.purple],
+      stroke: { curve: 'smooth', width: 3 },
+      markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 8 } },
+      dataLabels: {
+        enabled: true,
+        formatter: v => v > 0 ? ABBR(v) : '',
+        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 3, opacity: 0.85, borderWidth: 0 },
+        style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { position: 'top', horizontalAlign: 'left' },
+      tooltip: { shared: true, y: { formatter: v => BRL(v) } }
+    });
   } else {
-    document.getElementById('ch-rec-loja').innerHTML='<div class="empty">Preencha a coluna "loja" em Contas a Receber para ver este gráfico</div>';
+    emptyState('ch-rec-loja', 'Preencha a coluna "loja" em Contas a Receber para ver este gráfico');
   }
 
-  const ct=groupSum(rec,'conta','valor_recebido');
-  const ck=Object.keys(ct);
-  const cl=ck.map(k=>k.replace('Receita de Vistoria - ',''));
-  Plotly.react('ch-rec-tipo',
-    [{type:'pie', hole:.6, labels:cl, values:ck.map(k=>ct[k]),
-      marker:{colors:[C.gold, C.cyan, C.purple, C.green]}, textinfo:'percent',
-      textfont:{size:14,color:'#000'}, hovertemplate:'%{label}: R$ %{value:,.2f}<extra></extra>'}],
-    L({title:{text:'Particular vs Despachante',font:{color:C.gold,size:14}},
-       height:300, legend:{orientation:'h',y:-.08,font:{size:12}}}), CFG);
+  // ─── Particular vs Despachante (donut) ───────────────────────────────────
+  const ct = groupSum(rec,'conta','valor_recebido');
+  const ck = Object.keys(ct);
+  const cl = ck.map(k=>k.replace('Receita de Vistoria - ',''));
+  if (ck.length){
+    makeChart('ch-rec-tipo', {
+      chart: { type: 'donut', height: 300 },
+      series: ck.map(k => +ct[k].toFixed(2)),
+      labels: cl,
+      colors: [C.gold, C.cyan, C.purple, C.green],
+      stroke: { width: 2, colors: ['#0a0a0a'] },
+      dataLabels: {
+        enabled: true,
+        formatter: v => v.toFixed(1) + '%',
+        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '62%',
+            labels: {
+              show: true,
+              total: { show: true, label: 'Total', fontSize: '11px', color: '#a3a3a3', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
+              value: { fontSize: '20px', color: '#FFD60A', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+            }
+          }
+        }
+      },
+      legend: { position: 'bottom' },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-rec-tipo', 'Sem dados');
 
-  const fm=groupSum(rec,'metodo_pagamento','valor_recebido');
-  const fk=Object.keys(fm);
-  Plotly.react('ch-rec-metodo',
-    [{type:'pie', hole:.6, labels:fk, values:fk.map(k=>fm[k]),
-      marker:{colors:PALETTE}, textinfo:'percent',
-      textfont:{size:14,color:'#000'}, hovertemplate:'%{label}: R$ %{value:,.2f}<extra></extra>'}],
-    L({title:{text:'Forma de Recebimento',font:{color:C.gold,size:14}},
-       height:300, showlegend:true, legend:{orientation:'h',y:-.08,font:{size:12}}}), CFG);
+  // ─── Forma de Recebimento (donut) ────────────────────────────────────────
+  const fm = groupSum(rec,'metodo_pagamento','valor_recebido');
+  const fk = Object.keys(fm);
+  if (fk.length){
+    makeChart('ch-rec-metodo', {
+      chart: { type: 'donut', height: 300 },
+      series: fk.map(k => +fm[k].toFixed(2)),
+      labels: fk,
+      colors: PALETTE,
+      stroke: { width: 2, colors: ['#0a0a0a'] },
+      dataLabels: {
+        enabled: true, formatter: v => v.toFixed(1)+'%',
+        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '62%',
+            labels: {
+              show: true,
+              total: { show: true, label: 'Total', color: '#a3a3a3', fontSize: '11px', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
+              value: { fontSize: '20px', color: '#FFD60A', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+            }
+          }
+        }
+      },
+      legend: { position: 'bottom' },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-rec-metodo', 'Sem dados');
 
-  const sm=groupSum(rec,'status_pagamento','valor_recebido');
-  const sk=Object.keys(sm);
-  Plotly.react('ch-rec-status',
-    [{type:'pie', hole:.6, labels:sk, values:sk.map(k=>sm[k]),
-      marker:{colors:sk.map(s=>s==='Pago'?C.green:C.orange)}, textinfo:'percent',
-      textfont:{size:14,color:'#000'}, hovertemplate:'%{label}: R$ %{value:,.2f}<extra></extra>'}],
-    L({title:{text:'Status do Recebimento',font:{color:C.gold,size:14}},
-       height:300, legend:{orientation:'h',y:-.08,font:{size:12}}}), CFG);
+  // ─── Status Recebimento (donut) ──────────────────────────────────────────
+  const sm = groupSum(rec,'status_pagamento','valor_recebido');
+  const sk = Object.keys(sm);
+  if (sk.length){
+    makeChart('ch-rec-status', {
+      chart: { type: 'donut', height: 300 },
+      series: sk.map(k => +sm[k].toFixed(2)),
+      labels: sk,
+      colors: sk.map(s => s==='Pago' ? C.green : C.orange),
+      stroke: { width: 2, colors: ['#0a0a0a'] },
+      dataLabels: {
+        enabled: true, formatter: v => v.toFixed(1)+'%',
+        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+      },
+      plotOptions: {
+        pie: { donut: { size: '62%',
+          labels: {
+            show: true,
+            total: { show: true, label: 'Total', color: '#a3a3a3', fontSize: '11px', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
+            value: { fontSize: '20px', color: '#FFD60A', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+          }
+        } }
+      },
+      legend: { position: 'bottom' },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-rec-status', 'Sem dados');
 
-  const cm=groupSum(rec,'cliente','valor_recebido');
-  const ckeys=Object.keys(cm).sort((a,b)=>cm[b]-cm[a]).slice(0,15);
-  Plotly.react('ch-top-clientes',
-    [{type:'bar', orientation:'h', x:ckeys.map(k=>cm[k]), y:ckeys,
-      marker:{color:ckeys.map((_,i)=>i===0?C.gold:i<3?C.goldL:C.goldD)},
-      text:ckeys.map(k=>BRL(cm[k])), textposition:'auto', cliponaxis:false, textfont:{size:12,color:'#000'},
-      hovertemplate:'%{y}: %{text}<extra></extra>'}],
-    L({title:{text:'Top Clientes / Despachantes',font:{color:C.gold,size:14}}, height:460,
-       xaxis:{...L().xaxis,showgrid:false,range:[0,Math.max(...Object.values(cm))*1.35]},
-       yaxis:{...L().yaxis,automargin:true,autorange:'reversed',tickfont:{size:13}},
-       margin:{t:48,l:10,r:20,b:40}}), CFG);
+  // ─── Top Clientes (barras horizontais com gradiente dourado) ─────────────
+  const cm = groupSum(rec,'cliente','valor_recebido');
+  const ckeys = Object.keys(cm).sort((a,b)=>cm[b]-cm[a]).slice(0,15);
+  if (ckeys.length){
+    makeChart('ch-top-clientes', {
+      chart: { type: 'bar', height: 460 },
+      series: [{ name: 'Receita', data: ckeys.map(k => +cm[k].toFixed(2)) }],
+      xaxis: {
+        categories: ckeys, labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      plotOptions: {
+        bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      colors: ckeys.map((_,i) => i===0 ? C.gold : i<3 ? C.goldL : C.goldD),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => BRL(v), offsetX: 8,
+        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-top-clientes', 'Sem clientes no período');
 
+  // ─── Tabela ──────────────────────────────────────────────────────────────
   const fatRows = rec.slice(0,200).map(r=>`<tr>
     <td>${r._d?r._d.toLocaleDateString('pt-BR'):'—'}</td>
     <td>${r.placa||'—'}</td>
     <td>${r.cliente||'—'}</td>
     <td>${lojaLabel(r.loja)}</td>
     <td>${r.conta||'—'}</td>
-    <td style="text-align:right;color:${C.gold}">${BRL(r.valor_recebido||0)}</td>
+    <td style="text-align:right;color:${C.gold};font-weight:700">${BRL(r.valor_recebido||0)}</td>
     <td>${r.metodo_pagamento||'—'}</td>
     <td><span class="badge ${r.status_pagamento==='Pago'?'badge-pago':'badge-aberto'}">${r.status_pagamento||'—'}</span></td>
   </tr>`).join('');
   document.getElementById('tbl-fat').innerHTML = fatRows.length
     ? `<table class="data-table"><thead><tr><th>Data</th><th>Placa</th><th>Cliente</th><th>Loja</th><th>Conta</th><th style="text-align:right">Valor</th><th>Método</th><th>Status</th></tr></thead><tbody>${fatRows}</tbody></table><p style="color:#666;font-size:11px;padding:8px 14px">Mostrando até 200 registros.</p>`
-    : '<div class="empty">Sem dados no período</div>';
+    : '<div class="empty"><span class="material-symbols-outlined">inbox</span>Sem dados no período</div>';
 }
 
-// ══ DESPESAS ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
+//  DESPESAS
+// ══════════════════════════════════════════════════════════════════════════
 function renderDep({pag, vis}, prev){
   const total  = pag.reduce((s,r)=>s+(r.valor||0),0);
   const pgDone = pag.filter(r=>r.status==='Pago').reduce((s,r)=>s+(r.valor||0),0);
@@ -962,77 +1621,153 @@ function renderDep({pag, vis}, prev){
   const pp = prev?.pag;
   const pt = pp?.reduce((s,r)=>s+(r.valor||0),0);
 
-  kpi('kpi-dep-total','Total Lançado', total, pt, 'no período', C.gold, true);
-  kpi('kpi-dep-pago','Total Pago', pgDone,
-      pp?.filter(r=>r.status==='Pago').reduce((s,r)=>s+(r.valor||0),0),
-      total?`${(pgDone/total*100).toFixed(1)}% do total`:'', C.green, true);
-  kpi('kpi-dep-apagar','A Pagar', apagar, null,
-      total?`${(apagar/total*100).toFixed(1)}% do total`:'', C.red, true);
-  kpi('kpi-custo-vis','Custo / Vistoria', parseFloat(custoPorVis.toFixed(2)), null,
-      nVis?`${N(nVis)} vistorias no período`:'sem vistorias', C.gold, true);
+  kpi('kpi-dep-total', { label:'Total Lançado', value:total, prev:pt, sub:'período', icon:'receipt_long', isCurrency:true,
+                         sparkData: spark(pag,'_d','valor') });
+  kpi('kpi-dep-pago', { label:'Total Pago', value:pgDone,
+                        prev: pp?.filter(r=>r.status==='Pago').reduce((s,r)=>s+(r.valor||0),0),
+                        sub: total?`${(pgDone/total*100).toFixed(1)}% do total`:'',
+                        icon:'check_circle', isCurrency:true,
+                        sparkData: spark(pag.filter(r=>r.status==='Pago'),'_d','valor'),
+                        sparkColor: C.green });
+  kpi('kpi-dep-apagar', { label:'A Pagar', value:apagar, prev:null,
+                          sub: total?`${(apagar/total*100).toFixed(1)}% do total`:'',
+                          icon:'schedule', isCurrency:true });
+  kpi('kpi-custo-vis', { label:'Custo / Vistoria', value:parseFloat(custoPorVis.toFixed(2)), prev:null,
+                         sub: nVis?`${N(nVis)} vistorias no período`:'sem vistorias',
+                         icon:'price_check', isCurrency:true });
 
+  // ─── Evolução Mensal Despesas ────────────────────────────────────────────
   const hoje = new Date();
   const mesAtual = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
   const dm = byMonth(pag,'_d','valor');
-  const dmk = Object.keys(dm).filter(k=>k<=mesAtual).sort();
+  const dmk = Object.keys(dm).filter(k => k <= mesAtual).sort();
   const dml = dmk.map(monthLabel);
-  const dmy = dmk.map(k=>dm[k]);
-  const {momX:dx,momY:dy,momTxt:dt,momClr:dc} = momAnnotations(dml, dmy);
-  const dcInv = dc.map(c=>c===C.green?C.red:C.green);
-  Plotly.react('ch-dep-mes',
-    [{type:'scatter', name:'Despesas', x:dml, y:dmy, mode:'lines+markers+text',
-      line:{color:C.red,width:3}, marker:{size:9,color:C.red},
-      text:dmy.map(v=>`R$${(v/1000).toFixed(1)}k`), textposition:'top center',
-      textfont:{size:12,color:C.red},
-      hovertemplate:'%{x}: <b>R$ %{y:,.2f}</b><extra></extra>'},
-     {type:'scatter', x:dx, y:dy.map(v=>v*1.32), mode:'text',
-      text:dt, textfont:{size:12,color:dcInv}, showlegend:false, hoverinfo:'none'}],
-    L({title:{text:'Evolução Mensal de Despesas',font:{color:C.gold,size:14}},
-       height:360, showlegend:false,
-       yaxis:{...L().yaxis,showticklabels:false,rangemode:'tozero'}}), CFG);
+  const dmy = dmk.map(k => +dm[k].toFixed(2));
 
-  const cat=groupSum(pag.filter(r=>r.conta),'conta','valor');
-  const cks=Object.keys(cat).sort((a,b)=>cat[a]-cat[b]);
-  Plotly.react('ch-dep-cat',
-    [{type:'bar', orientation:'h', x:cks.map(k=>cat[k]), y:cks,
-      marker:{color:cks.map((_,i)=>i===cks.length-1?C.gold:i>=cks.length-3?C.goldL:C.goldD)},
-      text:cks.map(k=>BRL(cat[k])),
-      textposition:'auto', cliponaxis:false, textfont:{size:12,color:'#000'},
-      hovertemplate:'%{y}: %{text}<extra></extra>'}],
-    L({title:{text:'Despesas por Categoria',font:{color:C.gold,size:14}}, height:540,
-       xaxis:{...L().xaxis,showgrid:false,range:[0, Math.max(...Object.values(cat))*1.35]},
-       yaxis:{...L().yaxis,automargin:true,tickfont:{size:12}},
-       margin:{t:48,l:10,r:20,b:40}}), CFG);
+  if (dmk.length){
+    makeChart('ch-dep-mes', {
+      chart: { type: 'area', height: 340, dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.red } },
+      series: [{ name: 'Despesas', data: dmy }],
+      xaxis: {
+        categories: dml, labels: { style: { colors: '#a3a3a3' }, rotate: dmk.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      colors: [C.red],
+      stroke: { curve: 'smooth', width: 3 },
+      fill: {
+        type: 'gradient',
+        gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => ABBR(v), offsetY: -8,
+        background: { enabled: true, foreColor: '#fff', borderRadius: 4, padding: 4, opacity: 0.9, borderColor: C.red, borderWidth: 1 },
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      markers: { size: 5, colors: [C.red], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
+      legend: { show: false },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-dep-mes', 'Sem despesas no período');
 
-  const lj=groupSum(pag,'loja','valor');
-  const lk=Object.keys(lj).filter(k=>k&&k!=='null');
-  const ll=lk.map(l=>lojaLabel(l));
-  Plotly.react('ch-dep-loja',
-    [{type:'bar', x:ll, y:lk.map(k=>lj[k]),
-      marker:{color:lk.map(l=>LOJA_COLORS[l]||C.goldD)},
-      text:lk.map(k=>BRL(lj[k])), textposition:'outside', textfont:{size:13,color:'#FFF'},
-      hovertemplate:'%{x}: %{text}<extra></extra>'}],
-    L({title:{text:'Por Loja',font:{color:C.gold,size:14}}, height:260,
-       showlegend:false, yaxis:{...L().yaxis,showticklabels:false,rangemode:'tozero'},
-       margin:{t:48,l:10,r:10,b:40}}), CFG);
+  // ─── Despesas por Categoria ──────────────────────────────────────────────
+  const cat = groupSum(pag.filter(r=>r.conta), 'conta', 'valor');
+  const cks = Object.keys(cat).sort((a,b)=>cat[a]-cat[b]); // asc — barras crescem para cima
+  if (cks.length){
+    makeChart('ch-dep-cat', {
+      chart: { type: 'bar', height: 540 },
+      series: [{ name: 'Despesas', data: cks.map(k => +cat[k].toFixed(2)) }],
+      xaxis: {
+        categories: cks, labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '11.5px', fontWeight: 600 } } },
+      plotOptions: {
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '78%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      colors: cks.map((_,i) => i===cks.length-1 ? C.gold : i>=cks.length-3 ? C.goldL : C.goldD),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => BRL(v), offsetX: 8,
+        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-dep-cat', 'Sem categorias no período');
 
-  Plotly.react('ch-dep-status',
-    [{type:'pie', hole:.6, labels:['Pago','A Pagar'], values:[pgDone,apagar],
-      marker:{colors:[C.green,C.red]}, textinfo:'percent',
-      textfont:{size:14,color:'#000'}, hovertemplate:'%{label}: R$ %{value:,.2f}<extra></extra>'}],
-    L({title:{text:'Status Pagamento',font:{color:C.gold,size:14}},
-       height:260, legend:{orientation:'h',y:-.1,font:{size:12}}}), CFG);
+  // ─── Por Loja ────────────────────────────────────────────────────────────
+  const lj = groupSum(pag, 'loja', 'valor');
+  const lk = Object.keys(lj).filter(k => k && k !== 'null');
+  if (lk.length){
+    makeChart('ch-dep-loja', {
+      chart: { type: 'bar', height: 240 },
+      series: [{ name: 'Despesas', data: lk.map(k => +lj[k].toFixed(2)) }],
+      xaxis: {
+        categories: lk.map(l => lojaLabel(l)),
+        labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 700 } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { show: false },
+      plotOptions: {
+        bar: { borderRadius: 8, columnWidth: '55%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      colors: lk.map(l => LOJA_COLORS[l] || C.goldD),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => ABBR(v), offsetY: -22,
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      grid: { yaxis: { lines: { show: false } } },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-dep-loja', 'Sem dados');
 
-  const today=new Date(); today.setHours(0,0,0,0);
-  const prox=_PAG.filter(r=>r.status==='A Pagar'&&r._d).sort((a,b)=>a._d-b._d).slice(0,25);
-  if(!prox.length){
-    document.getElementById('tbl-vencimentos').innerHTML='<div class="empty">Nenhum vencimento em aberto</div>';
+  // ─── Status Pagamento (donut) ────────────────────────────────────────────
+  if (pgDone + apagar > 0){
+    makeChart('ch-dep-status', {
+      chart: { type: 'donut', height: 240 },
+      series: [+pgDone.toFixed(2), +apagar.toFixed(2)],
+      labels: ['Pago','A Pagar'],
+      colors: [C.green, C.red],
+      stroke: { width: 2, colors: ['#0a0a0a'] },
+      dataLabels: {
+        enabled: true, formatter: v => v.toFixed(1)+'%',
+        style: { fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#000'] }
+      },
+      plotOptions: {
+        pie: { donut: { size: '60%',
+          labels: {
+            show: true,
+            total: { show: true, label: 'Total', color: '#a3a3a3', fontSize: '11px', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
+            value: { fontSize: '18px', color: '#FFD60A', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+          }
+        } }
+      },
+      legend: { position: 'bottom' },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-dep-status', 'Sem dados');
+
+  // ─── Tabelas ─────────────────────────────────────────────────────────────
+  const today = new Date(); today.setHours(0,0,0,0);
+  const prox = _PAG.filter(r => r.status==='A Pagar' && r._d).sort((a,b)=>a._d-b._d).slice(0,25);
+  if (!prox.length){
+    document.getElementById('tbl-vencimentos').innerHTML = '<div class="empty"><span class="material-symbols-outlined">check_circle</span>Nenhum vencimento em aberto</div>';
   } else {
-    const rows=prox.map(r=>{
-      const venc=r._d.toLocaleDateString('pt-BR');
-      const diff=Math.ceil((r._d-today)/864e5);
-      const urgTxt=diff<0?`${Math.abs(diff)}d atrasado`:diff===0?'Hoje':`em ${diff}d`;
-      const urgColor=diff<0?C.red:diff<=7?C.orange:'';
+    const rows = prox.map(r=>{
+      const venc = r._d.toLocaleDateString('pt-BR');
+      const diff = Math.ceil((r._d-today)/864e5);
+      const urgTxt = diff<0 ? `${Math.abs(diff)}d atrasado` : diff===0 ? 'Hoje' : `em ${diff}d`;
+      const urgColor = diff<0 ? C.red : diff<=7 ? C.orange : '';
       return `<tr>
         <td style="color:${urgColor};font-weight:${diff<=7?'bold':'normal'}">${venc}</td>
         <td style="color:${diff<0?C.red:diff<=7?C.orange:C.muted}">${urgTxt}</td>
@@ -1042,187 +1777,274 @@ function renderDep({pag, vis}, prev){
         <td><span class="badge badge-apagar">A Pagar</span></td>
       </tr>`;
     }).join('');
-    document.getElementById('tbl-vencimentos').innerHTML=
+    document.getElementById('tbl-vencimentos').innerHTML =
       `<table class="data-table"><thead><tr><th>Vencimento</th><th>Prazo</th><th>Categoria</th><th>Descrição</th><th>Loja</th><th style="text-align:right">Valor</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  const depRows=pag.slice(0,200).map(r=>`<tr>
+  const depRows = pag.slice(0,200).map(r=>`<tr>
     <td>${r._d?r._d.toLocaleDateString('pt-BR'):'—'}</td>
     <td>${r.conta||'—'}</td><td>${r.descricao||'—'}</td>
     <td>${lojaLabel(r.loja)}</td>
-    <td style="text-align:right;color:${C.gold}">${BRL(r.valor||0)}</td>
+    <td style="text-align:right;color:${C.gold};font-weight:700">${BRL(r.valor||0)}</td>
     <td><span class="badge ${r.status==='Pago'?'badge-pago':'badge-apagar'}">${r.status||'—'}</span></td>
     <td>${r._dp?r._dp.toLocaleDateString('pt-BR'):'—'}</td>
   </tr>`).join('');
-  document.getElementById('tbl-dep').innerHTML=depRows.length
-    ?`<table class="data-table"><thead><tr><th>Vencimento</th><th>Categoria</th><th>Descrição</th><th>Loja</th><th style="text-align:right">Valor</th><th>Status</th><th>Pago em</th></tr></thead><tbody>${depRows}</tbody></table><p style="color:#666;font-size:11px;padding:8px 14px">Mostrando até 200 registros.</p>`
-    :'<div class="empty">Sem dados no período</div>';
+  document.getElementById('tbl-dep').innerHTML = depRows.length
+    ? `<table class="data-table"><thead><tr><th>Vencimento</th><th>Categoria</th><th>Descrição</th><th>Loja</th><th style="text-align:right">Valor</th><th>Status</th><th>Pago em</th></tr></thead><tbody>${depRows}</tbody></table><p style="color:#666;font-size:11px;padding:8px 14px">Mostrando até 200 registros.</p>`
+    : '<div class="empty"><span class="material-symbols-outlined">inbox</span>Sem dados no período</div>';
 }
 
-// ══ FLUXO FINANCEIRO ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
+//  FLUXO FINANCEIRO
+// ══════════════════════════════════════════════════════════════════════════
 function renderFl({pag, rec}, prev){
-  const recMes=byMonth(rec,'_d','valor_recebido');
-  const pagMes=byMonth(pag.filter(r=>r.status==='Pago'),'_dp','valor');
-  const allMes=[...new Set([...Object.keys(recMes),...Object.keys(pagMes)])].sort();
-  const ent=allMes.map(k=>recMes[k]||0);
-  const sai=allMes.map(k=>pagMes[k]||0);
-  const sal=ent.map((e,i)=>e-sai[i]);
-  const lbl=allMes.map(monthLabel);
+  const recMes = byMonth(rec,'_d','valor_recebido');
+  const pagMes = byMonth(pag.filter(r=>r.status==='Pago'),'_dp','valor');
+  const allMes = [...new Set([...Object.keys(recMes),...Object.keys(pagMes)])].sort();
+  const ent = allMes.map(k => +(recMes[k]||0).toFixed(2));
+  const sai = allMes.map(k => +(pagMes[k]||0).toFixed(2));
+  const sal = ent.map((e,i) => +((e-sai[i]).toFixed(2)));
+  const lbl = allMes.map(monthLabel);
 
-  const totEnt=ent.reduce((s,v)=>s+v,0);
-  const totSai=sai.reduce((s,v)=>s+v,0);
-  const totSal=totEnt-totSai;
+  const totEnt = ent.reduce((s,v)=>s+v,0);
+  const totSai = sai.reduce((s,v)=>s+v,0);
+  const totSal = totEnt - totSai;
 
-  const now=new Date(); now.setHours(0,0,0,0);
-  const in30=new Date(+now+30*864e5);
-  const prox30=_PAG.filter(r=>r.status==='A Pagar'&&r._d&&r._d>=now&&r._d<=in30)
-                   .reduce((s,r)=>s+(r.valor||0),0);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const in30 = new Date(+now+30*864e5);
+  const prox30 = _PAG.filter(r => r.status==='A Pagar' && r._d && r._d>=now && r._d<=in30)
+                     .reduce((s,r) => s+(r.valor||0), 0);
 
-  const pp=prev;
-  const ppEnt=pp?.rec.reduce((s,r)=>s+(r.valor_recebido||0),0);
-  const ppSai=pp?.pag.filter(r=>r.status==='Pago').reduce((s,r)=>s+(r.valor||0),0);
+  const pp = prev;
+  const ppEnt = pp?.rec.reduce((s,r)=>s+(r.valor_recebido||0),0);
+  const ppSai = pp?.pag.filter(r=>r.status==='Pago').reduce((s,r)=>s+(r.valor||0),0);
 
-  const margem = totEnt>0 ? (totSal/totEnt*100) : null;
-  const margemClr = margem===null?C.gold:margem>=20?C.green:margem>=0?C.orange:C.red;
+  const margem = totEnt > 0 ? (totSal/totEnt*100) : null;
 
-  kpi('kpi-fl-ent','Entradas', totEnt, ppEnt, 'receitas no período', C.green, true);
-  kpi('kpi-fl-sai','Saídas', totSai, ppSai, 'despesas pagas', C.red, true);
-  kpi('kpi-fl-saldo','Saldo', parseFloat(totSal.toFixed(2)), null,
-      'entradas – saídas', totSal>=0?C.gold:C.red, true);
-  kpi('kpi-fl-margem','Margem Líquida',
-      margem!==null ? parseFloat(margem.toFixed(1))+'%' : '—', null,
-      margem!==null?(margem>=20?'Saudável':margem>=0?'Atenção':'Prejuízo'):'sem receitas',
-      margemClr, false);
-  kpi('kpi-fl-prox30','Vence em 30d', parseFloat(prox30.toFixed(2)), null,
-      'a pagar nos próx. 30 dias', C.orange, true);
+  kpi('kpi-fl-ent', { label:'Entradas', value:totEnt, prev:ppEnt, sub:'receitas no período', icon:'arrow_upward', isCurrency:true,
+                      sparkData: ent, sparkColor: C.green });
+  kpi('kpi-fl-sai', { label:'Saídas', value:totSai, prev:ppSai, sub:'despesas pagas', icon:'arrow_downward', isCurrency:true,
+                      sparkData: sai, sparkColor: C.red });
+  kpi('kpi-fl-saldo', { label:'Saldo', value:parseFloat(totSal.toFixed(2)), prev:null, sub:'entradas – saídas', icon:'account_balance', isCurrency:true,
+                        sparkData: sal, sparkColor: totSal>=0?C.green:C.red });
+  kpi('kpi-fl-margem', { label:'Margem Líquida',
+                         value: margem!==null ? parseFloat(margem.toFixed(1))+'%' : '—',
+                         prev:null,
+                         sub: margem!==null ? (margem>=20?'Saudável':margem>=0?'Atenção':'Prejuízo') : 'sem receitas',
+                         icon:'percent' });
+  kpi('kpi-fl-prox30', { label:'Vence em 30d', value:parseFloat(prox30.toFixed(2)), prev:null, sub:'a pagar nos próximos 30d', icon:'event_upcoming', isCurrency:true });
 
-  const abbr = v => `R$${(v/1000).toFixed(1)}k`;
-  Plotly.react('ch-fl-linhas',
-    [{type:'scatter', name:'Entradas', x:lbl, y:ent, mode:'lines+markers+text',
-      line:{color:C.green,width:3}, marker:{size:8,color:C.green},
-      text:ent.map(abbr), textposition:'top center', textfont:{size:12,color:C.green},
-      hovertemplate:'%{x} — Entradas: <b>R$ %{y:,.2f}</b><extra></extra>'},
-     {type:'scatter', name:'Saídas', x:lbl, y:sai, mode:'lines+markers+text',
-      line:{color:C.red,width:3}, marker:{size:8,color:C.red},
-      text:sai.map(abbr), textposition:'bottom center', textfont:{size:12,color:C.red},
-      hovertemplate:'%{x} — Saídas: <b>R$ %{y:,.2f}</b><extra></extra>'},
-     {type:'scatter', name:'Saldo', x:lbl, y:sal, mode:'lines+markers+text',
-      line:{color:C.gold,width:3.5,dash:'dot'}, marker:{color:sal.map(s=>s>=0?C.green:C.red),size:10},
-      text:sal.map(abbr), textposition:'middle right', textfont:{size:12,color:C.gold},
-      hovertemplate:'%{x} — Saldo: <b>R$ %{y:,.2f}</b><extra></extra>'}],
-    L({title:{text:'Entradas vs Saídas e Saldo por Mês',font:{color:C.gold,size:14}},
-       height:440, showlegend:true, legend:{orientation:'h',y:1.05,x:0,font:{size:13}},
-       yaxis:{...L().yaxis,showticklabels:false},
-       xaxis:{...L().xaxis,tickangle:allMes.length>8?-45:0}}), CFG);
+  // ─── Linhas: Entradas / Saídas / Saldo ───────────────────────────────────
+  if (allMes.length){
+    makeChart('ch-fl-linhas', {
+      chart: { type: 'line', height: 420, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold } },
+      series: [
+        { name: 'Entradas', type: 'area', data: ent },
+        { name: 'Saídas',   type: 'area', data: sai },
+        { name: 'Saldo',    type: 'line', data: sal }
+      ],
+      xaxis: {
+        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      colors: [C.green, C.red, C.gold],
+      stroke: { curve: 'smooth', width: [2.5, 2.5, 4], dashArray: [0, 0, 4] },
+      fill: {
+        type: ['gradient','gradient','solid'],
+        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] },
+        opacity: [1, 1, 1]
+      },
+      markers: {
+        size: [4, 4, 6], strokeColors: '#0a0a0a', strokeWidth: 2,
+        hover: { size: 9 }
+      },
+      dataLabels: {
+        enabled: true, enabledOnSeries: [2],
+        formatter: v => ABBR(v),
+        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 0 },
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { position: 'top', horizontalAlign: 'left' },
+      tooltip: { shared: true, y: { formatter: v => BRL(v) } },
+      annotations: {
+        yaxis: [{ y: 0, borderColor: '#525252', strokeDashArray: 3, label: { text: 'Equilíbrio', style: { color: '#a3a3a3', background: '#1a1a1a', fontSize: '10px' } } }]
+      }
+    });
+  } else emptyState('ch-fl-linhas', 'Sem movimentações no período');
 
-  Plotly.react('ch-fl-barras',
-    [{type:'bar', name:'Receita', x:lbl, y:ent,
-      marker:{color:C.green, opacity:0.85},
-      text:ent.map(abbr), textposition:'outside', textfont:{size:12,color:C.green},
-      hovertemplate:'%{x} — Receita: <b>R$ %{y:,.2f}</b><extra></extra>'},
-     {type:'bar', name:'Despesa', x:lbl, y:sai,
-      marker:{color:C.red, opacity:0.85},
-      text:sai.map(abbr), textposition:'outside', textfont:{size:12,color:C.red},
-      hovertemplate:'%{x} — Despesa: <b>R$ %{y:,.2f}</b><extra></extra>'}],
-    L({title:{text:'Receita vs Despesa por Mês',font:{color:C.gold,size:14}},
-       barmode:'group', height:360, showlegend:true,
-       legend:{orientation:'h',y:1.05,x:0,font:{size:12}},
-       yaxis:{...L().yaxis,showticklabels:false,rangemode:'tozero'},
-       xaxis:{...L().xaxis,tickangle:allMes.length>8?-45:0}}), CFG);
+  // ─── Receita vs Despesa (barras agrupadas) ───────────────────────────────
+  if (allMes.length){
+    makeChart('ch-fl-barras', {
+      chart: { type: 'bar', height: 340 },
+      series: [
+        { name: 'Receita', data: ent },
+        { name: 'Despesa', data: sai }
+      ],
+      xaxis: {
+        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      colors: [C.green, C.red],
+      plotOptions: {
+        bar: { borderRadius: 5, columnWidth: '60%', dataLabels: { position: 'top' } }
+      },
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => ABBR(v), offsetY: -22,
+        style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
+      },
+      legend: { position: 'top', horizontalAlign: 'left' },
+      tooltip: { shared: true, y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-fl-barras', 'Sem dados');
 
-  Plotly.react('ch-fl-saldo',
-    [{type:'bar', name:'Saldo', x:lbl, y:sal,
-      marker:{color:sal.map(s=>s>=0?C.green:C.red), opacity:0.9},
-      text:sal.map(abbr), textposition:'outside', textfont:{size:12,color:sal.map(s=>s>=0?C.green:C.red)},
-      hovertemplate:'%{x} — Saldo: <b>R$ %{y:,.2f}</b><extra></extra>'}],
-    L({title:{text:'Saldo por Mês',font:{color:C.gold,size:14}},
-       height:360, showlegend:false,
-       shapes:[{type:'line',x0:-0.5,x1:lbl.length-0.5,y0:0,y1:0,
-                line:{color:'#525252',width:1.5,dash:'dot'}}],
-       yaxis:{...L().yaxis,showticklabels:false,zeroline:false},
-       xaxis:{...L().xaxis,tickangle:allMes.length>8?-45:0}}), CFG);
+  // ─── Saldo por Mês (barras divergentes verde/vermelho) ───────────────────
+  if (allMes.length){
+    makeChart('ch-fl-saldo', {
+      chart: { type: 'bar', height: 340 },
+      series: [{ name: 'Saldo', data: sal }],
+      xaxis: {
+        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      colors: sal.map(s => s>=0 ? C.green : C.red),
+      plotOptions: {
+        bar: { borderRadius: 6, columnWidth: '55%', distributed: true, dataLabels: { position: 'top' }, colors: { ranges: [{ from: -1e12, to: 0, color: C.red }, { from: 0, to: 1e12, color: C.green }] } }
+      },
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => ABBR(v), offsetY: -22,
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
+      },
+      legend: { show: false },
+      annotations: { yaxis: [{ y: 0, borderColor: '#525252', strokeDashArray: 3 }] },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-fl-saldo', 'Sem dados');
 
-  const flRows=allMes.map((mk,i)=>`<tr>
+  // ─── Tabela ──────────────────────────────────────────────────────────────
+  const flRows = allMes.map((mk,i)=>`<tr>
     <td>${lbl[i]}</td>
     <td style="color:${C.green}">${BRL(ent[i])}</td>
     <td style="color:${C.red}">${BRL(sai[i])}</td>
     <td style="color:${sal[i]>=0?C.gold:C.red};font-weight:bold">${BRL(sal[i])}</td>
   </tr>`).join('');
-  document.getElementById('tbl-fl').innerHTML=flRows
-    ?`<table class="data-table"><thead><tr><th>Mês</th><th>Entradas</th><th>Saídas</th><th>Saldo</th></tr></thead><tbody>${flRows}</tbody></table>`
-    :'<div class="empty">Sem dados no período</div>';
+  document.getElementById('tbl-fl').innerHTML = flRows
+    ? `<table class="data-table"><thead><tr><th>Mês</th><th>Entradas</th><th>Saídas</th><th>Saldo</th></tr></thead><tbody>${flRows}</tbody></table>`
+    : '<div class="empty"><span class="material-symbols-outlined">inbox</span>Sem dados no período</div>';
 }
 
-// ══ COBRANÇA ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
+//  COBRANÇA
+// ══════════════════════════════════════════════════════════════════════════
 function renderCob(){
-  const cliFilter = document.getElementById('f-cob-cliente').value;
+  const cliFilter  = document.getElementById('f-cob-cliente').value;
   const lojaFilter = document.getElementById('f-cob-loja').value;
   const hoje = new Date(); hoje.setHours(0,0,0,0);
 
   const aberto = _REC.filter(r =>
     r.status_pagamento==='Em Aberto' &&
-    (cliFilter==='all' || r.cliente===cliFilter) &&
+    (cliFilter==='all'  || r.cliente===cliFilter) &&
     (lojaFilter==='all' || r.loja===lojaFilter)
   );
 
-  const totalAberto = aberto.reduce((s,r)=>s+(r.valor_recebido||0),0);
+  const totalAberto = aberto.reduce((s,r)=>s+(r.valor_recebido||0), 0);
   const ticket = aberto.length ? totalAberto/aberto.length : 0;
   const porCliente = {};
   aberto.forEach(r=>{ const c=r.cliente||'—'; porCliente[c]=(porCliente[c]||0)+(r.valor_recebido||0); });
   const maiorDevedor = Object.keys(porCliente).sort((a,b)=>porCliente[b]-porCliente[a])[0]||'—';
 
-  kpi('kpi-cob-total','Total em Aberto', totalAberto, null, `${aberto.length} registros`, C.red, true);
-  kpi('kpi-cob-qtd','Registros em Aberto', aberto.length, null, 'sem recebimento');
-  kpi('kpi-cob-ticket','Ticket Médio em Aberto', parseFloat(ticket.toFixed(2)), null, '', C.gold, true);
-  kpi('kpi-cob-maior','Maior em Aberto', maiorDevedor, null,
-      porCliente[maiorDevedor]?BRL(porCliente[maiorDevedor]):'', C.orange);
+  kpi('kpi-cob-total', { label:'Total em Aberto', value:totalAberto, prev:null, sub:`${aberto.length} registros`, icon:'pending_actions', isCurrency:true,
+                         sparkData: spark(aberto,'_d','valor_recebido'), sparkColor: C.red });
+  kpi('kpi-cob-qtd', { label:'Registros em Aberto', value:aberto.length, prev:null, sub:'sem recebimento', icon:'list_alt' });
+  kpi('kpi-cob-ticket', { label:'Ticket Médio em Aberto', value:parseFloat(ticket.toFixed(2)), prev:null, sub:'', icon:'receipt', isCurrency:true });
+  kpi('kpi-cob-maior', { label:'Maior em Aberto', value:maiorDevedor, prev:null,
+                         sub: porCliente[maiorDevedor] ? BRL(porCliente[maiorDevedor]) : '',
+                         icon:'priority_high' });
 
-  const cobMes={};
+  // ─── Inadimplência por Mês ───────────────────────────────────────────────
+  const cobMes = {};
   aberto.filter(r=>r._d).forEach(r=>{
-    const mk=r._d.getFullYear()+'-'+String(r._d.getMonth()+1).padStart(2,'0');
-    cobMes[mk]=(cobMes[mk]||0)+(r.valor_recebido||0);
+    const mk = r._d.getFullYear()+'-'+String(r._d.getMonth()+1).padStart(2,'0');
+    cobMes[mk] = (cobMes[mk]||0) + (r.valor_recebido||0);
   });
-  const cobMks=Object.keys(cobMes).sort();
-  const cobLbl=cobMks.map(monthLabel);
-  const cobVals=cobMks.map(k=>cobMes[k]);
-  if(cobMks.length){
-    Plotly.react('ch-cob-evolucao',
-      [{type:'bar', x:cobLbl, y:cobVals,
-        marker:{color:cobVals.map((_,i)=>i===cobVals.length-1?C.red:C.orange), opacity:0.85},
-        text:cobVals.map(v=>`R$${(v/1000).toFixed(1)}k`),
-        textposition:'outside', textfont:{size:12,color:'#FFF'},
-        hovertemplate:'%{x}: <b>R$ %{y:,.2f}</b> em aberto<extra></extra>'}],
-      L({title:{text:'Inadimplência por Mês (Em Aberto)',font:{color:C.gold,size:14}},
-         height:320, showlegend:false,
-         yaxis:{...L().yaxis,showticklabels:false,rangemode:'tozero'},
-         xaxis:{...L().xaxis,tickangle:cobMks.length>8?-45:0}}), CFG);
-  } else {
-    document.getElementById('ch-cob-evolucao').innerHTML='<div class="empty">Sem dados</div>';
-  }
+  const cobMks = Object.keys(cobMes).sort();
+  const cobLbl = cobMks.map(monthLabel);
+  const cobVals = cobMks.map(k => +cobMes[k].toFixed(2));
 
-  const porClienteAll={};
+  if (cobMks.length){
+    makeChart('ch-cob-evolucao', {
+      chart: { type: 'bar', height: 320 },
+      series: [{ name: 'Em Aberto', data: cobVals }],
+      xaxis: {
+        categories: cobLbl, labels: { style: { colors: '#a3a3a3' }, rotate: cobMks.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      colors: cobVals.map((_,i) => i===cobVals.length-1 ? C.red : C.orange),
+      plotOptions: {
+        bar: { borderRadius: 6, columnWidth: '55%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => ABBR(v), offsetY: -22,
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
+      },
+      legend: { show: false },
+      tooltip: { y: { formatter: v => BRL(v) + ' em aberto' } }
+    });
+  } else emptyState('ch-cob-evolucao', 'Sem inadimplência');
+
+  // ─── Top Devedores ───────────────────────────────────────────────────────
+  const porClienteAll = {};
   aberto.forEach(r=>{
-    const c=r.cliente||'Desconhecido';
-    porClienteAll[c]=(porClienteAll[c]||0)+(r.valor_recebido||0);
+    const c = r.cliente || 'Desconhecido';
+    porClienteAll[c] = (porClienteAll[c]||0) + (r.valor_recebido||0);
   });
-  const topDev=Object.keys(porClienteAll).sort((a,b)=>porClienteAll[b]-porClienteAll[a]).slice(0,12);
-  if(topDev.length){
-    Plotly.react('ch-cob-porcliente',
-      [{type:'bar', orientation:'h', x:topDev.map(k=>porClienteAll[k]), y:topDev,
-        marker:{color:topDev.map((_,i)=>i===0?C.red:i<3?C.orange:C.goldD)},
-        text:topDev.map(k=>BRL(porClienteAll[k])),
-        textposition:'auto', cliponaxis:false, textfont:{size:11,color:'#000'},
-        hovertemplate:'%{y}: <b>%{text}</b><extra></extra>'}],
-      L({title:{text:'Top Devedores',font:{color:C.gold,size:14}}, height:320,
-         xaxis:{...L().xaxis,showgrid:false,range:[0,Math.max(...topDev.map(k=>porClienteAll[k]))*1.35]},
-         yaxis:{...L().yaxis,automargin:true,autorange:'reversed',tickfont:{size:12}},
-         margin:{t:48,l:10,r:20,b:40}}), CFG);
-  } else {
-    document.getElementById('ch-cob-porcliente').innerHTML='<div class="empty">Nenhum devedor</div>';
-  }
+  const topDev = Object.keys(porClienteAll).sort((a,b)=>porClienteAll[b]-porClienteAll[a]).slice(0,12);
 
-  if(!aberto.length){
-    document.getElementById('tbl-cob').innerHTML='<div class="empty">Nenhum recebimento em aberto</div>';
+  if (topDev.length){
+    makeChart('ch-cob-porcliente', {
+      chart: { type: 'bar', height: 320 },
+      series: [{ name: 'Em Aberto', data: topDev.map(k => +porClienteAll[k].toFixed(2)) }],
+      xaxis: {
+        categories: topDev, labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      plotOptions: {
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'top' } }
+      },
+      colors: topDev.map((_,i) => i===0 ? C.red : i<3 ? C.orange : C.goldD),
+      fill: {
+        type: 'gradient',
+        gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.6, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
+      },
+      dataLabels: {
+        enabled: true, formatter: v => BRL(v), offsetX: 8,
+        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { show: false },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+      tooltip: { y: { formatter: v => BRL(v) } }
+    });
+  } else emptyState('ch-cob-porcliente', 'Nenhum devedor');
+
+  // ─── Tabela ──────────────────────────────────────────────────────────────
+  if (!aberto.length){
+    document.getElementById('tbl-cob').innerHTML = '<div class="empty"><span class="material-symbols-outlined">check_circle</span>Nenhum recebimento em aberto</div>';
     return;
   }
 
@@ -1232,10 +2054,10 @@ function renderCob(){
     return db-da;
   });
 
-  const rows=sorted.map(r=>{
+  const rows = sorted.map(r=>{
     const dias = r._d ? Math.ceil((hoje-r._d)/864e5) : null;
-    const diasStr = dias===null?'—':dias>0?`${dias}d em aberto`:dias===0?'Hoje':'-';
-    const urgColor = dias===null?'':dias>30?C.red:dias>15?C.orange:C.gold;
+    const diasStr = dias===null ? '—' : dias>0 ? `${dias}d em aberto` : dias===0 ? 'Hoje' : '-';
+    const urgColor = dias===null ? '' : dias>30 ? C.red : dias>15 ? C.orange : C.gold;
     return `<tr>
       <td>${r._d?r._d.toLocaleDateString('pt-BR'):'—'}</td>
       <td style="color:${urgColor};font-weight:bold">${diasStr}</td>
@@ -1248,7 +2070,7 @@ function renderCob(){
     </tr>`;
   }).join('');
 
-  document.getElementById('tbl-cob').innerHTML=
+  document.getElementById('tbl-cob').innerHTML =
     `<table class="data-table"><thead><tr>
       <th>Data</th><th>Dias em Aberto</th><th>Placa</th><th>Cliente</th>
       <th>Loja</th><th>Conta</th><th style="text-align:right">Valor</th><th>Método</th>
@@ -1259,43 +2081,43 @@ function renderCob(){
 function exportXlsx(tab){
   const {vis,pag,rec} = getFiltered();
   let data=[], filename='';
-  if(tab==='op'){
+  if (tab==='op'){
     filename='vistorias';
-    data=vis.map(r=>({'Data':r.DATA,'Vistoriador':r.VISTORIADOR,'Loja':lojaLabel(r.loja),'Tipo':r.TIPO,'Status':r.STATUS,'Forma Pgto':r.FORMAPAGAMENTO,'Valor':r.VALOR}));
-  } else if(tab==='fat'){
+    data = vis.map(r=>({'Data':r.DATA,'Vistoriador':r.VISTORIADOR,'Loja':lojaLabel(r.loja),'Tipo':r.TIPO,'Status':r.STATUS,'Forma Pgto':r.FORMAPAGAMENTO,'Valor':r.VALOR}));
+  } else if (tab==='fat'){
     filename='recebimentos';
-    data=rec.map(r=>({'Data':r.data_pagamento,'Placa':r.placa,'Cliente':r.cliente,'Loja':lojaLabel(r.loja),'Conta':r.conta,'Valor':r.valor_recebido,'Método':r.metodo_pagamento,'Status':r.status_pagamento}));
-  } else if(tab==='dep'){
+    data = rec.map(r=>({'Data':r.data_pagamento,'Placa':r.placa,'Cliente':r.cliente,'Loja':lojaLabel(r.loja),'Conta':r.conta,'Valor':r.valor_recebido,'Método':r.metodo_pagamento,'Status':r.status_pagamento}));
+  } else if (tab==='dep'){
     filename='despesas';
-    data=pag.map(r=>({'Vencimento':r.data_vencimento,'Categoria':r.conta,'Descrição':r.descricao,'Loja':lojaLabel(r.loja),'Valor':r.valor,'Status':r.status,'Pago em':r.data_pagamento,'Observação':r.observacao}));
-  } else if(tab==='fl'){
+    data = pag.map(r=>({'Vencimento':r.data_vencimento,'Categoria':r.conta,'Descrição':r.descricao,'Loja':lojaLabel(r.loja),'Valor':r.valor,'Status':r.status,'Pago em':r.data_pagamento,'Observação':r.observacao}));
+  } else if (tab==='fl'){
     filename='fluxo';
-    const recMes=byMonth(rec,'_d','valor_recebido');
-    const pagMes=byMonth(pag.filter(r=>r.status==='Pago'),'_dp','valor');
-    const allMes=[...new Set([...Object.keys(recMes),...Object.keys(pagMes)])].sort();
-    data=allMes.map(k=>({'Mês':monthLabel(k),'Entradas':recMes[k]||0,'Saídas':pagMes[k]||0,'Saldo':(recMes[k]||0)-(pagMes[k]||0)}));
-  } else if(tab==='cob'){
+    const recMes = byMonth(rec,'_d','valor_recebido');
+    const pagMes = byMonth(pag.filter(r=>r.status==='Pago'),'_dp','valor');
+    const allMes = [...new Set([...Object.keys(recMes),...Object.keys(pagMes)])].sort();
+    data = allMes.map(k=>({'Mês':monthLabel(k),'Entradas':recMes[k]||0,'Saídas':pagMes[k]||0,'Saldo':(recMes[k]||0)-(pagMes[k]||0)}));
+  } else if (tab==='cob'){
     filename='cobranca';
-    const cliF=document.getElementById('f-cob-cliente').value;
-    const lojaF=document.getElementById('f-cob-loja').value;
-    const hoje=new Date(); hoje.setHours(0,0,0,0);
-    const aberto=_REC.filter(r=>r.status_pagamento==='Em Aberto'&&(cliF==='all'||r.cliente===cliF)&&(lojaF==='all'||r.loja===lojaF));
-    data=aberto.map(r=>{
-      const dias=r._d?Math.ceil((hoje-r._d)/864e5):null;
+    const cliF  = document.getElementById('f-cob-cliente').value;
+    const lojaF = document.getElementById('f-cob-loja').value;
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const aberto = _REC.filter(r => r.status_pagamento==='Em Aberto' && (cliF==='all'||r.cliente===cliF) && (lojaF==='all'||r.loja===lojaF));
+    data = aberto.map(r=>{
+      const dias = r._d ? Math.ceil((hoje-r._d)/864e5) : null;
       return {'Data':r.data_pagamento,'Dias em Aberto':dias,'Placa':r.placa,'Cliente':r.cliente,'Loja':lojaLabel(r.loja),'Conta':r.conta,'Valor':r.valor_recebido,'Método':r.metodo_pagamento};
     });
   }
-  if(!data.length){ alert('Sem dados para exportar.'); return; }
-  const ws=XLSX.utils.json_to_sheet(data);
-  const wb=XLSX.utils.book_new();
+  if (!data.length){ alert('Sem dados para exportar.'); return; }
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Dados');
   XLSX.writeFile(wb, `autocar_${filename}_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
 // ══ RENDER ALL ════════════════════════════════════════════════════════════
 function renderAll(){
-  const data=getFiltered();
-  const prev=getPrev();
+  const data = getFiltered();
+  const prev = getPrev();
   renderOp(data, prev);
   renderFat(data, prev);
   renderDep(data, prev);
@@ -1317,26 +2139,31 @@ function showTab(name){
   document.querySelectorAll('.sidenav-link').forEach(a=>a.classList.toggle('active', a.dataset.tab===name));
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
   const info = TAB_INFO[name];
-  if(info){
+  if (info){
     document.getElementById('page-title').textContent = info.title;
     document.getElementById('page-subtitle').textContent = info.sub;
   }
   document.body.classList.remove('drawer-open');
   window.scrollTo({top:0, behavior:'smooth'});
-  setTimeout(()=>window.dispatchEvent(new Event('resize')), 120);
+  // Reflow ApexCharts inside the just-shown tab.
+  setTimeout(() => {
+    Object.keys(CHARTS).forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.offsetParent !== null) {
+        try { CHARTS[id].render(); } catch(_) {}
+      }
+    });
+    window.dispatchEvent(new Event('resize'));
+  }, 80);
 }
 
 document.querySelectorAll('[data-tab]').forEach(el=>{
   el.addEventListener('click', e=>{ e.preventDefault(); showTab(el.dataset.tab); });
 });
 
-// ══ DRAWER (mobile sidebar) ═══════════════════════════════════════════════
-document.getElementById('menu-toggle').addEventListener('click', ()=>{
-  document.body.classList.toggle('drawer-open');
-});
-document.getElementById('drawer-overlay').addEventListener('click', ()=>{
-  document.body.classList.remove('drawer-open');
-});
+// ══ DRAWER ════════════════════════════════════════════════════════════════
+document.getElementById('menu-toggle').addEventListener('click', ()=>{ document.body.classList.toggle('drawer-open'); });
+document.getElementById('drawer-overlay').addEventListener('click', ()=>{ document.body.classList.remove('drawer-open'); });
 
 // ══ FILTER TOGGLE ═════════════════════════════════════════════════════════
 document.getElementById('filter-toggle').addEventListener('click', ()=>{
@@ -1347,17 +2174,23 @@ document.getElementById('filter-toggle').addEventListener('click', ()=>{
 
 // ══ PERIOD / FILTERS ══════════════════════════════════════════════════════
 function syncDateInputs(){
-  const fmt=d=>d?d.toISOString().split('T')[0]:'';
-  document.getElementById('f-from').value=fmt(S.from);
-  document.getElementById('f-to').value=fmt(S.to);
+  const fmt = d => d ? d.toISOString().split('T')[0] : '';
+  document.getElementById('f-from').value = fmt(S.from);
+  document.getElementById('f-to').value   = fmt(S.to);
+}
+
+function updatePeriodBadge(label){
+  const el = document.getElementById('period-badge');
+  if (el) el.textContent = label;
 }
 
 function onDateChange(){
   document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
-  const fv=document.getElementById('f-from').value;
-  const tv=document.getElementById('f-to').value;
-  S.from=fv?new Date(fv+'T00:00:00'):null;
-  S.to  =tv?new Date(tv+'T23:59:59'):null;
+  const fv = document.getElementById('f-from').value;
+  const tv = document.getElementById('f-to').value;
+  S.from = fv ? new Date(fv+'T00:00:00') : null;
+  S.to   = tv ? new Date(tv+'T23:59:59') : null;
+  updatePeriodBadge(fv && tv ? `${new Date(fv).toLocaleDateString('pt-BR')} → ${new Date(tv).toLocaleDateString('pt-BR')}` : 'Personalizado');
   renderAll();
 }
 
@@ -1368,18 +2201,21 @@ function onFilterChange(){
   renderAll();
 }
 
+const PERIOD_LABELS = { '7d':'Últimos 7 dias', '30d':'Últimos 30 dias', 'mtd':'Este mês', '90d':'Últimos 90 dias', 'ytd':'Este ano', 'all':'Todo período' };
+
 function setPeriod(p, btn){
   document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  const now=new Date(); now.setHours(23,59,59,999);
-  let from=null;
-  if(p==='7d')  { from=new Date(+now-6*864e5); from.setHours(0,0,0,0); }
-  if(p==='30d') { from=new Date(+now-29*864e5); from.setHours(0,0,0,0); }
-  if(p==='90d') { from=new Date(+now-89*864e5); from.setHours(0,0,0,0); }
-  if(p==='mtd') { from=new Date(now.getFullYear(),now.getMonth(),1); }
-  if(p==='ytd') { from=new Date(now.getFullYear(),0,1); }
-  if(p==='all') { S.from=null; S.to=null; syncDateInputs(); renderAll(); return; }
-  S.from=from; S.to=now;
+  if (btn) btn.classList.add('active');
+  const now = new Date(); now.setHours(23,59,59,999);
+  let from = null;
+  if (p==='7d')  { from=new Date(+now-6*864e5);  from.setHours(0,0,0,0); }
+  if (p==='30d') { from=new Date(+now-29*864e5); from.setHours(0,0,0,0); }
+  if (p==='90d') { from=new Date(+now-89*864e5); from.setHours(0,0,0,0); }
+  if (p==='mtd') { from=new Date(now.getFullYear(),now.getMonth(),1); }
+  if (p==='ytd') { from=new Date(now.getFullYear(),0,1); }
+  if (p==='all') { S.from=null; S.to=null; updatePeriodBadge(PERIOD_LABELS[p]); syncDateInputs(); renderAll(); return; }
+  S.from = from; S.to = now;
+  updatePeriodBadge(PERIOD_LABELS[p]);
   syncDateInputs(); renderAll();
 }
 
