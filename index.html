@@ -823,7 +823,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:43</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:56</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1344,11 +1344,8 @@ function baseChart(opts){
 //   2) Detect labels that share ~same X and push them vertically (centered spread)
 //      so none collide. All labels stay visible — they just migrate up/down as needed.
 
-// Light series → dark text; dark series → light text.
-function _labelTextColor(seriesColor){
-  const lights = ['#FFD60A', '#FFE25A', '#FFE45C', '#FFFFFF', '#C8960C'];
-  return lights.includes((seriesColor||'').toUpperCase()) ? '#0a0a0a' : '#FFFFFF';
-}
+// All dataLabel numbers render in black — series pills carry the color distinction.
+function _labelTextColor(_seriesColor){ return '#0a0a0a'; }
 
 // ── % helpers ────────────────────────────────────────────────────────────
 // Month-over-month % for each point. First point + prev-zero = "—" (no baseline).
@@ -1377,11 +1374,27 @@ function computeYoYMeta(data){
   });
 }
 
-// Colors for pct-badge (green/red/gray).
+// Colors for pct-badge (green/red/gray). Retained for potential future reuse.
 function _pctColors(dir){
   if (dir === 'up')   return { bg:'#10B981', fg:'#FFFFFF' };
   if (dir === 'down') return { bg:'#EF4444', fg:'#FFFFFF' };
   return { bg:'#525252', fg:'#FFFFFF' };
+}
+
+// Formats a single YoY number into the same inline style as pct meta ("▲ 12%" / "▼ 8%" / "—").
+function formatYoyInline(yoy){
+  if (yoy == null) return '—';
+  const abs = Math.abs(yoy);
+  if (abs < 0.5) return '—';
+  const rounded = abs >= 10 ? Math.round(abs) : +abs.toFixed(1);
+  return yoy > 0 ? `\u25B2 ${rounded}%` : `\u25BC ${rounded}%`;
+}
+
+// Builds "(M/M X · YoY Y)" tail for tooltips.
+function mmYoyTail(pctInfo, yoy){
+  const mm = pctInfo ? pctInfo.label : '—';
+  const yy = formatYoyInline(yoy);
+  return ` (M/M ${mm} · YoY ${yy})`;
 }
 
 // Inject a small pct pill below each label <g> of a series.
@@ -1503,34 +1516,23 @@ function _resolveLabelCollisions(root){
   });
 }
 
-// chart.events that: (1) recolor labels per series, (2) inject optional
-// pct-change badge below each label, (3) resolve vertical collisions.
-// pctMetaPerSeries: optional array per series — [sIdx][pIdx] = {dir,label} or null.
-function perSeriesLabelEvents(seriesColors, pctMetaPerSeries){
+// chart.events that: (1) recolor labels per series, (2) resolve vertical collisions.
+// % comparison is not rendered visually — it lives only in the tooltip formatter.
+function perSeriesLabelEvents(seriesColors){
   function apply(chartContext){
     const root = chartContext && chartContext.el;
     if (!root) return;
-    // 1) Recolor main label pills per series — but only on the MAIN rect,
-    //    not on our injected pct-badge rect (which already carries its own color).
     root.querySelectorAll('.apexcharts-datalabels').forEach((group, seriesIndex) => {
       if (seriesIndex >= seriesColors.length) return;
       const fill = seriesColors[seriesIndex];
-      group.querySelectorAll('g').forEach(lg => {
-        // Skip badge internals
-        const mainRect = lg.querySelector(':scope > rect');
-        if (mainRect){
-          mainRect.setAttribute('fill', fill);
-          mainRect.setAttribute('stroke', '#0a0a0a');
-          mainRect.setAttribute('stroke-width', '0.5');
-          mainRect.setAttribute('fill-opacity', '0.95');
-        }
-        const mainText = lg.querySelector(':scope > text');
-        if (mainText) mainText.setAttribute('fill', _labelTextColor(fill));
+      group.querySelectorAll('rect').forEach(r => {
+        r.setAttribute('fill', fill);
+        r.setAttribute('stroke', '#0a0a0a');
+        r.setAttribute('stroke-width', '0.5');
+        r.setAttribute('fill-opacity', '0.95');
       });
+      group.querySelectorAll('text').forEach(t => t.setAttribute('fill', _labelTextColor(fill)));
     });
-    // 2) Inject pct-badges (idempotent). Done before anti-overlap so bbox includes them.
-    _injectPctBadges(root, pctMetaPerSeries);
-    // 3) Anti-overlap on combined bbox (rAF so layout settles first)
     requestAnimationFrame(() => _resolveLabelCollisions(root));
   }
   return { mounted: apply, updated: apply, animationEnd: apply };
@@ -1776,7 +1778,7 @@ function renderVisMesChart(vis){
   makeChart('ch-vis-mes', {
     chart: {
       type: 'line', height: 460, stacked: false,
-      events: perSeriesLabelEvents(colors, pctMeta)
+      events: perSeriesLabelEvents(colors)
     },
     series, colors,
     stroke: { curve: 'smooth', width: strokeWidth, dashArray },
@@ -1789,8 +1791,8 @@ function renderVisMesChart(vis){
         const v = typeof real === 'number' ? real : val;
         return v > 0 ? N(Math.round(v)) : '';
       },
-      background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
     },
     markers: { size: markerSize, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 10 } },
     xaxis: {
@@ -1807,9 +1809,9 @@ function renderVisMesChart(vis){
       shared: true, intersect: false,
       y: {
         formatter: function(v, { seriesIndex, dataPointIndex }){
+          const mm  = pctMeta[seriesIndex] && pctMeta[seriesIndex][dataPointIndex];
           const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
-          const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
-          return N(v) + ' vistorias' + yoyTxt;
+          return N(v) + ' vistorias' + mmYoyTail(mm, yoy);
         }
       }
     }
@@ -1862,7 +1864,7 @@ function renderRecLojaChart(recMesLoja){
   const yoyMeta = active.map(s => computeYoYMeta(s.data));
 
   makeChart('ch-rec-loja', {
-    chart: { type: 'line', height: 400, events: perSeriesLabelEvents(colors, pctMeta) },
+    chart: { type: 'line', height: 400, events: perSeriesLabelEvents(colors) },
     series, colors,
     xaxis: {
       categories: ml,
@@ -1880,17 +1882,17 @@ function renderRecLojaChart(recMesLoja){
         const v = typeof real === 'number' ? real : val;
         return v > 0 ? ABBR(v) : '';
       },
-      background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
     },
     legend: { position: 'top', horizontalAlign: 'left' },
     tooltip: {
       shared: true,
       y: {
         formatter: function(v, { seriesIndex, dataPointIndex }){
+          const mm  = pctMeta[seriesIndex] && pctMeta[seriesIndex][dataPointIndex];
           const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
-          const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
-          return BRL(v) + yoyTxt;
+          return BRL(v) + mmYoyTail(mm, yoy);
         }
       }
     }
@@ -1919,7 +1921,7 @@ function renderFlLinhasChart(d){
   const yoyMeta     = active.map(s => computeYoYMeta(s.data));
 
   makeChart('ch-fl-linhas', {
-    chart: { type: 'line', height: 480, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(colors, pctMeta) },
+    chart: { type: 'line', height: 480, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(colors) },
     series, colors,
     xaxis: {
       categories: d.lbl, labels: { style: { colors: '#c5c5c5' }, rotate: d.lbl.length > 8 ? -45 : 0 },
@@ -1940,17 +1942,17 @@ function renderFlLinhasChart(d){
         const v = typeof real === 'number' ? real : val;
         return v !== 0 ? ABBR(v) : '';
       },
-      background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
     },
     legend: { position: 'top', horizontalAlign: 'left' },
     tooltip: {
       shared: true,
       y: {
         formatter: function(v, { seriesIndex, dataPointIndex }){
+          const mm  = pctMeta[seriesIndex] && pctMeta[seriesIndex][dataPointIndex];
           const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
-          const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
-          return BRL(v) + yoyTxt;
+          return BRL(v) + mmYoyTail(mm, yoy);
         }
       }
     },
@@ -2313,13 +2315,13 @@ function renderFat({rec}, prev){
 
   if (rmk.length){
     const rmSeriesData = rmy.map(v => +v.toFixed(2));
-    const rmPct = [computePctMeta(rmSeriesData)];
+    const rmPct = computePctMeta(rmSeriesData);
     const rmYoy = computeYoYMeta(rmSeriesData);
     makeChart('ch-rec-mes', {
       chart: {
         type: 'area', height: 380,
         dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.gold },
-        events: perSeriesLabelEvents([C.gold], rmPct)
+        events: perSeriesLabelEvents([C.gold])
       },
       series: [{ name: 'Receita', data: rmSeriesData }],
       xaxis: {
@@ -2337,17 +2339,15 @@ function renderFat({rec}, prev){
       dataLabels: {
         enabled: true,
         formatter: v => ABBR(v),
-        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+        background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
       },
       markers: { size: 5, colors: [C.gold], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
       legend: { show: false },
       tooltip: {
         y: {
           formatter: function(v, { dataPointIndex }){
-            const yoy = rmYoy[dataPointIndex];
-            const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
-            return BRL(v) + yoyTxt;
+            return BRL(v) + mmYoyTail(rmPct[dataPointIndex], rmYoy[dataPointIndex]);
           }
         }
       }
@@ -2544,13 +2544,13 @@ function renderDep({pag, vis}, prev){
   const dmy = dmk.map(k => +dm[k].toFixed(2));
 
   if (dmk.length){
-    const dmPct = [computePctMeta(dmy)];
+    const dmPct = computePctMeta(dmy);
     const dmYoy = computeYoYMeta(dmy);
     makeChart('ch-dep-mes', {
       chart: {
         type: 'area', height: 380,
         dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.red },
-        events: perSeriesLabelEvents([C.red], dmPct)
+        events: perSeriesLabelEvents([C.red])
       },
       series: [{ name: 'Despesas', data: dmy }],
       xaxis: {
@@ -2566,17 +2566,15 @@ function renderDep({pag, vis}, prev){
       },
       dataLabels: {
         enabled: true, formatter: v => ABBR(v),
-        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+        background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
       },
       markers: { size: 5, colors: [C.red], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
       legend: { show: false },
       tooltip: {
         y: {
           formatter: function(v, { dataPointIndex }){
-            const yoy = dmYoy[dataPointIndex];
-            const yoyTxt = yoy == null ? '' : ` (YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%)`;
-            return BRL(v) + yoyTxt;
+            return BRL(v) + mmYoyTail(dmPct[dataPointIndex], dmYoy[dataPointIndex]);
           }
         }
       }
