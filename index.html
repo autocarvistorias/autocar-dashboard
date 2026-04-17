@@ -823,7 +823,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 08:56</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">17/04/2026 09:05</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -968,11 +968,6 @@ tailwind.config = {
       </div>
       <div class="chart-card card-fx">
         <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">storefront</span>Receita por Loja</span></div>
-        <div class="loja-chips-row" id="recloja-chips" role="group" aria-label="Séries visíveis">
-          <button class="loja-chip active" data-serie="Goiania"  style="--chip-color:#C8960C">Goiânia</button>
-          <button class="loja-chip active" data-serie="Prime"    style="--chip-color:#00BCD4">Prime</button>
-          <button class="loja-chip active" data-serie="Anapolis" style="--chip-color:#AB47BC">Anápolis</button>
-        </div>
         <div id="ch-rec-loja" class="chart-host" style="min-height:320px"></div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1054,11 +1049,6 @@ tailwind.config = {
       </div>
       <div class="chart-card card-fx">
         <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">multiline_chart</span>Entradas, Saídas e Saldo</span></div>
-        <div class="loja-chips-row" id="fl-chips" role="group" aria-label="Séries visíveis">
-          <button class="loja-chip active" data-serie="Entradas" style="--chip-color:#10B981">Entradas</button>
-          <button class="loja-chip active" data-serie="Saidas"   style="--chip-color:#EF4444">Saídas</button>
-          <button class="loja-chip active" data-serie="Saldo"    style="--chip-color:#FFD60A">Saldo</button>
-        </div>
         <div id="ch-fl-linhas" class="chart-host" style="min-height:420px"></div>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1344,118 +1334,12 @@ function baseChart(opts){
 //   2) Detect labels that share ~same X and push them vertically (centered spread)
 //      so none collide. All labels stay visible — they just migrate up/down as needed.
 
-// All dataLabel numbers render in black — series pills carry the color distinction.
-function _labelTextColor(_seriesColor){ return '#0a0a0a'; }
-
-// ── % helpers ────────────────────────────────────────────────────────────
-// Month-over-month % for each point. First point + prev-zero = "—" (no baseline).
-function computePctMeta(data){
-  return data.map((v, i) => {
-    if (i === 0) return { dir:'none', label:'—' };
-    const prev = data[i-1];
-    if (prev == null || prev === 0) return { dir:'none', label:'—' };
-    const pct = ((v - prev) / Math.abs(prev)) * 100;
-    const abs = Math.abs(pct);
-    const rounded = abs >= 10 ? Math.round(abs) : +abs.toFixed(1);
-    if (abs < 0.5) return { dir:'none', label:'—' };
-    return pct > 0
-      ? { dir:'up',   label:`\u25B2 ${rounded}%` }
-      : { dir:'down', label:`\u25BC ${rounded}%` };
-  });
+// Light series → dark text; dark series → light text.
+function _labelTextColor(seriesColor){
+  const lights = ['#FFD60A', '#FFE25A', '#FFE45C', '#FFFFFF', '#C8960C'];
+  return lights.includes((seriesColor||'').toUpperCase()) ? '#0a0a0a' : '#FFFFFF';
 }
 
-// Year-over-year % for tooltip; null when <12 prior points available.
-function computeYoYMeta(data){
-  return data.map((v, i) => {
-    if (i < 12) return null;
-    const prev = data[i-12];
-    if (prev == null || prev === 0) return null;
-    return ((v - prev) / Math.abs(prev)) * 100;
-  });
-}
-
-// Colors for pct-badge (green/red/gray). Retained for potential future reuse.
-function _pctColors(dir){
-  if (dir === 'up')   return { bg:'#10B981', fg:'#FFFFFF' };
-  if (dir === 'down') return { bg:'#EF4444', fg:'#FFFFFF' };
-  return { bg:'#525252', fg:'#FFFFFF' };
-}
-
-// Formats a single YoY number into the same inline style as pct meta ("▲ 12%" / "▼ 8%" / "—").
-function formatYoyInline(yoy){
-  if (yoy == null) return '—';
-  const abs = Math.abs(yoy);
-  if (abs < 0.5) return '—';
-  const rounded = abs >= 10 ? Math.round(abs) : +abs.toFixed(1);
-  return yoy > 0 ? `\u25B2 ${rounded}%` : `\u25BC ${rounded}%`;
-}
-
-// Builds "(M/M X · YoY Y)" tail for tooltips.
-function mmYoyTail(pctInfo, yoy){
-  const mm = pctInfo ? pctInfo.label : '—';
-  const yy = formatYoyInline(yoy);
-  return ` (M/M ${mm} · YoY ${yy})`;
-}
-
-// Inject a small pct pill below each label <g> of a series.
-// Idempotent per label. Skipped when meta is null/empty for that point.
-function _injectPctBadges(root, pctMetaPerSeries){
-  if (!pctMetaPerSeries) return;
-  const NS = 'http://www.w3.org/2000/svg';
-  root.querySelectorAll('.apexcharts-datalabels').forEach((group, sIdx) => {
-    const meta = pctMetaPerSeries[sIdx];
-    if (!meta) return;
-    const labelGroups = group.querySelectorAll('g');
-    labelGroups.forEach((labelG, pIdx) => {
-      if (labelG.dataset.pctInjected === '1') return;
-      const info = meta[pIdx];
-      if (!info) return;
-      const mainRect = labelG.querySelector('rect');
-      const mainText = labelG.querySelector('text');
-      if (!mainRect || !mainText || !mainText.textContent.trim()) return;
-
-      const mx = parseFloat(mainRect.getAttribute('x')) || 0;
-      const my = parseFloat(mainRect.getAttribute('y')) || 0;
-      const mw = parseFloat(mainRect.getAttribute('width')) || 0;
-      const mh = parseFloat(mainRect.getAttribute('height')) || 0;
-
-      const col = _pctColors(info.dir);
-      const badgeG = document.createElementNS(NS, 'g');
-      badgeG.setAttribute('class', 'pct-badge');
-
-      const text = document.createElementNS(NS, 'text');
-      text.setAttribute('x', mx + mw/2);
-      text.setAttribute('y', my + mh + 11);
-      text.setAttribute('font-size', '9');
-      text.setAttribute('font-weight', '800');
-      text.setAttribute('font-family', 'Plus Jakarta Sans, sans-serif');
-      text.setAttribute('fill', col.fg);
-      text.setAttribute('text-anchor', 'middle');
-      text.textContent = info.label;
-      badgeG.appendChild(text);
-      labelG.appendChild(badgeG);
-
-      // Measure then insert rect behind
-      let bbox;
-      try { bbox = text.getBBox(); } catch(_) { bbox = null; }
-      if (bbox && bbox.width > 0) {
-        const pad = { x: 4, y: 1 };
-        const rect = document.createElementNS(NS, 'rect');
-        rect.setAttribute('x', bbox.x - pad.x);
-        rect.setAttribute('y', bbox.y - pad.y);
-        rect.setAttribute('width',  bbox.width  + pad.x*2);
-        rect.setAttribute('height', bbox.height + pad.y*2);
-        rect.setAttribute('rx', 3);
-        rect.setAttribute('fill', col.bg);
-        rect.setAttribute('fill-opacity', '0.95');
-        rect.setAttribute('stroke', '#0a0a0a');
-        rect.setAttribute('stroke-width', '0.5');
-        badgeG.insertBefore(rect, text);
-      }
-      labelG.dataset.pctInjected = '1';
-    });
-  });
-}
 
 // Measures each label's bbox in root coords, groups by X column, and pushes
 // colliding ones apart symmetrically around the column's midpoint.
@@ -1772,12 +1656,10 @@ function renderVisMesChart(vis){
   const fillType    = active.map(s => s.isTotal ? 'solid' : 'gradient');
   const fillOpacity = active.map(_ => 1);
   const markerSize  = active.map(s => s.isTotal ? 7 : 5);
-  const pctMeta     = active.map(s => computePctMeta(s.data));
-  const yoyMeta     = active.map(s => computeYoYMeta(s.data));
 
   makeChart('ch-vis-mes', {
     chart: {
-      type: 'line', height: 460, stacked: false,
+      type: 'line', height: 440, stacked: false,
       events: perSeriesLabelEvents(colors)
     },
     series, colors,
@@ -1791,8 +1673,8 @@ function renderVisMesChart(vis){
         const v = typeof real === 'number' ? real : val;
         return v > 0 ? N(Math.round(v)) : '';
       },
-      background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
+      background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
     },
     markers: { size: markerSize, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 10 } },
     xaxis: {
@@ -1805,16 +1687,7 @@ function renderVisMesChart(vis){
       labels: { style: { colors: '#c5c5c5', fontSize: '12px' }, formatter: v => N(Math.round(v)) }
     },
     legend: { position: 'top', horizontalAlign: 'left', fontWeight: 600, markers: { width: 12, height: 12, radius: 99 } },
-    tooltip: {
-      shared: true, intersect: false,
-      y: {
-        formatter: function(v, { seriesIndex, dataPointIndex }){
-          const mm  = pctMeta[seriesIndex] && pctMeta[seriesIndex][dataPointIndex];
-          const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
-          return N(v) + ' vistorias' + mmYoyTail(mm, yoy);
-        }
-      }
-    }
+    tooltip: { shared: true, intersect: false, y: { formatter: v => N(v) + ' vistorias' } }
   });
 }
 
@@ -1840,128 +1713,6 @@ function chipActive(rowId, serieKey){
   });
 })();
 CHIP_RENDERERS['vismes-chips'] = () => { if (_visMesLastData) renderVisMesChart(_visMesLastData); };
-
-// ── Receita por Loja ─────────────────────────────────────────────────────
-let _recLojaLast = null;
-function renderRecLojaChart(recMesLoja){
-  _recLojaLast = recMesLoja;
-  const mks = Object.keys(recMesLoja).sort();
-  if (!mks.length){
-    emptyState('ch-rec-loja', 'Preencha a coluna "loja" em Contas a Receber para ver este gráfico');
-    return;
-  }
-  const ml = mks.map(monthLabel);
-  const catalog = [
-    { key:'Goiania',  name:'Goiânia',  color: C.gold,   data: mks.map(k => +recMesLoja[k].Goiania.toFixed(2)) },
-    { key:'Prime',    name:'Prime',    color: C.cyan,   data: mks.map(k => +recMesLoja[k].Prime.toFixed(2)) },
-    { key:'Anapolis', name:'Anápolis', color: C.purple, data: mks.map(k => +recMesLoja[k].Anapolis.toFixed(2)) }
-  ];
-  const active = catalog.filter(s => chipActive('recloja-chips', s.key));
-  if (!active.length) return;
-  const series  = active.map(s => ({ name: s.name, data: s.data }));
-  const colors  = active.map(s => s.color);
-  const pctMeta = active.map(s => computePctMeta(s.data));
-  const yoyMeta = active.map(s => computeYoYMeta(s.data));
-
-  makeChart('ch-rec-loja', {
-    chart: { type: 'line', height: 400, events: perSeriesLabelEvents(colors) },
-    series, colors,
-    xaxis: {
-      categories: ml,
-      labels: { style: { colors: '#c5c5c5' }, rotate: mks.length > 8 ? -45 : 0 },
-      axisBorder: { show: false }, axisTicks: { show: false }
-    },
-    yaxis: { min: 0, labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
-    stroke: { curve: 'smooth', width: 3 },
-    markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } },
-    dataLabels: {
-      enabled: true,
-      enabledOnSeries: active.map((_, i) => i),
-      formatter: function(val, opts){
-        const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
-        const v = typeof real === 'number' ? real : val;
-        return v > 0 ? ABBR(v) : '';
-      },
-      background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
-    },
-    legend: { position: 'top', horizontalAlign: 'left' },
-    tooltip: {
-      shared: true,
-      y: {
-        formatter: function(v, { seriesIndex, dataPointIndex }){
-          const mm  = pctMeta[seriesIndex] && pctMeta[seriesIndex][dataPointIndex];
-          const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
-          return BRL(v) + mmYoyTail(mm, yoy);
-        }
-      }
-    }
-  });
-}
-CHIP_RENDERERS['recloja-chips'] = () => { if (_recLojaLast) renderRecLojaChart(_recLojaLast); };
-
-// ── Fluxo: Entradas / Saídas / Saldo ─────────────────────────────────────
-let _flLinhasLast = null;
-function renderFlLinhasChart(d){
-  _flLinhasLast = d;
-  const catalog = [
-    { key:'Entradas', name:'Entradas', color:'#10B981', type:'area', data:d.ent, solid:false },
-    { key:'Saidas',   name:'Saídas',   color:'#EF4444', type:'area', data:d.sai, solid:false },
-    { key:'Saldo',    name:'Saldo',    color: C.gold,   type:'line', data:d.sal, solid:true  }
-  ];
-  const active = catalog.filter(s => chipActive('fl-chips', s.key));
-  if (!active.length) return;
-  const series      = active.map(s => ({ name:s.name, type:s.type, data:s.data }));
-  const colors      = active.map(s => s.color);
-  const strokeWidth = active.map(s => s.solid ? 4 : 2.5);
-  const dashArray   = active.map(s => s.solid ? 4 : 0);
-  const fillType    = active.map(s => s.solid ? 'solid' : 'gradient');
-  const markerSize  = active.map(s => s.solid ? 7 : 5);
-  const pctMeta     = active.map(s => computePctMeta(s.data));
-  const yoyMeta     = active.map(s => computeYoYMeta(s.data));
-
-  makeChart('ch-fl-linhas', {
-    chart: { type: 'line', height: 480, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(colors) },
-    series, colors,
-    xaxis: {
-      categories: d.lbl, labels: { style: { colors: '#c5c5c5' }, rotate: d.lbl.length > 8 ? -45 : 0 },
-      axisBorder: { show: false }, axisTicks: { show: false }
-    },
-    yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
-    stroke: { curve: 'smooth', width: strokeWidth, dashArray },
-    fill: {
-      type: fillType,
-      gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
-      opacity: active.map(_ => 1)
-    },
-    markers: { size: markerSize, strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 10 } },
-    dataLabels: {
-      enabled: true, enabledOnSeries: active.map((_, i) => i),
-      formatter: function(val, opts){
-        const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
-        const v = typeof real === 'number' ? real : val;
-        return v !== 0 ? ABBR(v) : '';
-      },
-      background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
-    },
-    legend: { position: 'top', horizontalAlign: 'left' },
-    tooltip: {
-      shared: true,
-      y: {
-        formatter: function(v, { seriesIndex, dataPointIndex }){
-          const mm  = pctMeta[seriesIndex] && pctMeta[seriesIndex][dataPointIndex];
-          const yoy = yoyMeta[seriesIndex] && yoyMeta[seriesIndex][dataPointIndex];
-          return BRL(v) + mmYoyTail(mm, yoy);
-        }
-      }
-    },
-    annotations: {
-      yaxis: [{ y: 0, borderColor: '#525252', strokeDashArray: 3, label: { text: 'Equilíbrio', style: { color: '#a3a3a3', background: '#1a1a1a', fontSize: '10px' } } }]
-    }
-  });
-}
-CHIP_RENDERERS['fl-chips'] = () => { if (_flLinhasLast) renderFlLinhasChart(_flLinhasLast); };
 
 // ══════════════════════════════════════════════════════════════════════════
 //  OPERAÇÕES
@@ -2314,16 +2065,9 @@ function renderFat({rec}, prev){
   const rmy = rmk.map(k=>rm[k]);
 
   if (rmk.length){
-    const rmSeriesData = rmy.map(v => +v.toFixed(2));
-    const rmPct = computePctMeta(rmSeriesData);
-    const rmYoy = computeYoYMeta(rmSeriesData);
     makeChart('ch-rec-mes', {
-      chart: {
-        type: 'area', height: 380,
-        dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.gold },
-        events: perSeriesLabelEvents([C.gold])
-      },
-      series: [{ name: 'Receita', data: rmSeriesData }],
+      chart: { type: 'area', height: 340, dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.gold } },
+      series: [{ name: 'Receita', data: rmy.map(v => +v.toFixed(2)) }],
       xaxis: {
         categories: rml,
         labels: { style: { colors: '#a3a3a3' }, rotate: rmk.length > 8 ? -45 : 0 },
@@ -2339,22 +2083,19 @@ function renderFat({rec}, prev){
       dataLabels: {
         enabled: true,
         formatter: v => ABBR(v),
-        background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
+        background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 0 },
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
+        offsetY: -8
       },
       markers: { size: 5, colors: [C.gold], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
       legend: { show: false },
-      tooltip: {
-        y: {
-          formatter: function(v, { dataPointIndex }){
-            return BRL(v) + mmYoyTail(rmPct[dataPointIndex], rmYoy[dataPointIndex]);
-          }
-        }
-      }
+      tooltip: { y: { formatter: v => BRL(v) } }
     });
   } else emptyState('ch-rec-mes', 'Sem receitas no período');
 
-  // ─── Receita por Loja (linhas múltiplas com chips + pct + yoy) ───────────
+  // ─── Receita por Loja (linhas múltiplas com data labels visíveis) ────────
+  const recLojas = ['Goiania','Prime','Anapolis'];
+  const recLojaLbls = ['Goiânia','Prime','Anápolis'];
   const recMesLoja = {};
   rec.forEach(r=>{
     if(!r._d||!r.loja) return;
@@ -2362,7 +2103,39 @@ function renderFat({rec}, prev){
     if(!recMesLoja[mk]) recMesLoja[mk] = { Goiania:0, Prime:0, Anapolis:0 };
     if(recMesLoja[mk][r.loja]!==undefined) recMesLoja[mk][r.loja] += r.valor_recebido||0;
   });
-  renderRecLojaChart(recMesLoja);
+  const rmlk = Object.keys(recMesLoja).sort();
+  if (rmlk.length){
+    const rmll = rmlk.map(monthLabel);
+    const recLojaColors = [C.gold, C.cyan, C.purple];
+    makeChart('ch-rec-loja', {
+      chart: { type: 'line', height: 380, events: perSeriesLabelEvents(recLojaColors) },
+      series: recLojas.map((l,i)=>({ name: recLojaLbls[i], data: rmlk.map(k=>+recMesLoja[k][l].toFixed(2)) })),
+      xaxis: {
+        categories: rmll,
+        labels: { style: { colors: '#c5c5c5' }, rotate: rmlk.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { min: 0, labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
+      colors: recLojaColors,
+      stroke: { curve: 'smooth', width: 3 },
+      markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } },
+      dataLabels: {
+        enabled: true,
+        enabledOnSeries: [0, 1, 2],
+        formatter: function(val, opts){
+          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+          const v = typeof real === 'number' ? real : val;
+          return v > 0 ? ABBR(v) : '';
+        },
+        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { position: 'top', horizontalAlign: 'left' },
+      tooltip: { shared: true, y: { formatter: v => BRL(v) } }
+    });
+  } else {
+    emptyState('ch-rec-loja', 'Preencha a coluna "loja" em Contas a Receber para ver este gráfico');
+  }
 
   // ─── Particular vs Despachante (donut) ───────────────────────────────────
   const ct = groupSum(rec,'conta','valor_recebido');
@@ -2544,14 +2317,8 @@ function renderDep({pag, vis}, prev){
   const dmy = dmk.map(k => +dm[k].toFixed(2));
 
   if (dmk.length){
-    const dmPct = computePctMeta(dmy);
-    const dmYoy = computeYoYMeta(dmy);
     makeChart('ch-dep-mes', {
-      chart: {
-        type: 'area', height: 380,
-        dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.red },
-        events: perSeriesLabelEvents([C.red])
-      },
+      chart: { type: 'area', height: 340, dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.red } },
       series: [{ name: 'Despesas', data: dmy }],
       xaxis: {
         categories: dml, labels: { style: { colors: '#a3a3a3' }, rotate: dmk.length > 8 ? -45 : 0 },
@@ -2565,19 +2332,13 @@ function renderDep({pag, vis}, prev){
         gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => ABBR(v),
-        background: { enabled: true, foreColor: '#0a0a0a', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#0a0a0a'] }
+        enabled: true, formatter: v => ABBR(v), offsetY: -8,
+        background: { enabled: true, foreColor: '#fff', borderRadius: 4, padding: 4, opacity: 0.9, borderColor: C.red, borderWidth: 1 },
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
       },
       markers: { size: 5, colors: [C.red], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
       legend: { show: false },
-      tooltip: {
-        y: {
-          formatter: function(v, { dataPointIndex }){
-            return BRL(v) + mmYoyTail(dmPct[dataPointIndex], dmYoy[dataPointIndex]);
-          }
-        }
-      }
+      tooltip: { y: { formatter: v => BRL(v) } }
     });
   } else emptyState('ch-dep-mes', 'Sem despesas no período');
 
@@ -2758,8 +2519,48 @@ function renderFl({pag, rec}, prev){
   kpi('kpi-fl-prox30', { label:'Vence em 30d', value:parseFloat(prox30.toFixed(2)), prev:null, sub:'a pagar nos próximos 30d', icon:'event_upcoming', isCurrency:true });
 
   // ─── Linhas: Entradas / Saídas / Saldo ───────────────────────────────────
-  if (allMes.length) renderFlLinhasChart({ lbl, ent, sai, sal });
-  else emptyState('ch-fl-linhas', 'Sem movimentações no período');
+  if (allMes.length){
+    const flColors = [C.green, C.red, C.gold];
+    makeChart('ch-fl-linhas', {
+      chart: { type: 'line', height: 460, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(flColors) },
+      series: [
+        { name: 'Entradas', type: 'area', data: ent },
+        { name: 'Saídas',   type: 'area', data: sai },
+        { name: 'Saldo',    type: 'line', data: sal }
+      ],
+      xaxis: {
+        categories: lbl, labels: { style: { colors: '#c5c5c5' }, rotate: lbl.length > 8 ? -45 : 0 },
+        axisBorder: { show: false }, axisTicks: { show: false }
+      },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
+      colors: flColors,
+      stroke: { curve: 'smooth', width: [2.5, 2.5, 4], dashArray: [0, 0, 4] },
+      fill: {
+        type: ['gradient','gradient','solid'],
+        gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
+        opacity: [1, 1, 1]
+      },
+      markers: {
+        size: [5, 5, 7], strokeColors: '#0a0a0a', strokeWidth: 2,
+        hover: { size: 10 }
+      },
+      dataLabels: {
+        enabled: true, enabledOnSeries: [0, 1, 2],
+        formatter: function(val, opts){
+          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+          const v = typeof real === 'number' ? real : val;
+          return v !== 0 ? ABBR(v) : '';
+        },
+        background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      },
+      legend: { position: 'top', horizontalAlign: 'left' },
+      tooltip: { shared: true, y: { formatter: v => BRL(v) } },
+      annotations: {
+        yaxis: [{ y: 0, borderColor: '#525252', strokeDashArray: 3, label: { text: 'Equilíbrio', style: { color: '#a3a3a3', background: '#1a1a1a', fontSize: '10px' } } }]
+      }
+    });
+  } else emptyState('ch-fl-linhas', 'Sem movimentações no período');
 
   // ─── Receita vs Despesa (barras agrupadas) ───────────────────────────────
   if (allMes.length){
