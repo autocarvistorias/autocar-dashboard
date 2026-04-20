@@ -826,7 +826,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:11</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:23</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1119,32 +1119,17 @@ tailwind.config = {
     <section id="cx" class="tab-content space-y-5">
       <div class="chart-card card-fx">
         <div class="flex flex-wrap gap-3 items-center">
-          <span class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold">Mês:</span>
-          <select id="f-cx-mes" class="flt" onchange="renderCx()"></select>
-          <span class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold ml-2">Loja:</span>
-          <select id="f-cx-loja" class="flt" onchange="renderCx()">
-            <option value="all">Todas as lojas</option>
-            <option value="Goiania">Goiânia</option>
-            <option value="Prime">Prime</option>
-            <option value="Anapolis">Anápolis</option>
-          </select>
+          <span class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold">Data:</span>
+          <input type="date" id="f-cx-data" onchange="renderCx()">
+          <button class="period-btn active" id="cx-btn-hoje" onclick="cxHoje()">Hoje</button>
         </div>
-      </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4">
-        <div class="kpi-card card-fx" id="kpi-cx-go-fis" style="--accent:#C8960C;--accent-glow:rgba(200,150,12,0.45)"></div>
-        <div class="kpi-card card-fx" id="kpi-cx-go-ban" style="--accent:#C8960C;--accent-glow:rgba(200,150,12,0.25)"></div>
-        <div class="kpi-card card-fx" id="kpi-cx-pr-fis" style="--accent:#00BCD4;--accent-glow:rgba(0,188,212,0.45)"></div>
-        <div class="kpi-card card-fx" id="kpi-cx-pr-ban" style="--accent:#00BCD4;--accent-glow:rgba(0,188,212,0.25)"></div>
-        <div class="kpi-card card-fx" id="kpi-cx-an-fis" style="--accent:#AB47BC;--accent-glow:rgba(171,71,188,0.45)"></div>
-        <div class="kpi-card card-fx" id="kpi-cx-an-ban" style="--accent:#AB47BC;--accent-glow:rgba(171,71,188,0.25)"></div>
-        <div class="kpi-card card-fx" id="kpi-cx-total"></div>
       </div>
       <div class="chart-card card-fx">
         <div class="card-title">
-          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">savings</span>Saldo Diário por Loja</span>
-          <button class="export-btn" onclick="exportXlsx('cx')"><span class="material-symbols-outlined" style="font-size:14px">download</span>Exportar</button>
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">savings</span>Caixa por Loja</span>
+          <span id="cx-data-label" class="title-meta"></span>
         </div>
-        <div class="tbl-wrap tbl-lg"><div id="tbl-cx"></div></div>
+        <div id="tbl-cx"></div>
       </div>
     </section>
 
@@ -2811,174 +2796,138 @@ function renderCob(){
 // ══════════════════════════════════════════════════════════════════════════
 //  CAIXA FINANCEIRO
 // ══════════════════════════════════════════════════════════════════════════
-function renderCx(){
-  // Saldos reais confirmados em 20/04/2026.
+(function buildCxData(){
   const REF_DATE   = '2026-04-20';
   const REF_FISICO = { Goiania: 241.15,  Prime: 1411.10,  Anapolis: 555.00   };
   const REF_BANCO  = { Goiania: 7984.97, Prime: 7664.28,  Anapolis: 11379.92 };
-
   const LOJAS = ['Goiania','Prime','Anapolis'];
-  const LOJA_LABEL = { Goiania:'Goiânia', Prime:'Prime', Anapolis:'Anápolis' };
-  const LOJA_COLOR = { Goiania:'#C8960C', Prime:'#00BCD4', Anapolis:'#AB47BC' };
 
   function tipoRec(m){
-    if (!m) return null;
-    const u = m.toUpperCase();
-    if (u === 'PIX') return 'banco';
-    if (u === 'DINHEIRO' || u === 'CAIXA') return 'fisico';
+    if (!m) return null; const u = m.toUpperCase();
+    if (u==='PIX') return 'banco';
+    if (u==='DINHEIRO'||u==='CAIXA') return 'fisico';
     return null;
   }
   function tipoDep(f){
-    if (!f) return null;
-    const u = f.toUpperCase();
+    if (!f) return null; const u = f.toUpperCase();
     if (['PIX','DEBITO','BOLETO'].includes(u)) return 'banco';
-    if (u === 'DINHEIRO') return 'fisico';
+    if (u==='DINHEIRO') return 'fisico';
     return null;
   }
 
-  // Build day-by-day movements from ALL records
   const movByDay = {};
   _REC.forEach(r => {
-    if (!r.data_pagamento || r.valor_recebido == null) return;
-    if (r.status_pagamento !== 'Pago') return;
-    const tipo = tipoRec(r.metodo_pagamento);
-    if (!tipo) return;
-    const loja = r.loja;
-    if (!loja || !LOJAS.includes(loja)) return;
+    if (!r.data_pagamento || r.valor_recebido==null || r.status_pagamento!=='Pago') return;
+    const tipo = tipoRec(r.metodo_pagamento); if (!tipo) return;
+    const loja = r.loja; if (!loja||!LOJAS.includes(loja)) return;
     const d = r.data_pagamento;
-    if (!movByDay[d]) movByDay[d] = {};
-    if (!movByDay[d][loja]) movByDay[d][loja] = {fisico:0, banco:0};
+    if (!movByDay[d]) movByDay[d]={};
+    if (!movByDay[d][loja]) movByDay[d][loja]={fisico:0,banco:0};
     movByDay[d][loja][tipo] += r.valor_recebido;
   });
   _PAG.forEach(p => {
-    if (!p.data_pagamento || p.valor == null) return;
-    if (p.status !== 'Pago') return;
-    const tipo = tipoDep(p.forma_pagamento);
-    if (!tipo) return;
-    const loja = p.loja;
-    if (!loja || !LOJAS.includes(loja)) return;
+    if (!p.data_pagamento || p.valor==null || p.status!=='Pago') return;
+    const tipo = tipoDep(p.forma_pagamento); if (!tipo) return;
+    const loja = p.loja; if (!loja||!LOJAS.includes(loja)) return;
     const d = p.data_pagamento;
-    if (!movByDay[d]) movByDay[d] = {};
-    if (!movByDay[d][loja]) movByDay[d][loja] = {fisico:0, banco:0};
+    if (!movByDay[d]) movByDay[d]={};
+    if (!movByDay[d][loja]) movByDay[d][loja]={fisico:0,banco:0};
     movByDay[d][loja][tipo] -= p.valor;
   });
 
   const allDates = Object.keys(movByDay).sort();
-
-  // Populate month selector on first call
-  const mesEl = document.getElementById('f-cx-mes');
-  if (mesEl && mesEl.options.length === 0){
-    const months = [...new Set(allDates.map(d => d.slice(0,7)))].sort();
-    const now = new Date().toISOString().slice(0,7);
-    months.forEach(m => {
-      const [y,mo] = m.split('-');
-      const lbl = new Date(y, mo-1, 1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-      const opt = document.createElement('option');
-      opt.value = m; opt.textContent = lbl[0].toUpperCase() + lbl.slice(1);
-      if (m === now) opt.selected = true;
-      mesEl.appendChild(opt);
-    });
-  }
-
-  // Use own month filter (ignores global period filter)
-  const selMes   = mesEl?.value || new Date().toISOString().slice(0,7);
-  const cxLoja   = document.getElementById('f-cx-loja')?.value || 'all';
-  const [cxY, cxM] = selMes.split('-').map(Number);
-  const cxFrom = new Date(cxY, cxM-1, 1);
-  const cxTo   = new Date(cxY, cxM, 0, 23, 59, 59);
-
-  // Compute prefix sums of movements (from earliest date forward)
-  const prefixFis = {}, prefixBan = {};
+  const prefixFis={}, prefixBan={};
   const run = { Goiania:{fisico:0,banco:0}, Prime:{fisico:0,banco:0}, Anapolis:{fisico:0,banco:0} };
   for (const d of allDates){
     for (const loja of LOJAS){
       if (movByDay[d][loja]){
-        run[loja].fisico += movByDay[d][loja].fisico || 0;
-        run[loja].banco  += movByDay[d][loja].banco  || 0;
+        run[loja].fisico += movByDay[d][loja].fisico||0;
+        run[loja].banco  += movByDay[d][loja].banco ||0;
       }
     }
-    prefixFis[d] = { Goiania: run.Goiania.fisico, Prime: run.Prime.fisico, Anapolis: run.Anapolis.fisico };
-    prefixBan[d] = { Goiania: run.Goiania.banco,  Prime: run.Prime.banco,  Anapolis: run.Anapolis.banco  };
+    prefixFis[d]={Goiania:run.Goiania.fisico, Prime:run.Prime.fisico, Anapolis:run.Anapolis.fisico};
+    prefixBan[d]={Goiania:run.Goiania.banco,  Prime:run.Prime.banco,  Anapolis:run.Anapolis.banco };
   }
+  const rfp = prefixFis[REF_DATE]||{Goiania:0,Prime:0,Anapolis:0};
+  const rbp = prefixBan[REF_DATE]||{Goiania:0,Prime:0,Anapolis:0};
 
-  // Prefix at REF_DATE (anchor offsets for both físico and banco)
-  const refFisPrefix = prefixFis[REF_DATE] || { Goiania:0, Prime:0, Anapolis:0 };
-  const refBanPrefix = prefixBan[REF_DATE] || { Goiania:0, Prime:0, Anapolis:0 };
-
-  // Balance at any date d:
-  //   fisico(d) = REF_FISICO[loja] + (prefixFis[d][loja] - refFisPrefix[loja])
-  //   banco(d)  = REF_BANCO[loja]  + (prefixBan[d][loja] - refBanPrefix[loja])
-  function balanceAt(d){
-    const pf = prefixFis[d] || { Goiania:0, Prime:0, Anapolis:0 };
-    const pb = prefixBan[d] || { Goiania:0, Prime:0, Anapolis:0 };
-    const res = {};
-    for (const loja of LOJAS){
-      res[loja] = {
-        fisico: REF_FISICO[loja] + (pf[loja] - refFisPrefix[loja]),
-        banco:  REF_BANCO[loja]  + (pb[loja] - refBanPrefix[loja])
-      };
+  window._CX = {
+    allDates,
+    balanceAt(d){
+      const pf=prefixFis[d]||{Goiania:0,Prime:0,Anapolis:0};
+      const pb=prefixBan[d]||{Goiania:0,Prime:0,Anapolis:0};
+      const res={};
+      for (const loja of LOJAS)
+        res[loja]={ fisico: REF_FISICO[loja]+(pf[loja]-rfp[loja]), banco: REF_BANCO[loja]+(pb[loja]-rbp[loja]) };
+      return res;
     }
-    return res;
-  }
+  };
+})();
 
-  // KPI: balance at end of selected month
-  const kpiDate = cxTo.toISOString().split('T')[0];
-  const kpiClosest = allDates.filter(d => d <= kpiDate).at(-1) || allDates[0];
-  const kpiSaldo = kpiClosest ? balanceAt(kpiClosest) : balanceAt(allDates[0] || REF_DATE);
+function cxHoje(){
+  document.getElementById('f-cx-data').value = '';
+  renderCx();
+}
 
-  kpi('kpi-cx-go-fis', { label:'Goiânia Físico', value: kpiSaldo?.Goiania?.fisico ?? 0, prev:null, sub:'dinheiro em caixa', icon:'payments', isCurrency:true });
-  kpi('kpi-cx-go-ban', { label:'Goiânia Banco',  value: kpiSaldo?.Goiania?.banco  ?? 0, prev:null, sub:'saldo bancário',    icon:'account_balance', isCurrency:true });
-  kpi('kpi-cx-pr-fis', { label:'Prime Físico',   value: kpiSaldo?.Prime?.fisico   ?? 0, prev:null, sub:'dinheiro em caixa', icon:'payments', isCurrency:true });
-  kpi('kpi-cx-pr-ban', { label:'Prime Banco',    value: kpiSaldo?.Prime?.banco    ?? 0, prev:null, sub:'saldo bancário',    icon:'account_balance', isCurrency:true });
-  kpi('kpi-cx-an-fis', { label:'Anápolis Físico',value: kpiSaldo?.Anapolis?.fisico ?? 0,prev:null, sub:'dinheiro em caixa', icon:'payments', isCurrency:true });
-  kpi('kpi-cx-an-ban', { label:'Anápolis Banco', value: kpiSaldo?.Anapolis?.banco  ?? 0,prev:null, sub:'saldo bancário',    icon:'account_balance', isCurrency:true });
-  const totalFisico = LOJAS.reduce((s,l) => s + (kpiSaldo?.[l]?.fisico ?? 0), 0);
-  const totalBanco  = LOJAS.reduce((s,l) => s + (kpiSaldo?.[l]?.banco  ?? 0), 0);
-  kpi('kpi-cx-total', { label:'Total Geral', value: totalFisico + totalBanco, prev:null,
-    sub:`Físico ${BRL(totalFisico)} · Banco ${BRL(totalBanco)}`, icon:'wallet', isCurrency:true });
+function renderCx(){
+  const LOJAS       = ['Goiania','Prime','Anapolis'];
+  const LOJA_LABEL  = { Goiania:'Goiânia', Prime:'Prime', Anapolis:'Anápolis' };
+  const LOJA_COLOR  = { Goiania:'#C8960C', Prime:'#00BCD4', Anapolis:'#AB47BC' };
 
-  // Build table rows (only days within selected month that have movements)
-  const tableRows = [];
-  for (const d of allDates){
-    const dt = new Date(d + 'T12:00:00');
-    if (dt < cxFrom || dt > cxTo) continue;
-    const bal = balanceAt(d);
-    tableRows.push({ data: d, ...bal });
-  }
+  const {allDates, balanceAt} = window._CX;
 
-  // Determine which lojas to show
-  const showLojas = cxLoja === 'all' ? LOJAS : (LOJAS.includes(cxLoja) ? [cxLoja] : LOJAS);
+  // Determine reference date: input value or today (anchored to REF_DATE)
+  const inputVal = document.getElementById('f-cx-data')?.value;
+  const targetDate = inputVal || '2026-04-20';
+  const closest = allDates.filter(d => d <= targetDate).at(-1);
 
-  // Build table header
-  let thHtml = '<th>Data</th>';
-  for (const loja of showLojas){
+  // Label
+  const lbl = inputVal
+    ? new Date(inputVal+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})
+    : 'Hoje — 20/04/2026';
+  const labelEl = document.getElementById('cx-data-label');
+  if (labelEl) labelEl.textContent = lbl;
+
+  // Set date input default
+  const dataEl = document.getElementById('f-cx-data');
+  if (dataEl && !dataEl.value) dataEl.value = '2026-04-20';
+
+  const bal = closest ? balanceAt(closest) : null;
+
+  // Build table
+  let totalFis = 0, totalBan = 0;
+  const rows = LOJAS.map(loja => {
+    const fis = bal?.[loja]?.fisico ?? 0;
+    const ban = bal?.[loja]?.banco  ?? 0;
+    const tot = fis + ban;
+    totalFis += fis; totalBan += ban;
     const c = LOJA_COLOR[loja];
-    thHtml += `<th style="color:${c};border-bottom:2px solid ${c}">${LOJA_LABEL[loja]} Físico</th>`;
-    thHtml += `<th style="color:${c};border-bottom:2px solid ${c};opacity:0.75">${LOJA_LABEL[loja]} Banco</th>`;
-  }
-  if (showLojas.length > 1) thHtml += '<th>Total Geral</th>';
-
-  // Build table body
-  const fmt = d => { const [y,m,dy] = d.split('-'); return `${dy}/${m}/${y}`; };
-  const trHtml = tableRows.map(row => {
-    let rowTotal = 0;
-    let td = `<td>${fmt(row.data)}</td>`;
-    for (const loja of showLojas){
-      const fis = row[loja].fisico;
-      const ban = row[loja].banco;
-      rowTotal += fis + ban;
-      td += `<td style="color:${fis>=0?'#e4e4e4':'#ef4444'};font-weight:600">${BRL(fis)}</td>`;
-      td += `<td style="color:${ban>=0?'#a3a3a3':'#ef4444'}">${BRL(ban)}</td>`;
-    }
-    if (showLojas.length > 1){
-      td += `<td style="color:${rowTotal>=0?C.gold:'#ef4444'};font-weight:bold">${BRL(rowTotal)}</td>`;
-    }
-    return `<tr>${td}</tr>`;
+    return `<tr>
+      <td style="color:${c};font-weight:700">${LOJA_LABEL[loja]}</td>
+      <td style="color:#e4e4e4;font-weight:600">${BRL(fis)}</td>
+      <td style="color:#a3a3a3">${BRL(ban)}</td>
+      <td style="color:${C.gold};font-weight:bold">${BRL(tot)}</td>
+    </tr>`;
   }).join('');
 
-  document.getElementById('tbl-cx').innerHTML = trHtml
-    ? `<table class="data-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table>`
-    : '<div class="empty"><span class="material-symbols-outlined">inbox</span>Sem movimentações no período</div>';
+  const totalGeral = totalFis + totalBan;
+  const totalRow = `<tr style="border-top:2px solid #333">
+    <td style="font-weight:700;color:#fff">Total</td>
+    <td style="color:#e4e4e4;font-weight:700">${BRL(totalFis)}</td>
+    <td style="color:#a3a3a3;font-weight:700">${BRL(totalBan)}</td>
+    <td style="color:${C.gold};font-weight:800;font-size:1.05em">${BRL(totalGeral)}</td>
+  </tr>`;
+
+  document.getElementById('tbl-cx').innerHTML =
+    `<table class="data-table">
+      <thead><tr>
+        <th>Loja</th>
+        <th>Dinheiro Físico</th>
+        <th>Banco</th>
+        <th>Total</th>
+      </tr></thead>
+      <tbody>${rows}${totalRow}</tbody>
+    </table>`;
 }
 
 // ══ EXPORT XLSX ═══════════════════════════════════════════════════════════
@@ -3040,7 +2989,6 @@ function renderAll(){
   renderDep(data, prev);
   renderFl(data, prev);
   renderCob();
-  renderCx();
 }
 
 // ══ TAB SWITCHING ═════════════════════════════════════════════════════════
@@ -3064,7 +3012,7 @@ function showTab(name){
   }
   document.body.classList.remove('drawer-open');
   window.scrollTo({top:0, behavior:'smooth'});
-  // Render any chart that was deferred because its tab was hidden.
+  if (name === 'cx') renderCx();
   setTimeout(() => {
     flushPendingCharts();
     window.dispatchEvent(new Event('resize'));
