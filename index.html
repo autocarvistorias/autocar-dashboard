@@ -826,7 +826,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:23</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:27</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -2848,8 +2848,9 @@ function renderCob(){
     prefixFis[d]={Goiania:run.Goiania.fisico, Prime:run.Prime.fisico, Anapolis:run.Anapolis.fisico};
     prefixBan[d]={Goiania:run.Goiania.banco,  Prime:run.Prime.banco,  Anapolis:run.Anapolis.banco };
   }
-  const rfp = prefixFis[REF_DATE]||{Goiania:0,Prime:0,Anapolis:0};
-  const rbp = prefixBan[REF_DATE]||{Goiania:0,Prime:0,Anapolis:0};
+  const refClosest = allDates.filter(d => d <= REF_DATE).at(-1) || '';
+  const rfp = refClosest ? prefixFis[refClosest] : {Goiania:0,Prime:0,Anapolis:0};
+  const rbp = refClosest ? prefixBan[refClosest] : {Goiania:0,Prime:0,Anapolis:0};
 
   window._CX = {
     allDates,
