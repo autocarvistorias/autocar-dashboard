@@ -797,6 +797,9 @@ tailwind.config = {
     <a class="sidenav-link" data-tab="cob">
       <span class="material-symbols-outlined">notifications_active</span>Cobrança
     </a>
+    <a class="sidenav-link" data-tab="cx">
+      <span class="material-symbols-outlined">savings</span>Caixa Financeiro
+    </a>
   </nav>
 
   <!-- Mini-arcade (fills the empty space between nav and footer) -->
@@ -823,7 +826,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">18/04/2026 12:02</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 09:52</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1112,6 +1115,26 @@ tailwind.config = {
       </div>
     </section>
 
+    <!-- ════════ CAIXA FINANCEIRO ════════ -->
+    <section id="cx" class="tab-content space-y-5">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4">
+        <div class="kpi-card card-fx" id="kpi-cx-go-fis" style="--accent:#C8960C;--accent-glow:rgba(200,150,12,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-cx-go-ban" style="--accent:#C8960C;--accent-glow:rgba(200,150,12,0.25)"></div>
+        <div class="kpi-card card-fx" id="kpi-cx-pr-fis" style="--accent:#00BCD4;--accent-glow:rgba(0,188,212,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-cx-pr-ban" style="--accent:#00BCD4;--accent-glow:rgba(0,188,212,0.25)"></div>
+        <div class="kpi-card card-fx" id="kpi-cx-an-fis" style="--accent:#AB47BC;--accent-glow:rgba(171,71,188,0.45)"></div>
+        <div class="kpi-card card-fx" id="kpi-cx-an-ban" style="--accent:#AB47BC;--accent-glow:rgba(171,71,188,0.25)"></div>
+        <div class="kpi-card card-fx" id="kpi-cx-total"></div>
+      </div>
+      <div class="chart-card card-fx">
+        <div class="card-title">
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">savings</span>Saldo Diário por Loja</span>
+          <button class="export-btn" onclick="exportXlsx('cx')"><span class="material-symbols-outlined" style="font-size:14px">download</span>Exportar</button>
+        </div>
+        <div class="tbl-wrap tbl-lg"><div id="tbl-cx"></div></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -1132,6 +1155,7 @@ tailwind.config = {
   <button class="bnav-btn" data-tab="dep"><span class="material-symbols-outlined">payments</span><span class="lbl">Desp.</span></button>
   <button class="bnav-btn" data-tab="fl"><span class="material-symbols-outlined">swap_horiz</span><span class="lbl">Fluxo</span></button>
   <button class="bnav-btn" data-tab="cob"><span class="material-symbols-outlined">notifications_active</span><span class="lbl">Cobr.</span></button>
+  <button class="bnav-btn" data-tab="cx"><span class="material-symbols-outlined">savings</span><span class="lbl">Caixa</span></button>
 </nav>
 
 <script>
@@ -2771,6 +2795,160 @@ function renderCob(){
     </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+//  CAIXA FINANCEIRO
+// ══════════════════════════════════════════════════════════════════════════
+function renderCx(){
+  // Saldos físicos reais confirmados em 20/04/2026.
+  // Banco: acumulado a partir dos lançamentos registrados nas planilhas (sem saldo inicial bancário informado).
+  const REF_DATE   = '2026-04-20';
+  const REF_FISICO = { Goiania: 241.15, Prime: 1411.10, Anapolis: 555.00 };
+
+  const LOJAS = ['Goiania','Prime','Anapolis'];
+  const LOJA_LABEL = { Goiania:'Goiânia', Prime:'Prime', Anapolis:'Anápolis' };
+  const LOJA_COLOR = { Goiania:'#C8960C', Prime:'#00BCD4', Anapolis:'#AB47BC' };
+
+  function tipoRec(m){
+    if (!m) return null;
+    const u = m.toUpperCase();
+    if (u === 'PIX') return 'banco';
+    if (u === 'DINHEIRO' || u === 'CAIXA') return 'fisico';
+    return null;
+  }
+  function tipoDep(f){
+    if (!f) return null;
+    const u = f.toUpperCase();
+    if (['PIX','DEBITO','BOLETO'].includes(u)) return 'banco';
+    if (u === 'DINHEIRO') return 'fisico';
+    return null;
+  }
+
+  // Build day-by-day movements from ALL records
+  const movByDay = {};
+  _REC.forEach(r => {
+    if (!r.data_pagamento || r.valor_recebido == null) return;
+    if (r.status_pagamento !== 'Pago') return;
+    const tipo = tipoRec(r.metodo_pagamento);
+    if (!tipo) return;
+    const loja = r.loja;
+    if (!loja || !LOJAS.includes(loja)) return;
+    const d = r.data_pagamento;
+    if (!movByDay[d]) movByDay[d] = {};
+    if (!movByDay[d][loja]) movByDay[d][loja] = {fisico:0, banco:0};
+    movByDay[d][loja][tipo] += r.valor_recebido;
+  });
+  _PAG.forEach(p => {
+    if (!p.data_pagamento || p.valor == null) return;
+    if (p.status !== 'Pago') return;
+    const tipo = tipoDep(p.forma_pagamento);
+    if (!tipo) return;
+    const loja = p.loja;
+    if (!loja || !LOJAS.includes(loja)) return;
+    const d = p.data_pagamento;
+    if (!movByDay[d]) movByDay[d] = {};
+    if (!movByDay[d][loja]) movByDay[d][loja] = {fisico:0, banco:0};
+    movByDay[d][loja][tipo] -= p.valor;
+  });
+
+  const allDates = Object.keys(movByDay).sort();
+
+  // Compute prefix sums of movements (from earliest date forward)
+  const prefixFis = {}, prefixBan = {};
+  const run = { Goiania:{fisico:0,banco:0}, Prime:{fisico:0,banco:0}, Anapolis:{fisico:0,banco:0} };
+  for (const d of allDates){
+    for (const loja of LOJAS){
+      if (movByDay[d][loja]){
+        run[loja].fisico += movByDay[d][loja].fisico || 0;
+        run[loja].banco  += movByDay[d][loja].banco  || 0;
+      }
+    }
+    prefixFis[d] = { Goiania: run.Goiania.fisico, Prime: run.Prime.fisico, Anapolis: run.Anapolis.fisico };
+    prefixBan[d] = { Goiania: run.Goiania.banco,  Prime: run.Prime.banco,  Anapolis: run.Anapolis.banco  };
+  }
+
+  // Prefix at REF_DATE (for physical anchor calculation)
+  const refFisPrefix = prefixFis[REF_DATE] || { Goiania:0, Prime:0, Anapolis:0 };
+
+  // Balance at any date d:
+  //   fisico(d) = REF_FISICO[loja] + (prefixFis[d][loja] - refFisPrefix[loja])
+  //   banco(d)  = prefixBan[d][loja]   (acumulado desde o início, sem saldo inicial)
+  function balanceAt(d){
+    const pf = prefixFis[d] || { Goiania:0, Prime:0, Anapolis:0 };
+    const pb = prefixBan[d] || { Goiania:0, Prime:0, Anapolis:0 };
+    const res = {};
+    for (const loja of LOJAS){
+      res[loja] = {
+        fisico: REF_FISICO[loja] + (pf[loja] - refFisPrefix[loja]),
+        banco:  pb[loja]
+      };
+    }
+    return res;
+  }
+
+  const filterFrom = S.from;
+  const filterTo   = S.to;
+
+  // KPI: balance at filterTo (or today)
+  const kpiDate = filterTo ? filterTo.toISOString().split('T')[0] : REF_DATE;
+  const kpiClosest = allDates.filter(d => d <= kpiDate).at(-1) || allDates[0];
+  const kpiSaldo = kpiClosest ? balanceAt(kpiClosest) : balanceAt(allDates[0] || REF_DATE);
+
+  kpi('kpi-cx-go-fis', { label:'Goiânia Físico', value: kpiSaldo?.Goiania?.fisico ?? 0, prev:null, sub:'dinheiro em caixa', icon:'payments', isCurrency:true });
+  kpi('kpi-cx-go-ban', { label:'Goiânia Banco',  value: kpiSaldo?.Goiania?.banco  ?? 0, prev:null, sub:'saldo bancário',    icon:'account_balance', isCurrency:true });
+  kpi('kpi-cx-pr-fis', { label:'Prime Físico',   value: kpiSaldo?.Prime?.fisico   ?? 0, prev:null, sub:'dinheiro em caixa', icon:'payments', isCurrency:true });
+  kpi('kpi-cx-pr-ban', { label:'Prime Banco',    value: kpiSaldo?.Prime?.banco    ?? 0, prev:null, sub:'saldo bancário',    icon:'account_balance', isCurrency:true });
+  kpi('kpi-cx-an-fis', { label:'Anápolis Físico',value: kpiSaldo?.Anapolis?.fisico ?? 0,prev:null, sub:'dinheiro em caixa', icon:'payments', isCurrency:true });
+  kpi('kpi-cx-an-ban', { label:'Anápolis Banco', value: kpiSaldo?.Anapolis?.banco  ?? 0,prev:null, sub:'saldo bancário',    icon:'account_balance', isCurrency:true });
+  const totalFisico = LOJAS.reduce((s,l) => s + (kpiSaldo?.[l]?.fisico ?? 0), 0);
+  const totalBanco  = LOJAS.reduce((s,l) => s + (kpiSaldo?.[l]?.banco  ?? 0), 0);
+  kpi('kpi-cx-total', { label:'Total Geral', value: totalFisico + totalBanco, prev:null,
+    sub:`Físico ${BRL(totalFisico)} · Banco ${BRL(totalBanco)}`, icon:'wallet', isCurrency:true });
+
+  // Build table rows
+  const tableRows = [];
+  for (const d of allDates){
+    const dt = new Date(d + 'T12:00:00');
+    if (filterFrom && dt < filterFrom) continue;
+    if (filterTo   && dt > filterTo)   continue;
+    const bal = balanceAt(d);
+    tableRows.push({ data: d, ...bal });
+  }
+
+  // Determine which lojas to show
+  const showLojas = S.loja === 'all' ? LOJAS : (LOJAS.includes(S.loja) ? [S.loja] : LOJAS);
+
+  // Build table header
+  let thHtml = '<th>Data</th>';
+  for (const loja of showLojas){
+    const c = LOJA_COLOR[loja];
+    thHtml += `<th style="color:${c};border-bottom:2px solid ${c}">${LOJA_LABEL[loja]} Físico</th>`;
+    thHtml += `<th style="color:${c};border-bottom:2px solid ${c};opacity:0.75">${LOJA_LABEL[loja]} Banco</th>`;
+  }
+  if (showLojas.length > 1) thHtml += '<th>Total Geral</th>';
+
+  // Build table body
+  const fmt = d => { const [y,m,dy] = d.split('-'); return `${dy}/${m}/${y}`; };
+  const trHtml = tableRows.map(row => {
+    let rowTotal = 0;
+    let td = `<td>${fmt(row.data)}</td>`;
+    for (const loja of showLojas){
+      const fis = row[loja].fisico;
+      const ban = row[loja].banco;
+      rowTotal += fis + ban;
+      td += `<td style="color:${fis>=0?'#e4e4e4':'#ef4444'};font-weight:600">${BRL(fis)}</td>`;
+      td += `<td style="color:${ban>=0?'#a3a3a3':'#ef4444'}">${BRL(ban)}</td>`;
+    }
+    if (showLojas.length > 1){
+      td += `<td style="color:${rowTotal>=0?C.gold:'#ef4444'};font-weight:bold">${BRL(rowTotal)}</td>`;
+    }
+    return `<tr>${td}</tr>`;
+  }).join('');
+
+  document.getElementById('tbl-cx').innerHTML = trHtml
+    ? `<table class="data-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table>`
+    : '<div class="empty"><span class="material-symbols-outlined">inbox</span>Sem movimentações no período</div>';
+}
+
 // ══ EXPORT XLSX ═══════════════════════════════════════════════════════════
 function exportXlsx(tab){
   const {vis,pag,rec} = getFiltered();
@@ -2800,6 +2978,19 @@ function exportXlsx(tab){
       const dias = r._d ? Math.ceil((hoje-r._d)/864e5) : null;
       return {'Data':r.data_pagamento,'Dias em Aberto':dias,'Placa':r.placa,'Cliente':r.cliente,'Loja':lojaLabel(r.loja),'Conta':r.conta,'Valor':r.valor_recebido,'Método':r.metodo_pagamento};
     });
+  } else if (tab==='cx'){
+    filename='caixa';
+    const rows = document.querySelectorAll('#tbl-cx table tbody tr');
+    rows.forEach(tr => {
+      const cells = tr.querySelectorAll('td');
+      if (!cells.length) return;
+      const obj = {'Data': cells[0].textContent};
+      for (let i = 1; i < cells.length; i++){
+        const th = document.querySelectorAll('#tbl-cx table thead th')[i];
+        if (th) obj[th.textContent] = cells[i].textContent;
+      }
+      data.push(obj);
+    });
   }
   if (!data.length){ alert('Sem dados para exportar.'); return; }
   const ws = XLSX.utils.json_to_sheet(data);
@@ -2817,6 +3008,7 @@ function renderAll(){
   renderDep(data, prev);
   renderFl(data, prev);
   renderCob();
+  renderCx();
 }
 
 // ══ TAB SWITCHING ═════════════════════════════════════════════════════════
@@ -2826,6 +3018,7 @@ const TAB_INFO = {
   dep: { title:'Despesas',         sub:'Categorias, vencimentos e custo por vistoria' },
   fl:  { title:'Fluxo Financeiro', sub:'Entradas, saídas, saldo e margem' },
   cob: { title:'Cobrança',         sub:'Recebimentos em aberto e top devedores' },
+  cx:  { title:'Caixa Financeiro', sub:'Saldo diário de banco e dinheiro físico por loja' },
 };
 
 function showTab(name){
