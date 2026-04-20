@@ -826,7 +826,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:00</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:11</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -2812,10 +2812,10 @@ function renderCob(){
 //  CAIXA FINANCEIRO
 // ══════════════════════════════════════════════════════════════════════════
 function renderCx(){
-  // Saldos físicos reais confirmados em 20/04/2026.
-  // Banco: acumulado a partir dos lançamentos registrados nas planilhas (sem saldo inicial bancário informado).
+  // Saldos reais confirmados em 20/04/2026.
   const REF_DATE   = '2026-04-20';
-  const REF_FISICO = { Goiania: 241.15, Prime: 1411.10, Anapolis: 555.00 };
+  const REF_FISICO = { Goiania: 241.15,  Prime: 1411.10,  Anapolis: 555.00   };
+  const REF_BANCO  = { Goiania: 7984.97, Prime: 7664.28,  Anapolis: 11379.92 };
 
   const LOJAS = ['Goiania','Prime','Anapolis'];
   const LOJA_LABEL = { Goiania:'Goiânia', Prime:'Prime', Anapolis:'Anápolis' };
@@ -2901,12 +2901,13 @@ function renderCx(){
     prefixBan[d] = { Goiania: run.Goiania.banco,  Prime: run.Prime.banco,  Anapolis: run.Anapolis.banco  };
   }
 
-  // Prefix at REF_DATE (for physical anchor calculation)
+  // Prefix at REF_DATE (anchor offsets for both físico and banco)
   const refFisPrefix = prefixFis[REF_DATE] || { Goiania:0, Prime:0, Anapolis:0 };
+  const refBanPrefix = prefixBan[REF_DATE] || { Goiania:0, Prime:0, Anapolis:0 };
 
   // Balance at any date d:
   //   fisico(d) = REF_FISICO[loja] + (prefixFis[d][loja] - refFisPrefix[loja])
-  //   banco(d)  = prefixBan[d][loja]   (acumulado desde o início, sem saldo inicial)
+  //   banco(d)  = REF_BANCO[loja]  + (prefixBan[d][loja] - refBanPrefix[loja])
   function balanceAt(d){
     const pf = prefixFis[d] || { Goiania:0, Prime:0, Anapolis:0 };
     const pb = prefixBan[d] || { Goiania:0, Prime:0, Anapolis:0 };
@@ -2914,7 +2915,7 @@ function renderCx(){
     for (const loja of LOJAS){
       res[loja] = {
         fisico: REF_FISICO[loja] + (pf[loja] - refFisPrefix[loja]),
-        banco:  pb[loja]
+        banco:  REF_BANCO[loja]  + (pb[loja] - refBanPrefix[loja])
       };
     }
     return res;
