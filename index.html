@@ -141,11 +141,11 @@ tailwind.config = {
     50%      { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
   }
 
-  .logo-glow { animation: glowPulse 4.5s ease-in-out infinite; }
+  .logo-glow { filter: drop-shadow(0 0 6px rgba(255, 214, 10, 0.30)); }
 
   .live-dot {
     width: 8px; height: 8px; border-radius: 999px; background: #22c55e;
-    animation: pulseDot 2s ease-in-out infinite; display: inline-block;
+    display: inline-block;
   }
 
   /* ── Card foundation ───────────────────────────────────────────────────── */
@@ -174,7 +174,7 @@ tailwind.config = {
     transform: translateY(-2px);
   }
   .card-fx:hover::before { opacity: 1; }
-  .card-fx:hover::after { opacity: 1; animation: scan 2.5s linear infinite; }
+  .card-fx:hover::after { opacity: 0; }
 
   /* ── KPI card ──────────────────────────────────────────────────────────── */
   .kpi-card {
@@ -212,7 +212,7 @@ tailwind.config = {
       radial-gradient(120% 80% at 100% 100%, var(--accent, #FFD60A) 0%, transparent 55%);
     background-size: 200% 200%;
     opacity: .07;
-    animation: bgShift 14s ease-in-out infinite alternate;
+    animation: none;
     mix-blend-mode: screen;
   }
   /* All real content goes above the aurora layer */
@@ -238,16 +238,16 @@ tailwind.config = {
   .kpi-card .kpi-icon::after {
     content: ''; position: absolute; inset: -2px; border-radius: 11px;
     pointer-events: none; color: var(--accent, var(--gold));
-    animation: kpi-ring 3.4s cubic-bezier(.2,.6,.3,1) infinite;
+    animation: none;
   }
-  .kpi-card .kpi-icon::after { animation-delay: 1.7s; }
+  .kpi-card .kpi-icon::after { animation: none; }
   .kpi-card .kpi-icon .material-symbols-outlined { font-size: 18px; position: relative; z-index: 1; }
   .kpi-card .value {
     font-family: "Plus Jakarta Sans", sans-serif;
     font-size: clamp(26px, 2.4vw, 36px);
     font-weight: 800; color: var(--accent, var(--gold));
     line-height: 1.05; word-break: keep-all; overflow-wrap: normal; letter-spacing: -0.5px;
-    text-shadow: 0 0 22px var(--accent-glow, var(--gold-glow));
+    text-shadow: none;
     animation: countUp .5s ease both;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
@@ -632,7 +632,7 @@ tailwind.config = {
     padding: 6px 12px 10px;
     font-size: 12px; letter-spacing: 0.04em;
   }
-  .ma-hint { color: #FFD60A; animation: ma-pulse 2.2s ease-in-out infinite; font-weight: 600; }
+  .ma-hint { color: #FFD60A; font-weight: 600; }
   .ma-hint.playing { animation: none; color: rgba(255,255,255,0.7); }
   .ma-hi { color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums; font-weight: 600; }
   /* Canvas wrapper takes the remaining flex space, canvas fills it absolutely.
@@ -826,7 +826,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:27</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 12:39</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
