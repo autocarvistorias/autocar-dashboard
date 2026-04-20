@@ -826,7 +826,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 09:52</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">20/04/2026 10:00</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1117,6 +1117,19 @@ tailwind.config = {
 
     <!-- ════════ CAIXA FINANCEIRO ════════ -->
     <section id="cx" class="tab-content space-y-5">
+      <div class="chart-card card-fx">
+        <div class="flex flex-wrap gap-3 items-center">
+          <span class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold">Mês:</span>
+          <select id="f-cx-mes" class="flt" onchange="renderCx()"></select>
+          <span class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold ml-2">Loja:</span>
+          <select id="f-cx-loja" class="flt" onchange="renderCx()">
+            <option value="all">Todas as lojas</option>
+            <option value="Goiania">Goiânia</option>
+            <option value="Prime">Prime</option>
+            <option value="Anapolis">Anápolis</option>
+          </select>
+        </div>
+      </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4">
         <div class="kpi-card card-fx" id="kpi-cx-go-fis" style="--accent:#C8960C;--accent-glow:rgba(200,150,12,0.45)"></div>
         <div class="kpi-card card-fx" id="kpi-cx-go-ban" style="--accent:#C8960C;--accent-glow:rgba(200,150,12,0.25)"></div>
@@ -2852,6 +2865,28 @@ function renderCx(){
 
   const allDates = Object.keys(movByDay).sort();
 
+  // Populate month selector on first call
+  const mesEl = document.getElementById('f-cx-mes');
+  if (mesEl && mesEl.options.length === 0){
+    const months = [...new Set(allDates.map(d => d.slice(0,7)))].sort();
+    const now = new Date().toISOString().slice(0,7);
+    months.forEach(m => {
+      const [y,mo] = m.split('-');
+      const lbl = new Date(y, mo-1, 1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+      const opt = document.createElement('option');
+      opt.value = m; opt.textContent = lbl[0].toUpperCase() + lbl.slice(1);
+      if (m === now) opt.selected = true;
+      mesEl.appendChild(opt);
+    });
+  }
+
+  // Use own month filter (ignores global period filter)
+  const selMes   = mesEl?.value || new Date().toISOString().slice(0,7);
+  const cxLoja   = document.getElementById('f-cx-loja')?.value || 'all';
+  const [cxY, cxM] = selMes.split('-').map(Number);
+  const cxFrom = new Date(cxY, cxM-1, 1);
+  const cxTo   = new Date(cxY, cxM, 0, 23, 59, 59);
+
   // Compute prefix sums of movements (from earliest date forward)
   const prefixFis = {}, prefixBan = {};
   const run = { Goiania:{fisico:0,banco:0}, Prime:{fisico:0,banco:0}, Anapolis:{fisico:0,banco:0} };
@@ -2885,11 +2920,8 @@ function renderCx(){
     return res;
   }
 
-  const filterFrom = S.from;
-  const filterTo   = S.to;
-
-  // KPI: balance at filterTo (or today)
-  const kpiDate = filterTo ? filterTo.toISOString().split('T')[0] : REF_DATE;
+  // KPI: balance at end of selected month
+  const kpiDate = cxTo.toISOString().split('T')[0];
   const kpiClosest = allDates.filter(d => d <= kpiDate).at(-1) || allDates[0];
   const kpiSaldo = kpiClosest ? balanceAt(kpiClosest) : balanceAt(allDates[0] || REF_DATE);
 
@@ -2904,18 +2936,17 @@ function renderCx(){
   kpi('kpi-cx-total', { label:'Total Geral', value: totalFisico + totalBanco, prev:null,
     sub:`Físico ${BRL(totalFisico)} · Banco ${BRL(totalBanco)}`, icon:'wallet', isCurrency:true });
 
-  // Build table rows
+  // Build table rows (only days within selected month that have movements)
   const tableRows = [];
   for (const d of allDates){
     const dt = new Date(d + 'T12:00:00');
-    if (filterFrom && dt < filterFrom) continue;
-    if (filterTo   && dt > filterTo)   continue;
+    if (dt < cxFrom || dt > cxTo) continue;
     const bal = balanceAt(d);
     tableRows.push({ data: d, ...bal });
   }
 
   // Determine which lojas to show
-  const showLojas = S.loja === 'all' ? LOJAS : (LOJAS.includes(S.loja) ? [S.loja] : LOJAS);
+  const showLojas = cxLoja === 'all' ? LOJAS : (LOJAS.includes(cxLoja) ? [cxLoja] : LOJAS);
 
   // Build table header
   let thHtml = '<th>Data</th>';
