@@ -733,6 +733,9 @@ tailwind.config = {
     <a class="sidenav-link" data-tab="cx">
       <span class="material-symbols-outlined">savings</span>Caixa Financeiro
     </a>
+    <a class="sidenav-link" data-tab="eq">
+      <span class="material-symbols-outlined">groups</span>Equipe
+    </a>
   </nav>
 
   <!-- Mini-arcade (fills the empty space between nav and footer) -->
@@ -759,7 +762,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">22/04/2026 18:27</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">23/04/2026 09:30</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1066,6 +1069,249 @@ tailwind.config = {
       </div>
     </section>
 
+    <!-- ════════ EQUIPE ════════ -->
+    <section id="eq" class="tab-content space-y-5">
+
+      <!-- Cards dos sócios -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+
+        <div class="chart-card card-fx" style="border-top:3px solid #2196F3;padding:20px 22px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div style="width:40px;height:40px;border-radius:50%;background:rgba(33,150,243,.15);display:flex;align-items:center;justify-content:center">
+              <span class="material-symbols-outlined" style="color:#2196F3;font-size:20px">account_balance</span>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:#fff">Murilo</div>
+              <div style="font-size:11px;color:#2196F3;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Financeiro</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#888;line-height:1.6">
+            Receitas · Despesas · Conciliação bancária<br>
+            Fluxo de caixa · Dashboard · Inadimplência
+          </div>
+        </div>
+
+        <div class="chart-card card-fx" style="border-top:3px solid #4CAF50;padding:20px 22px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div style="width:40px;height:40px;border-radius:50%;background:rgba(76,175,80,.15);display:flex;align-items:center;justify-content:center">
+              <span class="material-symbols-outlined" style="color:#4CAF50;font-size:20px">badge</span>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:#fff">Victor</div>
+              <div style="font-size:11px;color:#4CAF50;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Administrativo / RH</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#888;line-height:1.6">
+            Notas fiscais · Documentação · Contratos<br>
+            Contador · Compras · Manutenção
+          </div>
+        </div>
+
+        <div class="chart-card card-fx" style="border-top:3px solid #C8960C;padding:20px 22px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div style="width:40px;height:40px;border-radius:50%;background:rgba(200,150,12,.15);display:flex;align-items:center;justify-content:center">
+              <span class="material-symbols-outlined" style="color:#C8960C;font-size:20px">storefront</span>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:#fff">Wesley</div>
+              <div style="font-size:11px;color:#C8960C;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Comercial / Operação</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#888;line-height:1.6">
+            Despachantes · Lojistas · Prospecção<br>
+            Marketing digital · Operação · Qualidade
+          </div>
+        </div>
+      </div>
+
+      <!-- Mapa de Processos -->
+      <div class="chart-card card-fx">
+        <div class="card-title">
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="material-symbols-outlined title-glyph" style="font-size:18px">checklist</span>Mapa de Processos
+          </span>
+          <span class="title-meta">Responsável decide · Suporte executa quando necessário</span>
+        </div>
+        <div class="tbl-wrap tbl-lg">
+          <table class="data-table" style="min-width:600px">
+            <thead>
+              <tr>
+                <th style="width:44px">#</th>
+                <th>Processo</th>
+                <th style="width:180px">Responsável</th>
+                <th style="width:150px">Suporte</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4" style="background:rgba(33,150,243,.12);color:#64B5F6;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 14px;white-space:normal">FINANCEIRO</td></tr>
+              <tr><td>1</td><td>Lançamento de receitas no sistema</td><td><span style="color:#2196F3;font-weight:600">Murilo</span></td><td style="color:#888">Victor</td></tr>
+              <tr><td>2</td><td>Lançamento de despesas no sistema</td><td><span style="color:#2196F3;font-weight:600">Murilo</span></td><td style="color:#888">Victor</td></tr>
+              <tr><td>3</td><td>Conciliação bancária (banco vs planilha)</td><td><span style="color:#2196F3;font-weight:600">Murilo</span></td><td style="color:#888">—</td></tr>
+              <tr><td>4</td><td>Controle de inadimplência</td><td><span style="color:#2196F3;font-weight:600">Murilo</span></td><td style="color:#888">Wesley</td></tr>
+              <tr><td>5</td><td>Fluxo de caixa e relatório mensal</td><td><span style="color:#2196F3;font-weight:600">Murilo</span></td><td style="color:#888">—</td></tr>
+              <tr><td>6</td><td>Atualização do dashboard</td><td><span style="color:#2196F3;font-weight:600">Murilo</span></td><td style="color:#888">—</td></tr>
+              <tr><td colspan="4" style="background:rgba(76,175,80,.12);color:#81C784;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 14px;white-space:normal">ADMINISTRATIVO / RH / COMPRAS</td></tr>
+              <tr><td>7</td><td>Emissão de notas fiscais</td><td><span style="color:#4CAF50;font-weight:600">Victor</span></td><td style="color:#888">Murilo</td></tr>
+              <tr><td>8</td><td>Documentação legal (alvarás, licenças)</td><td><span style="color:#4CAF50;font-weight:600">Victor</span></td><td style="color:#888">Murilo</td></tr>
+              <tr><td>9</td><td>Contratos com fornecedores</td><td><span style="color:#4CAF50;font-weight:600">Victor</span></td><td style="color:#888">Murilo</td></tr>
+              <tr><td>10</td><td>Interface com o contador (folha, férias, admissão/demissão)</td><td><span style="color:#4CAF50;font-weight:600">Victor</span></td><td style="color:#888">Murilo</td></tr>
+              <tr><td>11</td><td>Compras (limpeza, escritório, lanches)</td><td><span style="color:#4CAF50;font-weight:600">Victor</span></td><td style="color:#888">Wesley</td></tr>
+              <tr><td>12</td><td>Manutenção das lojas e equipamentos</td><td><span style="color:#4CAF50;font-weight:600">Victor</span></td><td style="color:#888">Wesley</td></tr>
+              <tr><td colspan="4" style="background:rgba(200,150,12,.12);color:#FFD54F;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 14px;white-space:normal">COMERCIAL / MARKETING / OPERAÇÃO</td></tr>
+              <tr><td>13</td><td>Relacionamento com despachantes e lojistas</td><td><span style="color:#C8960C;font-weight:600">Wesley</span></td><td style="color:#888">Victor</td></tr>
+              <tr><td>14</td><td>Prospecção de novos clientes</td><td><span style="color:#C8960C;font-weight:600">Wesley</span></td><td style="color:#888">Victor</td></tr>
+              <tr><td>15</td><td>Marketing digital (Instagram, Google etc.)</td><td><span style="color:#C8960C;font-weight:600">Wesley</span></td><td style="color:#888">Victor</td></tr>
+              <tr><td>16</td><td>Material de divulgação (panfletos, artes)</td><td><span style="color:#C8960C;font-weight:600">Wesley</span></td><td style="color:#888">Victor</td></tr>
+              <tr><td>17</td><td>Qualidade da operação diária</td><td><span style="color:#C8960C;font-weight:600">Wesley</span></td><td style="color:#888">Todos</td></tr>
+              <tr><td>18</td><td>Gestão de reclamações de clientes</td><td><span style="color:#C8960C;font-weight:600">Wesley</span></td><td style="color:#888">Victor</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Rotinas -->
+      <div class="chart-card card-fx">
+        <div class="card-title">
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="material-symbols-outlined title-glyph" style="font-size:18px">event_repeat</span>Rotinas por Sócio
+          </span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;padding:4px 0 8px">
+
+          <!-- Murilo -->
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#2196F3;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(33,150,243,.25)">
+              Murilo — Financeiro
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Diária</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Lançar receitas do dia no sistema</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Semanal</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Revisar contas a pagar; verificar inadimplentes</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Mensal</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Conciliação bancária · relatório financeiro · atualizar dashboard · reunião de sócios</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Victor -->
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#4CAF50;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(76,175,80,.25)">
+              Victor — Administrativo / RH
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Diária</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Emitir notas fiscais do dia</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Semanal</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Verificar estoque de materiais; levantar necessidade de compras</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Mensal</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Documentação para o contador · compras mensais · verificar vencimento de alvarás e contratos</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wesley -->
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#C8960C;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(200,150,12,.25)">
+              Wesley — Comercial / Operação
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Diária</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Supervisionar operação das lojas; atender despachantes e lojistas presentes</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Semanal</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Contato ativo com clientes fixos ausentes; verificar avaliações e reclamações</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="min-width:64px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;padding-top:2px">Mensal</span>
+                <span style="font-size:12.5px;color:#ccc;line-height:1.5">Ação de marketing · relatório de clientes novos x recorrentes · reunião de sócios</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Reunião Mensal + Indicadores lado a lado -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+
+        <!-- Reunião Mensal -->
+        <div class="chart-card card-fx">
+          <div class="card-title">
+            <span style="display:flex;align-items:center;gap:8px">
+              <span class="material-symbols-outlined title-glyph" style="font-size:18px">groups_2</span>Reunião Mensal
+            </span>
+            <span class="title-meta">1ª semana do mês · ~1 hora</span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="data-table" style="min-width:300px">
+              <thead><tr><th style="width:36px">#</th><th>Pauta</th><th style="width:120px">Apresenta</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Resultado financeiro do mês</td><td style="color:#2196F3;font-weight:600">Murilo</td></tr>
+                <tr><td>2</td><td>Situação de inadimplência</td><td style="color:#2196F3;font-weight:600">Murilo</td></tr>
+                <tr><td>3</td><td>RH, compras e pendências administrativas</td><td style="color:#4CAF50;font-weight:600">Victor</td></tr>
+                <tr><td>4</td><td>Volume de clientes, novos e perdidos</td><td style="color:#C8960C;font-weight:600">Wesley</td></tr>
+                <tr><td>5</td><td>Ações de marketing do próximo mês</td><td style="color:#C8960C;font-weight:600">Wesley</td></tr>
+                <tr><td>6</td><td>Decisões em aberto</td><td style="color:#888">Todos</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Indicadores -->
+        <div class="chart-card card-fx">
+          <div class="card-title">
+            <span style="display:flex;align-items:center;gap:8px">
+              <span class="material-symbols-outlined title-glyph" style="font-size:18px">leaderboard</span>Indicadores de Resultado
+            </span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="data-table" style="min-width:300px">
+              <thead><tr><th style="width:80px">Sócio</th><th>Indicador</th><th style="width:100px">Meta</th></tr></thead>
+              <tbody>
+                <tr><td style="color:#2196F3;font-weight:600">Murilo</td><td>Dashboard atualizado até dia 5</td><td style="color:#22c55e">100%</td></tr>
+                <tr><td style="color:#2196F3;font-weight:600">Murilo</td><td>Inadimplência sobre receita total</td><td style="color:#22c55e">&lt; 5%</td></tr>
+                <tr><td style="color:#4CAF50;font-weight:600">Victor</td><td>Notas fiscais emitidas no prazo</td><td style="color:#22c55e">100%</td></tr>
+                <tr><td style="color:#4CAF50;font-weight:600">Victor</td><td>Compras dentro do orçamento</td><td style="color:#22c55e">Sim</td></tr>
+                <tr><td style="color:#4CAF50;font-weight:600">Victor</td><td>Alvarás e contratos em dia</td><td style="color:#22c55e">Sim</td></tr>
+                <tr><td style="color:#C8960C;font-weight:600">Wesley</td><td>Novos clientes fixos conquistados</td><td style="color:#22c55e">≥ 2/mês</td></tr>
+                <tr><td style="color:#C8960C;font-weight:600">Wesley</td><td>Ações de marketing executadas</td><td style="color:#22c55e">≥ 4/mês</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Regra de Ouro -->
+      <div class="chart-card card-fx" style="border:1px solid rgba(200,150,12,.4);background:rgba(200,150,12,.05);padding:22px 24px">
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <span class="material-symbols-outlined" style="color:#C8960C;font-size:28px;margin-top:2px">stars</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#C8960C;margin-bottom:6px">Regra de Ouro</div>
+            <div style="font-size:13px;color:#bbb;line-height:1.7;font-style:italic">
+              Quem é <strong style="color:#fff;font-style:normal">Responsável</strong>, decide.
+              Quem é <strong style="color:#fff;font-style:normal">Suporte</strong>, executa quando solicitado ou quando o responsável está ausente.
+              Nenhum sócio toma decisão no processo do outro sem comunicação prévia.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 </div>
 
@@ -1087,6 +1333,7 @@ tailwind.config = {
   <button class="bnav-btn" data-tab="fl"><span class="material-symbols-outlined">swap_horiz</span><span class="lbl">Fluxo</span></button>
   <button class="bnav-btn" data-tab="cob"><span class="material-symbols-outlined">notifications_active</span><span class="lbl">Cobr.</span></button>
   <button class="bnav-btn" data-tab="cx"><span class="material-symbols-outlined">savings</span><span class="lbl">Caixa</span></button>
+  <button class="bnav-btn" data-tab="eq"><span class="material-symbols-outlined">groups</span><span class="lbl">Equipe</span></button>
 </nav>
 
 <script>
@@ -2933,6 +3180,7 @@ const TAB_INFO = {
   fl:  { title:'Fluxo Financeiro', sub:'Entradas, saídas, saldo e margem' },
   cob: { title:'Cobrança',         sub:'Recebimentos em aberto e top devedores' },
   cx:  { title:'Caixa Financeiro', sub:'Saldo diário de banco e dinheiro físico por loja' },
+  eq:  { title:'Equipe',           sub:'Estrutura organizacional, responsabilidades e rotinas' },
 };
 
 function showTab(name){
