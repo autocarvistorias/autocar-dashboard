@@ -762,7 +762,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">29/04/2026 12:55</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">29/04/2026 13:14</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -2977,9 +2977,9 @@ function renderCob(){
 //  CAIXA FINANCEIRO
 // ══════════════════════════════════════════════════════════════════════════
 (function buildCxData(){
-  const REF_DATE   = '2026-04-25';
-  const REF_FISICO = { Goiania: 222.25,  Prime: 2367.10,  Anapolis: 835.00   };
-  const REF_BANCO  = { Goiania: 1724.39, Prime: 8794.33,  Anapolis: 13798.14 };
+  const REF_DATE   = '2026-04-28';
+  const REF_FISICO = { Goiania: 222.25,  Prime: 666.10,   Anapolis: 935.00   };
+  const REF_BANCO  = { Goiania: 527.62,  Prime: 8144.79,  Anapolis: 9218.71  };
   const LOJAS = ['Goiania','Prime','Anapolis'];
 
   function tipoRec(m){
@@ -3059,19 +3059,19 @@ function renderCx(){
 
   // Determine reference date: input value or today (anchored to REF_DATE)
   const inputVal = document.getElementById('f-cx-data')?.value;
-  const targetDate = inputVal || '2026-04-25';
+  const targetDate = inputVal || '2026-04-28';
   const closest = allDates.filter(d => d <= targetDate).at(-1);
 
   // Label
   const lbl = inputVal
     ? new Date(inputVal+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})
-    : 'Hoje — 25/04/2026';
+    : 'Hoje — 28/04/2026';
   const labelEl = document.getElementById('cx-data-label');
   if (labelEl) labelEl.textContent = lbl;
 
   // Set date input default
   const dataEl = document.getElementById('f-cx-data');
-  if (dataEl && !dataEl.value) dataEl.value = '2026-04-25';
+  if (dataEl && !dataEl.value) dataEl.value = '2026-04-28';
 
   const bal = closest ? balanceAt(closest) : null;
 
