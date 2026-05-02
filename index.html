@@ -762,7 +762,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:41</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:54</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1881,10 +1881,13 @@ function renderVisMesChart(vis){
     stroke: { curve: 'smooth', width: strokeWidth, dashArray },
     fill: { type: fillType, gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] }, opacity: fillOpacity },
     dataLabels: {
-      enabled: true,
+      enabled: ml.length <= 12,
       enabledOnSeries: active.map((_, i) => i),
       formatter: function(val, opts){
-        const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+        const n = opts.w.config.series[opts.seriesIndex].data.length;
+        const i = opts.dataPointIndex;
+        if (n > 8 && i !== 0 && i !== n-1) return '';
+        const real = opts.w.config.series[opts.seriesIndex].data[i];
         const v = typeof real === 'number' ? real : val;
         return v > 0 ? N(Math.round(v)) : '';
       },
@@ -1895,7 +1898,7 @@ function renderVisMesChart(vis){
     xaxis: {
       categories: ml,
       axisBorder: { show: false }, axisTicks: { color: '#1f1f1f' },
-      labels: { style: { colors: '#c5c5c5', fontSize: '12px' }, rotate: -45, rotateAlways: ml.length > 8 }
+      labels: { style: { colors: '#c5c5c5', fontSize: '12px' }, rotate: -45, rotateAlways: ml.length > 6 }
     },
     yaxis: {
       min: 0,
@@ -1974,26 +1977,19 @@ function renderOp({vis}, prev){
 
   if (vkeys.length){
     makeChart('ch-vistoriadores', {
-      chart: { type: 'bar', height: 420 },
+      chart: { type: 'bar', height: Math.max(380, vkeys.length * 52) },
       series: [{ name: 'Vistorias', data: vkeys.map(k=>vmap[k]) }],
       xaxis: {
-        categories: vkeys.map(k=>k.split(' ')[0]+' '+k.split(' ').slice(-1)[0]),
+        categories: vkeys.map(k => k.split(' ')[0]+' '+k.split(' ').slice(-1)[0]),
         labels: { style: { colors: '#c5c5c5', fontSize: '12px' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 } } },
+      yaxis: { labels: { maxWidth: 175, style: { colors: '#e4e4e4', fontSize: '12px', fontWeight: 600 } } },
       plotOptions: {
-        bar: {
-          horizontal: true, borderRadius: 5, borderRadiusApplication: 'end',
-          barHeight: '78%', distributed: true,
-          dataLabels: { position: 'bottom' }
-        }
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '70%', distributed: true, dataLabels: { position: 'bottom' } }
       },
       colors: vkeys.map((_,i)=> i===0 ? C.gold : i<3 ? C.goldL : C.goldD),
-      fill: {
-        type: 'gradient',
-        gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.55, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] }
-      },
+      fill: { type: 'gradient', gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.55, opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] } },
       dataLabels: {
         enabled: true, textAnchor: 'start', offsetX: 12,
         formatter: function(val, opts){
@@ -2001,11 +1997,11 @@ function renderOp({vis}, prev){
           const v = typeof real === 'number' ? real : val;
           return vTotal ? `${N(v)}  ·  ${(v/vTotal*100).toFixed(1)}%` : N(v);
         },
-        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
-      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 8, right: 32 } },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 16, right: 40 } },
       tooltip: { y: { formatter: v => N(v) + ' vistorias' } }
     });
   } else emptyState('ch-vistoriadores', 'Sem vistoriadores no período');
@@ -2155,13 +2151,14 @@ function renderOp({vis}, prev){
   const fpkeys = Object.keys(fpmap).filter(k=>k!=='null'&&k!=='Outros').sort((a,b)=>fpmap[b]-fpmap[a]);
   if (fpkeys.length){
     makeChart('ch-forma-pag-vis', {
-      chart: { type: 'bar', height: 320 },
+      chart: { type: 'bar', height: Math.max(260, fpkeys.length * 50) },
       series: [{ name: 'Vistorias', data: fpkeys.map(k=>fpmap[k]) }],
       xaxis: {
-        categories: fpkeys, labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 } },
+        categories: fpkeys.map(k => truncate(k, 22)),
+        labels: { style: { colors: '#e4e4e4', fontSize: '12px', fontWeight: 600 } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#c5c5c5' } } },
+      yaxis: { labels: { maxWidth: 150, style: { colors: '#c5c5c5', fontSize: '12px' } } },
       plotOptions: {
         bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'bottom' } }
       },
@@ -2200,16 +2197,16 @@ function renderOp({vis}, prev){
 
   if (vaKeys.length){
     makeChart('ch-taxa-vis', {
-      chart: { type: 'bar', height: 400 },
+      chart: { type: 'bar', height: Math.max(360, vaKeys.length * 54) },
       series: [{ name: 'Aprovação', data: vaTaxas }],
       xaxis: {
         categories: vaLabels, min: 85, max: 102,
         labels: { formatter: v => v.toFixed(0)+'%', style: { colors: '#a3a3a3' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      yaxis: { labels: { maxWidth: 175, style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
       plotOptions: {
-        bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'top' } }
+        bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '65%', distributed: true, dataLabels: { position: 'top' } }
       },
       colors: vaTaxas.map(t => t>=97 ? C.green : t>=93 ? C.orange : C.red),
       fill: {
@@ -2286,7 +2283,7 @@ function renderFat({rec}, prev){
       series: [{ name: 'Receita', data: rmy.map(v => +v.toFixed(2)) }],
       xaxis: {
         categories: rml,
-        labels: { style: { colors: '#a3a3a3' }, rotate: rmk.length > 8 ? -45 : 0 },
+        labels: { style: { colors: '#a3a3a3' }, rotate: rmk.length > 6 ? -45 : 0, rotateAlways: rmk.length > 6 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
@@ -2297,8 +2294,13 @@ function renderFat({rec}, prev){
         gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true,
-        formatter: v => ABBR(v),
+        enabled: rmk.length <= 12,
+        formatter: function(val, opts){
+          const n = opts.w.config.series[0].data.length;
+          const i = opts.dataPointIndex;
+          if (n > 8 && i !== 0 && i !== n-1) return '';
+          return ABBR(val);
+        },
         background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 0 },
         style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
         offsetY: -8
@@ -2328,7 +2330,7 @@ function renderFat({rec}, prev){
       series: recLojas.map((l,i)=>({ name: recLojaLbls[i], data: rmlk.map(k=>+recMesLoja[k][l].toFixed(2)) })),
       xaxis: {
         categories: rmll,
-        labels: { style: { colors: '#c5c5c5' }, rotate: rmlk.length > 8 ? -45 : 0 },
+        labels: { style: { colors: '#c5c5c5' }, rotate: rmlk.length > 6 ? -45 : 0, rotateAlways: rmlk.length > 6 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { min: 0, labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
@@ -2336,10 +2338,13 @@ function renderFat({rec}, prev){
       stroke: { curve: 'smooth', width: 3 },
       markers: { size: 5, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 9 } },
       dataLabels: {
-        enabled: true,
+        enabled: rmlk.length <= 12,
         enabledOnSeries: [0, 1, 2],
         formatter: function(val, opts){
-          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+          const n = opts.w.config.series[opts.seriesIndex].data.length;
+          const i = opts.dataPointIndex;
+          if (n > 8 && i !== 0 && i !== n-1) return '';
+          const real = opts.w.config.series[opts.seriesIndex].data[i];
           const v = typeof real === 'number' ? real : val;
           return v > 0 ? ABBR(v) : '';
         },
@@ -2453,16 +2458,16 @@ function renderFat({rec}, prev){
   const ckeys = Object.keys(cm).sort((a,b)=>cm[b]-cm[a]).slice(0,15);
   if (ckeys.length){
     makeChart('ch-top-clientes', {
-      chart: { type: 'bar', height: 580 },
+      chart: { type: 'bar', height: Math.max(460, ckeys.length * 40) },
       series: [{ name: 'Receita', data: ckeys.map(k => +cm[k].toFixed(2)) }],
       xaxis: {
-        categories: ckeys.map(s => truncate(s, 32)),
+        categories: ckeys.map(s => truncate(s, 28)),
         labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5', fontSize: '12px' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 } } },
+      yaxis: { labels: { style: { colors: '#e4e4e4', fontSize: '12.5px', fontWeight: 600 }, maxWidth: 200 } },
       plotOptions: {
-        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '78%', distributed: true, dataLabels: { position: 'bottom' } }
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '68%', distributed: true, dataLabels: { position: 'bottom' } }
       },
       colors: ckeys.map((_,i) => i===0 ? C.gold : i<3 ? C.goldL : C.goldD),
       fill: {
@@ -2537,7 +2542,7 @@ function renderDep({pag, vis}, prev){
       chart: { type: 'area', height: 340, dropShadow: { enabled: true, top: 6, blur: 12, opacity: 0.3, color: C.red } },
       series: [{ name: 'Despesas', data: dmy }],
       xaxis: {
-        categories: dml, labels: { style: { colors: '#a3a3a3' }, rotate: dmk.length > 8 ? -45 : 0 },
+        categories: dml, labels: { style: { colors: '#a3a3a3' }, rotate: dmk.length > 6 ? -45 : 0, rotateAlways: dmk.length > 6 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
@@ -2548,7 +2553,15 @@ function renderDep({pag, vis}, prev){
         gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => ABBR(v), offsetY: -8,
+        enabled: dmk.length <= 12,
+        formatter: function(val, opts){
+          const n = opts.w.config.series[0].data.length;
+          const i = opts.dataPointIndex;
+          if (n > 8 && i !== 0 && i !== n-1) return '';
+          const v = typeof val === 'number' ? val : 0;
+          return v > 0 ? ABBR(v) : '';
+        },
+        offsetY: -8,
         background: { enabled: true, foreColor: '#fff', borderRadius: 4, padding: 4, opacity: 0.9, borderColor: C.red, borderWidth: 1 },
         style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
       },
@@ -2564,7 +2577,7 @@ function renderDep({pag, vis}, prev){
   const cks = Object.keys(catGrouped).sort((a,b)=>catGrouped[a]-catGrouped[b]); // asc — maiores em cima
   if (cks.length){
     makeChart('ch-dep-cat', {
-      chart: { type: 'bar', height: 560 },
+      chart: { type: 'bar', height: Math.max(560, cks.length * 46) },
       series: [{ name: 'Despesas', data: cks.map(k => +catGrouped[k].toFixed(2)) }],
       xaxis: {
         categories: cks.map(s => truncate(s, 28)),
@@ -2780,11 +2793,14 @@ function renderFl({pag, rec}, prev){
         hover: { size: 10 }
       },
       dataLabels: {
-        enabled: true, enabledOnSeries: [0, 1, 2, 3],
+        enabled: lbl.length <= 12, enabledOnSeries: [0, 1, 2, 3],
         formatter: function(val, opts){
-          const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
+          const n = opts.w.config.series[opts.seriesIndex].data.length;
+          const i = opts.dataPointIndex;
+          const real = opts.w.config.series[opts.seriesIndex].data[i];
           const v = typeof real === 'number' ? real : val;
-          if (opts.seriesIndex === 3) return opts.dataPointIndex === ent.length-1 ? ABBR(v) : '';
+          if (opts.seriesIndex === 3) return i === n-1 ? ABBR(v) : '';
+          if (n > 8 && i !== 0 && i !== n-1) return '';
           return v !== 0 ? ABBR(v) : '';
         },
         background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
@@ -2807,7 +2823,7 @@ function renderFl({pag, rec}, prev){
         { name: 'Despesa', data: sai }
       ],
       xaxis: {
-        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 8 ? -45 : 0 },
+        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 6 ? -45 : 0, rotateAlways: lbl.length > 6 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
@@ -2820,7 +2836,14 @@ function renderFl({pag, rec}, prev){
         gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => ABBR(v), offsetY: -22,
+        enabled: lbl.length <= 10,
+        formatter: function(val, opts){
+          const n = opts.w.config.series[opts.seriesIndex].data.length;
+          const i = opts.dataPointIndex;
+          if (n > 6 && i !== 0 && i !== n-1) return '';
+          return ABBR(val);
+        },
+        offsetY: -22,
         style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
       },
       legend: { position: 'top', horizontalAlign: 'left' },
@@ -2834,7 +2857,7 @@ function renderFl({pag, rec}, prev){
       chart: { type: 'bar', height: 340 },
       series: [{ name: 'Saldo', data: sal }],
       xaxis: {
-        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 8 ? -45 : 0 },
+        categories: lbl, labels: { style: { colors: '#a3a3a3' }, rotate: lbl.length > 6 ? -45 : 0, rotateAlways: lbl.length > 6 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
@@ -2847,7 +2870,14 @@ function renderFl({pag, rec}, prev){
         gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => ABBR(v), offsetY: -22,
+        enabled: lbl.length <= 12,
+        formatter: function(val, opts){
+          const n = opts.w.config.series[0].data.length;
+          const i = opts.dataPointIndex;
+          if (n > 8 && i !== 0 && i !== n-1) return '';
+          return ABBR(val);
+        },
+        offsetY: -22,
         style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
       },
       legend: { show: false },
@@ -2911,7 +2941,7 @@ function renderCob(){
       chart: { type: 'bar', height: 320 },
       series: [{ name: 'Em Aberto', data: cobVals }],
       xaxis: {
-        categories: cobLbl, labels: { style: { colors: '#a3a3a3' }, rotate: cobMks.length > 8 ? -45 : 0 },
+        categories: cobLbl, labels: { style: { colors: '#a3a3a3' }, rotate: cobMks.length > 6 ? -45 : 0, rotateAlways: cobMks.length > 6 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
@@ -2924,7 +2954,14 @@ function renderCob(){
         gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.7, opacityFrom: 1, opacityTo: 0.78, stops: [0, 100] }
       },
       dataLabels: {
-        enabled: true, formatter: v => ABBR(v), offsetY: -22,
+        enabled: cobMks.length <= 12,
+        formatter: function(val, opts){
+          const n = opts.w.config.series[0].data.length;
+          const i = opts.dataPointIndex;
+          if (n > 8 && i !== 0 && i !== n-1) return '';
+          return ABBR(val);
+        },
+        offsetY: -22,
         style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
       },
       legend: { show: false },
@@ -2942,15 +2979,16 @@ function renderCob(){
 
   if (topDev.length){
     makeChart('ch-cob-porcliente', {
-      chart: { type: 'bar', height: 320 },
+      chart: { type: 'bar', height: Math.max(300, topDev.length * 50) },
       series: [{ name: 'Em Aberto', data: topDev.map(k => +porClienteAll[k].toFixed(2)) }],
       xaxis: {
-        categories: topDev, labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
+        categories: topDev.map(k => truncate(k, 24)),
+        labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      yaxis: { labels: { maxWidth: 180, style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
       plotOptions: {
-        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'top' } }
+        bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '65%', distributed: true, dataLabels: { position: 'top' } }
       },
       colors: topDev.map((_,i) => i===0 ? C.red : i<3 ? C.orange : C.goldD),
       fill: {
