@@ -762,7 +762,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:35</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:38</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -2763,8 +2763,8 @@ function renderFl({pag, rec}, prev){
     makeChart('ch-fl-linhas', {
       chart: { type: 'line', height: 460, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(flColors) },
       series: [
-        { name: 'Entradas',          type: 'area', data: ent },
-        { name: 'Saídas',            type: 'area', data: sai },
+        { name: 'Entradas',          type: 'line', data: ent },
+        { name: 'Saídas',            type: 'line', data: sai },
         { name: 'Saldo',             type: 'line', data: sal },
         { name: 'Rec. Potencial',    type: 'line', data: entPot }
       ],
@@ -2774,12 +2774,8 @@ function renderFl({pag, rec}, prev){
       },
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
       colors: flColors,
-      stroke: { curve: 'smooth', width: [2.5, 2.5, 4, 2], dashArray: [0, 0, 4, 6] },
-      fill: {
-        type: ['gradient','gradient','solid','solid'],
-        gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
-        opacity: [1, 1, 1, 0.6]
-      },
+      stroke: { curve: 'smooth', width: [3, 3, 4, 2], dashArray: [0, 0, 4, 6] },
+      fill: { type: 'solid', opacity: [0.15, 0.10, 0, 0] },
       markers: {
         size: [5, 5, 7, 5], strokeColors: '#0a0a0a', strokeWidth: 2,
         hover: { size: 10 }
