@@ -275,7 +275,7 @@ tailwind.config = {
     background: #1a1a1a !important; border: 1px solid rgba(255,255,255,0.08) !important;
     color: #fff !important; font-weight: 600 !important; border-radius: 8px !important;
   }
-  .chart-host .apexcharts-legend-text { color: #d4d4d4 !important; font-family: Inter !important; }
+  .chart-host .apexcharts-legend-text { color: #d4d4d4 !important; font-family: 'Space Grotesk', Inter, sans-serif !important; }
   .chart-host .apexcharts-text { fill: #a3a3a3; }
   .chart-host .apexcharts-datalabel { font-family: 'Space Grotesk', sans-serif !important; }
 
@@ -447,9 +447,9 @@ tailwind.config = {
   }
 
   /* ── Apex axis labels (force readable size) ─────────────────────────── */
-  .chart-host .apexcharts-xaxis text,
-  .chart-host .apexcharts-yaxis text { font-size: 15px !important; font-weight: 600 !important; fill: #c5c5c5 !important; }
-  .chart-host .apexcharts-legend-text { font-size: 15px !important; font-weight: 600 !important; }
+  .chart-host .apexcharts-xaxis text { font-size: 13px !important; font-weight: 600 !important; fill: #c5c5c5 !important; }
+  .chart-host .apexcharts-yaxis text { font-weight: 600 !important; fill: #c5c5c5 !important; }
+  .chart-host .apexcharts-legend-text { font-size: 13px !important; font-weight: 600 !important; }
   .chart-host .apexcharts-datalabel,
   .chart-host .apexcharts-datalabels text { font-size: 14px !important; font-weight: 800 !important; }
   .chart-host .apexcharts-pie-label { font-size: 15px !important; font-weight: 800 !important; }
@@ -476,7 +476,6 @@ tailwind.config = {
     .period-btn { font-size: 12.5px; padding: 7px 14px; }
     .sidenav-link { font-size: 14px; }
     .chart-host .apexcharts-xaxis text,
-    .chart-host .apexcharts-yaxis text,
     .chart-host .apexcharts-legend-text { font-size: 12.5px !important; }
     .chart-host .apexcharts-datalabel,
     .chart-host .apexcharts-datalabels text { font-size: 12px !important; }
@@ -498,7 +497,6 @@ tailwind.config = {
     .period-btn { font-size: 14px; padding: 9px 18px; }
     .sidenav-link { font-size: 16px; }
     .chart-host .apexcharts-xaxis text,
-    .chart-host .apexcharts-yaxis text,
     .chart-host .apexcharts-legend-text { font-size: 16px !important; }
     .chart-host .apexcharts-datalabel,
     .chart-host .apexcharts-datalabels text { font-size: 15px !important; }
@@ -512,7 +510,6 @@ tailwind.config = {
     .kpi-card .sub { font-size: 15px; }
     .chart-card .card-title { font-size: 19px; }
     .chart-host .apexcharts-xaxis text,
-    .chart-host .apexcharts-yaxis text,
     .chart-host .apexcharts-legend-text { font-size: 17px !important; }
     .chart-host .apexcharts-datalabel,
     .chart-host .apexcharts-datalabels text { font-size: 16px !important; }
@@ -673,7 +670,7 @@ tailwind.config = {
   <div class="px-5 pb-5 mt-auto">
     <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:14px;">
       <p style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;">Atualizado em</p>
-      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Plus Jakarta Sans',sans-serif;">02/05/2026 19:39</p>
+      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">02/05/2026 19:59</p>
     </div>
   </div>
 </aside>
@@ -1406,7 +1403,7 @@ function baseChart(opts){
     theme: 'dark',
     shared: !isPieLike,
     intersect: false,
-    style: { fontSize: '13px', fontFamily: 'Inter' },
+    style: { fontSize: '13px', fontFamily: "'Space Grotesk', Inter, sans-serif" },
   }, opts.tooltip || {});
   // Final safety: shared & intersect are mutually exclusive.
   if (mergedTooltip.shared && mergedTooltip.intersect) mergedTooltip.intersect = false;
@@ -1419,7 +1416,7 @@ function baseChart(opts){
   merged.chart = Object.assign({
     background: 'transparent',
     foreColor: '#c5c5c5',
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: "'Space Grotesk', Inter, system-ui, sans-serif",
     animations: ANIM,
     toolbar: { show: false },
     zoom: { enabled: false },
@@ -1436,7 +1433,7 @@ function baseChart(opts){
     labels: { colors: '#e0e0e0' },
     markers: { width: 10, height: 10, radius: 99 },
     itemMargin: { horizontal: 10, vertical: 4 },
-    fontFamily: 'Inter', fontSize: '13px',
+    fontFamily: "'Space Grotesk', Inter", fontSize: '13px',
   }, opts.legend || {});
   merged.tooltip = mergedTooltip;
   merged.states = merged.states || {
@@ -1798,7 +1795,7 @@ function renderVisMesChart(vis){
         return v > 0 ? N(Math.round(v)) : '';
       },
       background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+      style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Space Grotesk' }
     },
     markers: { size: markerSize, strokeWidth: 2, strokeColors: '#0a0a0a', hover: { size: 10 } },
     xaxis: {
@@ -1811,6 +1808,7 @@ function renderVisMesChart(vis){
       labels: { style: { colors: '#c5c5c5', fontSize: '12px' }, formatter: v => N(Math.round(v)) }
     },
     legend: { position: 'top', horizontalAlign: 'left', fontWeight: 600, markers: { width: 12, height: 12, radius: 99 } },
+    grid: { padding: { right: 55 } },
     tooltip: { shared: true, intersect: false, y: { formatter: v => N(v) + ' vistorias' } }
   });
 }
@@ -1883,14 +1881,14 @@ function renderOp({vis}, prev){
 
   if (vkeys.length){
     makeChart('ch-vistoriadores', {
-      chart: { type: 'bar', height: Math.max(380, vkeys.length * 52) },
+      chart: { type: 'bar', height: Math.max(380, vkeys.length * 52), offsetX: 14 },
       series: [{ name: 'Vistorias', data: vkeys.map(k=>vmap[k]) }],
       xaxis: {
         categories: vkeys.map(k => k.split(' ')[0]+' '+k.split(' ').slice(-1)[0]),
         labels: { style: { colors: '#c5c5c5', fontSize: '12px' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { maxWidth: 175, style: { colors: '#e4e4e4', fontSize: '12px', fontWeight: 600 } } },
+      yaxis: { labels: { maxWidth: 220, style: { colors: '#e4e4e4', fontSize: '12px', fontWeight: 600 } } },
       plotOptions: {
         bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '70%', distributed: true, dataLabels: { position: 'bottom' } }
       },
@@ -1903,7 +1901,7 @@ function renderOp({vis}, prev){
           const v = typeof real === 'number' ? real : val;
           return vTotal ? `${N(v)}  ·  ${(v/vTotal*100).toFixed(1)}%` : N(v);
         },
-        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 700, fontFamily: 'Space Grotesk' },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
@@ -1937,7 +1935,7 @@ function renderOp({vis}, prev){
     },
     dataLabels: {
       enabled: true, offsetY: -22,
-      style: { colors: ['#fff'], fontSize: '13px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+      style: { colors: ['#fff'], fontSize: '13px', fontWeight: 700, fontFamily: 'Space Grotesk' }
     },
     legend: { show: false },
     grid: { yaxis: { lines: { show: false } } },
@@ -1954,10 +1952,10 @@ function renderOp({vis}, prev){
         startAngle: -135, endAngle: 135, hollow: { size: '62%', background: 'transparent' },
         track: { background: '#1f1f1f', strokeWidth: '100%' },
         dataLabels: {
-          name: { show: true, fontSize: '11px', color: '#a3a3a3', offsetY: 70, fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
+          name: { show: true, fontSize: '11px', color: '#a3a3a3', offsetY: 70, fontWeight: 700, fontFamily: 'Space Grotesk' },
           value: {
             show: true, fontSize: '34px', color: '#fff', offsetY: 8,
-            fontFamily: 'Plus Jakarta Sans', fontWeight: 800,
+            fontFamily: 'Space Grotesk', fontWeight: 800,
             formatter: v => v + '%'
           }
         }
@@ -1985,7 +1983,7 @@ function renderOp({vis}, prev){
       dataLabels: {
         enabled: true,
         formatter: (val, op) => N(op.w.config.series[op.seriesIndex]),
-        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Space Grotesk', colors: ['#FFFFFF'] },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
@@ -1996,10 +1994,10 @@ function renderOp({vis}, prev){
               show: true,
               total: {
                 show: true, label: 'Total', fontSize: '11px', color: '#a3a3a3',
-                fontFamily: 'Plus Jakarta Sans', fontWeight: 700,
+                fontFamily: 'Space Grotesk', fontWeight: 700,
                 formatter: w => N(w.globals.seriesTotals.reduce((a,b)=>a+b,0))
               },
-              value: { fontSize: '24px', color: '#C8960C', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+              value: { fontSize: '24px', color: '#C8960C', fontWeight: 800, fontFamily: 'Space Grotesk' }
             }
           }
         }
@@ -2040,7 +2038,7 @@ function renderOp({vis}, prev){
       dataLabels: {
         enabled: true, offsetY: -22,
         formatter: v => v + '%',
-        style: { colors: ['#fff'], fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+        style: { colors: ['#fff'], fontSize: '13px', fontWeight: 800, fontFamily: 'Space Grotesk' }
       },
       legend: { show: false },
       annotations: {
@@ -2057,14 +2055,14 @@ function renderOp({vis}, prev){
   const fpkeys = Object.keys(fpmap).filter(k=>k!=='null'&&k!=='Outros').sort((a,b)=>fpmap[b]-fpmap[a]);
   if (fpkeys.length){
     makeChart('ch-forma-pag-vis', {
-      chart: { type: 'bar', height: Math.max(260, fpkeys.length * 50) },
+      chart: { type: 'bar', height: Math.max(260, fpkeys.length * 50), offsetX: 14 },
       series: [{ name: 'Vistorias', data: fpkeys.map(k=>fpmap[k]) }],
       xaxis: {
         categories: fpkeys.map(k => truncate(k, 22)),
         labels: { style: { colors: '#e4e4e4', fontSize: '12px', fontWeight: 600 } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { maxWidth: 150, style: { colors: '#c5c5c5', fontSize: '12px' } } },
+      yaxis: { labels: { maxWidth: 220, style: { colors: '#c5c5c5', fontSize: '12px' } } },
       plotOptions: {
         bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '72%', distributed: true, dataLabels: { position: 'bottom' } }
       },
@@ -2079,7 +2077,7 @@ function renderOp({vis}, prev){
           const real = opts && opts.w && opts.w.config.series[opts.seriesIndex || 0].data[opts.dataPointIndex];
           return N(typeof real === 'number' ? real : val);
         },
-        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Space Grotesk' },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
@@ -2103,11 +2101,11 @@ function renderOp({vis}, prev){
 
   if (vaKeys.length){
     makeChart('ch-taxa-vis', {
-      chart: { type: 'bar', height: Math.max(360, vaKeys.length * 54) },
+      chart: { type: 'bar', height: Math.max(360, vaKeys.length * 54), offsetX: 14 },
       series: [{ name: 'Aprovação', data: vaTaxas }],
       xaxis: {
-        categories: vaLabels, min: 85, max: 102,
-        labels: { formatter: v => v.toFixed(0)+'%', style: { colors: '#a3a3a3' } },
+        categories: vaLabels, min: 85, max: 102, tickAmount: 6,
+        labels: { formatter: v => v.toFixed(0)+'%', style: { colors: '#a3a3a3' }, hideOverlappingLabels: true },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
       yaxis: { labels: { maxWidth: 220, style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
@@ -2121,7 +2119,7 @@ function renderOp({vis}, prev){
       },
       dataLabels: {
         enabled: true, formatter: v => v + '%', offsetX: 8,
-        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Space Grotesk' }
       },
       grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 20, right: 40 } },
       legend: { show: false },
@@ -2193,7 +2191,7 @@ function renderFat({rec}, prev){
         labels: { style: { colors: '#a3a3a3' }, rotate: rmk.length > 6 ? -45 : 0, rotateAlways: rmk.length > 6 },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } } },
+      yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' }, maxWidth: 80 } },
       colors: [C.gold],
       stroke: { curve: 'smooth', width: 3 },
       fill: {
@@ -2209,7 +2207,7 @@ function renderFat({rec}, prev){
           return ABBR(val);
         },
         background: { enabled: true, foreColor: '#000', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 0 },
-        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' },
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Space Grotesk' },
         offsetY: -8
       },
       markers: { size: 5, colors: [C.gold], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
@@ -2256,7 +2254,7 @@ function renderFat({rec}, prev){
           return v > 0 ? ABBR(v) : '';
         },
         background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Space Grotesk' }
       },
       legend: { position: 'top', horizontalAlign: 'left' },
       tooltip: { shared: true, y: { formatter: v => BRL(v) } }
@@ -2279,7 +2277,7 @@ function renderFat({rec}, prev){
       dataLabels: {
         enabled: true,
         formatter: v => v.toFixed(1) + '%',
-        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Space Grotesk', colors: ['#FFFFFF'] },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
@@ -2289,7 +2287,7 @@ function renderFat({rec}, prev){
             labels: {
               show: true,
               total: { show: true, label: 'Total', fontSize: '11px', color: '#a3a3a3', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
-              value: { fontSize: '20px', color: '#C8960C', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+              value: { fontSize: '20px', color: '#C8960C', fontWeight: 800, fontFamily: 'Space Grotesk', formatter: v => ABBR(+v) }
             }
           }
         }
@@ -2311,7 +2309,7 @@ function renderFat({rec}, prev){
       stroke: { width: 2, colors: ['#0a0a0a'] },
       dataLabels: {
         enabled: true, formatter: v => v.toFixed(1)+'%',
-        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Space Grotesk', colors: ['#FFFFFF'] },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
@@ -2321,7 +2319,7 @@ function renderFat({rec}, prev){
             labels: {
               show: true,
               total: { show: true, label: 'Total', color: '#a3a3a3', fontSize: '11px', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
-              value: { fontSize: '20px', color: '#C8960C', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+              value: { fontSize: '20px', color: '#C8960C', fontWeight: 800, fontFamily: 'Space Grotesk', formatter: v => ABBR(+v) }
             }
           }
         }
@@ -2343,7 +2341,7 @@ function renderFat({rec}, prev){
       stroke: { width: 2, colors: ['#0a0a0a'] },
       dataLabels: {
         enabled: true, formatter: v => v.toFixed(1)+'%',
-        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Space Grotesk', colors: ['#FFFFFF'] },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
@@ -2351,7 +2349,7 @@ function renderFat({rec}, prev){
           labels: {
             show: true,
             total: { show: true, label: 'Total', color: '#a3a3a3', fontSize: '11px', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
-            value: { fontSize: '20px', color: '#FFD60A', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+            value: { fontSize: '20px', color: '#FFD60A', fontWeight: 800, fontFamily: 'Space Grotesk', formatter: v => ABBR(+v) }
           }
         } }
       },
@@ -2365,7 +2363,7 @@ function renderFat({rec}, prev){
   const ckeys = Object.keys(cm).sort((a,b)=>cm[b]-cm[a]).slice(0,15);
   if (ckeys.length){
     makeChart('ch-top-clientes', {
-      chart: { type: 'bar', height: Math.max(460, ckeys.length * 40) },
+      chart: { type: 'bar', height: Math.max(460, ckeys.length * 40), offsetX: 14 },
       series: [{ name: 'Receita', data: ckeys.map(k => +cm[k].toFixed(2)) }],
       xaxis: {
         categories: ckeys.map(s => truncate(s, 28)),
@@ -2384,7 +2382,7 @@ function renderFat({rec}, prev){
       dataLabels: {
         enabled: true, textAnchor: 'start', offsetX: 12,
         formatter: v => ABBR(v),
-        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Space Grotesk' },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
@@ -2470,7 +2468,7 @@ function renderDep({pag, vis}, prev){
         },
         offsetY: -8,
         background: { enabled: true, foreColor: '#fff', borderRadius: 4, padding: 4, opacity: 0.9, borderColor: C.red, borderWidth: 1 },
-        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Space Grotesk' }
       },
       markers: { size: 5, colors: [C.red], strokeColors: '#0a0a0a', strokeWidth: 2, hover: { size: 9 } },
       legend: { show: false },
@@ -2484,7 +2482,7 @@ function renderDep({pag, vis}, prev){
   const cks = Object.keys(catGrouped).sort((a,b)=>catGrouped[a]-catGrouped[b]); // asc — maiores em cima
   if (cks.length){
     makeChart('ch-dep-cat', {
-      chart: { type: 'bar', height: Math.max(560, cks.length * 46) },
+      chart: { type: 'bar', height: Math.max(560, cks.length * 46), offsetX: 14 },
       series: [{ name: 'Despesas', data: cks.map(k => +catGrouped[k].toFixed(2)) }],
       xaxis: {
         categories: cks.map(s => truncate(s, 28)),
@@ -2503,7 +2501,7 @@ function renderDep({pag, vis}, prev){
       dataLabels: {
         enabled: true, textAnchor: 'start', offsetX: 12,
         formatter: v => ABBR(v),
-        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Space Grotesk' },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
@@ -2542,7 +2540,7 @@ function renderDep({pag, vis}, prev){
           return ABBR(typeof real === 'number' ? real : val);
         },
         offsetY: -24,
-        style: { colors: ['#fff'], fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+        style: { colors: ['#fff'], fontSize: '13px', fontWeight: 800, fontFamily: 'Space Grotesk' }
       },
       legend: { show: false },
       grid: { yaxis: { lines: { show: false } } },
@@ -2560,7 +2558,7 @@ function renderDep({pag, vis}, prev){
       stroke: { width: 2, colors: ['#0a0a0a'] },
       dataLabels: {
         enabled: true, formatter: v => v.toFixed(1)+'%',
-        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', colors: ['#FFFFFF'] },
+        style: { fontSize: '13px', fontWeight: 800, fontFamily: 'Space Grotesk', colors: ['#FFFFFF'] },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 3, color: '#000', opacity: 0.85 }
       },
       plotOptions: {
@@ -2568,7 +2566,7 @@ function renderDep({pag, vis}, prev){
           labels: {
             show: true,
             total: { show: true, label: 'Total', color: '#a3a3a3', fontSize: '11px', fontWeight: 700, formatter: w => ABBR(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
-            value: { fontSize: '18px', color: '#C8960C', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', formatter: v => ABBR(+v) }
+            value: { fontSize: '18px', color: '#C8960C', fontWeight: 800, fontFamily: 'Space Grotesk', formatter: v => ABBR(+v) }
           }
         } }
       },
@@ -2711,7 +2709,7 @@ function renderFl({pag, rec}, prev){
           return v !== 0 ? ABBR(v) : '';
         },
         background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
-        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' }
+        style: { fontSize: '11px', fontWeight: 800, fontFamily: 'Space Grotesk' }
       },
       legend: { position: 'top', horizontalAlign: 'left' },
       tooltip: { shared: true, y: { formatter: v => BRL(v) } },
@@ -2751,7 +2749,7 @@ function renderFl({pag, rec}, prev){
           return ABBR(val);
         },
         offsetY: -22,
-        style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
+        style: { fontSize: '10px', fontWeight: 700, fontFamily: 'Space Grotesk', colors: ['#fff'] }
       },
       legend: { position: 'top', horizontalAlign: 'left' },
       tooltip: { shared: true, y: { formatter: v => BRL(v) } }
@@ -2785,7 +2783,7 @@ function renderFl({pag, rec}, prev){
           return ABBR(val);
         },
         offsetY: -22,
-        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Space Grotesk', colors: ['#fff'] }
       },
       legend: { show: false },
       annotations: { yaxis: [{ y: 0, borderColor: '#525252', strokeDashArray: 3 }] },
@@ -2869,7 +2867,7 @@ function renderCob(){
           return ABBR(val);
         },
         offsetY: -22,
-        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans', colors: ['#fff'] }
+        style: { fontSize: '11px', fontWeight: 700, fontFamily: 'Space Grotesk', colors: ['#fff'] }
       },
       legend: { show: false },
       tooltip: { y: { formatter: v => BRL(v) + ' em aberto' } }
@@ -2886,14 +2884,14 @@ function renderCob(){
 
   if (topDev.length){
     makeChart('ch-cob-porcliente', {
-      chart: { type: 'bar', height: Math.max(300, topDev.length * 50) },
+      chart: { type: 'bar', height: Math.max(300, topDev.length * 50), offsetX: 14 },
       series: [{ name: 'Em Aberto', data: topDev.map(k => +porClienteAll[k].toFixed(2)) }],
       xaxis: {
         categories: topDev.map(k => truncate(k, 24)),
         labels: { formatter: v => ABBR(v), style: { colors: '#a3a3a3' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { maxWidth: 180, style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      yaxis: { labels: { maxWidth: 220, style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
       plotOptions: {
         bar: { horizontal: true, borderRadius: 5, borderRadiusApplication: 'end', barHeight: '65%', distributed: true, dataLabels: { position: 'top' } }
       },
@@ -2908,7 +2906,7 @@ function renderCob(){
           const real = opts && opts.w && opts.w.config.series[opts.seriesIndex || 0].data[opts.dataPointIndex];
           return ABBR(typeof real === 'number' ? real : val);
         },
-        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Plus Jakarta Sans' },
+        style: { colors: ['#fff'], fontSize: '12px', fontWeight: 800, fontFamily: 'Space Grotesk' },
         dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.6 }
       },
       legend: { show: false },
