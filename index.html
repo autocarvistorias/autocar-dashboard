@@ -762,7 +762,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:07</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:15</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -985,6 +985,20 @@ tailwind.config = {
         <div class="kpi-card card-fx" id="kpi-fl-saldo"></div>
         <div class="kpi-card card-fx" id="kpi-fl-margem"></div>
         <div class="kpi-card card-fx" id="kpi-fl-prox30" style="--accent:#f97316;--accent-glow:rgba(249,115,22,0.45)"></div>
+      </div>
+      <!-- Cenário: Todos Pagos -->
+      <div style="border:1px solid rgba(200,150,12,0.25);border-radius:12px;padding:14px 16px;background:rgba(200,150,12,0.04)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span class="material-symbols-outlined" style="font-size:16px;color:#C8960C">lightbulb</span>
+          <span style="font-size:11px;font-weight:700;color:#C8960C;letter-spacing:.08em;text-transform:uppercase">Cenário · Se todos pagassem</span>
+          <span style="font-size:10px;color:#666;margin-left:4px">receitas em aberto somadas às entradas reais</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="kpi-card card-fx" id="kpi-fl-pot-aberto"  style="--accent:#C8960C;--accent-glow:rgba(200,150,12,0.35)"></div>
+          <div class="kpi-card card-fx" id="kpi-fl-pot-ent"     style="--accent:#4ade80;--accent-glow:rgba(74,222,128,0.35)"></div>
+          <div class="kpi-card card-fx" id="kpi-fl-pot-saldo"   style="--accent:#4ade80;--accent-glow:rgba(74,222,128,0.35)"></div>
+          <div class="kpi-card card-fx" id="kpi-fl-pot-margem"  style="--accent:#4ade80;--accent-glow:rgba(74,222,128,0.35)"></div>
+        </div>
       </div>
       <div class="chart-card card-fx">
         <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">multiline_chart</span>Entradas, Saídas e Saldo</span></div>
@@ -2721,15 +2735,38 @@ function renderFl({pag, rec}, prev){
                          icon:'percent' });
   kpi('kpi-fl-prox30', { label:'Vence em 30d', value:parseFloat(prox30.toFixed(2)), prev:null, sub:'a pagar nos próximos 30d', icon:'event_upcoming', isCurrency:true });
 
+  // ─── Cenário: Se todos pagassem ──────────────────────────────────────────
+  const totAberto = rec.filter(r => r.status_pagamento === 'Em Aberto')
+                       .reduce((s,r) => s + (r.valor_recebido||0), 0);
+  const totPotEnt   = totEnt + totAberto;
+  const totPotSal   = totPotEnt - totSai;
+  const margemPot   = totPotEnt > 0 ? (totPotSal / totPotEnt * 100) : null;
+
+  kpi('kpi-fl-pot-aberto', { label:'Em Aberto', value:parseFloat(totAberto.toFixed(2)), prev:null,
+                              sub:'receitas a receber no período', icon:'pending_actions', isCurrency:true });
+  kpi('kpi-fl-pot-ent',    { label:'Rec. Potencial', value:parseFloat(totPotEnt.toFixed(2)), prev:null,
+                              sub:'entradas + em aberto', icon:'trending_up', isCurrency:true });
+  kpi('kpi-fl-pot-saldo',  { label:'Saldo Potencial', value:parseFloat(totPotSal.toFixed(2)), prev:null,
+                              sub:'se todos pagassem', icon:'account_balance', isCurrency:true });
+  kpi('kpi-fl-pot-margem', { label:'Margem Potencial',
+                              value: margemPot !== null ? parseFloat(margemPot.toFixed(1))+'%' : '—',
+                              prev: null,
+                              sub: margemPot !== null ? (margemPot>=20?'Saudável':margemPot>=0?'Atenção':'Prejuízo') : '—',
+                              icon: 'percent' });
+
+  // ─── Linha tracejada Receita Potencial (último mês + em aberto) ──────────
+  const entPot = ent.map((v, i) => i === ent.length - 1 ? +(v + totAberto).toFixed(2) : v);
+
   // ─── Linhas: Entradas / Saídas / Saldo ───────────────────────────────────
   if (allMes.length){
-    const flColors = [C.green, C.red, C.gold];
+    const flColors = [C.green, C.red, C.gold, '#4ade80'];
     makeChart('ch-fl-linhas', {
       chart: { type: 'line', height: 460, dropShadow: { enabled: true, top: 6, blur: 14, opacity: 0.3, color: C.gold }, events: perSeriesLabelEvents(flColors) },
       series: [
-        { name: 'Entradas', type: 'area', data: ent },
-        { name: 'Saídas',   type: 'area', data: sai },
-        { name: 'Saldo',    type: 'line', data: sal }
+        { name: 'Entradas',          type: 'area', data: ent },
+        { name: 'Saídas',            type: 'area', data: sai },
+        { name: 'Saldo',             type: 'line', data: sal },
+        { name: 'Rec. Potencial',    type: 'line', data: entPot }
       ],
       xaxis: {
         categories: lbl, labels: { style: { colors: '#c5c5c5' }, rotate: lbl.length > 8 ? -45 : 0 },
@@ -2737,21 +2774,22 @@ function renderFl({pag, rec}, prev){
       },
       yaxis: { labels: { formatter: v => ABBR(v), style: { colors: '#c5c5c5' } } },
       colors: flColors,
-      stroke: { curve: 'smooth', width: [2.5, 2.5, 4], dashArray: [0, 0, 4] },
+      stroke: { curve: 'smooth', width: [2.5, 2.5, 4, 2], dashArray: [0, 0, 4, 6] },
       fill: {
-        type: ['gradient','gradient','solid'],
+        type: ['gradient','gradient','solid','solid'],
         gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] },
-        opacity: [1, 1, 1]
+        opacity: [1, 1, 1, 0.6]
       },
       markers: {
-        size: [5, 5, 7], strokeColors: '#0a0a0a', strokeWidth: 2,
+        size: [5, 5, 7, 5], strokeColors: '#0a0a0a', strokeWidth: 2,
         hover: { size: 10 }
       },
       dataLabels: {
-        enabled: true, enabledOnSeries: [0, 1, 2],
+        enabled: true, enabledOnSeries: [0, 1, 2, 3],
         formatter: function(val, opts){
           const real = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
           const v = typeof real === 'number' ? real : val;
+          if (opts.seriesIndex === 3) return opts.dataPointIndex === ent.length-1 ? ABBR(v) : '';
           return v !== 0 ? ABBR(v) : '';
         },
         background: { enabled: true, foreColor: '#FFFFFF', borderRadius: 4, padding: 4, opacity: 0.95, borderWidth: 1, dropShadow: { enabled: true, top: 1, left: 1, blur: 2, opacity: 0.5 } },
