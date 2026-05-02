@@ -762,7 +762,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:38</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:41</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1392,8 +1392,7 @@ const ABBR = v => {
 // ══ State ═════════════════════════════════════════════════════════════════
 // Estado inicial: filtro "Este ano" (YTD) já aplicado por padr\u00e3o.
 const _ytdNow  = new Date(); _ytdNow.setHours(23,59,59,999);
-const _ytdFrom = new Date(_ytdNow.getFullYear(), _ytdNow.getMonth(), 1);
-const S = { from:_ytdFrom, to:_ytdNow, loja:'all', vistoriador:'all', status:'all' };
+const S = { from:null, to:null, loja:'all', vistoriador:'all', status:'all' };
 
 // Populate vistoriador dropdown
 (function(){
@@ -3647,7 +3646,7 @@ function initMiniArcade(container) {
 
 // ══ INIT ══════════════════════════════════════════════════════════════════
 document.querySelectorAll('.period-btn').forEach(b => {
-  if (b.dataset.p === 'mtd') b.classList.add('active');
+  if (b.dataset.p === 'all') b.classList.add('active');
 });
 syncDateInputs();
 renderAll();
