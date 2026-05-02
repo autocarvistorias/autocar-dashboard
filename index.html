@@ -670,7 +670,7 @@ tailwind.config = {
   <div class="px-5 pb-5 mt-auto">
     <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:14px;">
       <p style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;">Atualizado em</p>
-      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">02/05/2026 19:59</p>
+      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">02/05/2026 20:05</p>
     </div>
   </div>
 </aside>
@@ -3036,19 +3036,20 @@ function renderCx(){
 
   // Determine reference date: input value or today (anchored to REF_DATE)
   const inputVal = document.getElementById('f-cx-data')?.value;
-  const targetDate = inputVal || '2026-04-28';
+  const lastDate   = allDates.at(-1) || '';
+  const targetDate = inputVal || lastDate;
   const closest = allDates.filter(d => d <= targetDate).at(-1);
 
   // Label
   const lbl = inputVal
     ? new Date(inputVal+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})
-    : 'Hoje — 28/04/2026';
+    : (lastDate ? new Date(lastDate+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}) : '—');
   const labelEl = document.getElementById('cx-data-label');
   if (labelEl) labelEl.textContent = lbl;
 
-  // Set date input default
+  // Set date input default to last date with data
   const dataEl = document.getElementById('f-cx-data');
-  if (dataEl && !dataEl.value) dataEl.value = '2026-04-28';
+  if (dataEl && !dataEl.value) dataEl.value = lastDate;
 
   const bal = closest ? balanceAt(closest) : null;
 
