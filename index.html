@@ -762,7 +762,7 @@ tailwind.config = {
 
   <div class="p-4 mx-3 mb-4 rounded-2xl border border-outline-variant bg-surface-2/40">
     <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Atualizado em</p>
-    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 14:54</p>
+    <p class="text-primary font-bold mt-1 font-headline text-sm">02/05/2026 15:04</p>
   </div>
 </aside>
 <div id="drawer-overlay"></div>
@@ -1881,12 +1881,16 @@ function renderVisMesChart(vis){
     stroke: { curve: 'smooth', width: strokeWidth, dashArray },
     fill: { type: fillType, gradient: { shadeIntensity: 1, opacityFrom: 0.30, opacityTo: 0.03, stops: [0, 100] }, opacity: fillOpacity },
     dataLabels: {
-      enabled: ml.length <= 12,
+      enabled: true,
       enabledOnSeries: active.map((_, i) => i),
       formatter: function(val, opts){
         const n = opts.w.config.series[opts.seriesIndex].data.length;
         const i = opts.dataPointIndex;
-        if (n > 8 && i !== 0 && i !== n-1) return '';
+        if (n > 12) {
+          if (i !== n-1) return '';
+        } else if (n > 8) {
+          if (i !== 0 && i !== n-1) return '';
+        }
         const real = opts.w.config.series[opts.seriesIndex].data[i];
         const v = typeof real === 'number' ? real : val;
         return v > 0 ? N(Math.round(v)) : '';
@@ -2204,7 +2208,7 @@ function renderOp({vis}, prev){
         labels: { formatter: v => v.toFixed(0)+'%', style: { colors: '#a3a3a3' } },
         axisBorder: { show: false }, axisTicks: { show: false }
       },
-      yaxis: { labels: { maxWidth: 175, style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
+      yaxis: { labels: { maxWidth: 220, style: { colors: '#d4d4d4', fontSize: '12px', fontWeight: 600 } } },
       plotOptions: {
         bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '65%', distributed: true, dataLabels: { position: 'top' } }
       },
@@ -2217,6 +2221,7 @@ function renderOp({vis}, prev){
         enabled: true, formatter: v => v + '%', offsetX: 8,
         style: { colors: ['#fff'], fontSize: '11px', fontWeight: 700, fontFamily: 'Plus Jakarta Sans' }
       },
+      grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } }, padding: { left: 20, right: 40 } },
       legend: { show: false },
       annotations: {
         xaxis: [
