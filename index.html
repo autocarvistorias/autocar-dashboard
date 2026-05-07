@@ -705,7 +705,7 @@ tailwind.config = {
   <div class="px-5 pb-5 mt-auto">
     <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:14px;">
       <p style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;">Atualizado em</p>
-      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">06/05/2026 23:11</p>
+      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">06/05/2026 23:16</p>
     </div>
   </div>
 </aside>
@@ -2601,7 +2601,7 @@ function renderDep({pag, vis}, prev){
 //  FLUXO FINANCEIRO
 // ══════════════════════════════════════════════════════════════════════════
 function renderFl({pag, rec}, prev){
-  const recMes = byMonth(rec,'_d','valor_recebido');
+  const recMes = byMonth(rec.filter(r=>r.status_pagamento==='Pago'),'_d','valor_recebido');
   const pagMes = byMonth(pag.filter(r=>r.status==='Pago'),'_dp','valor');
   const allMes = [...new Set([...Object.keys(recMes),...Object.keys(pagMes)])].sort();
   const ent = allMes.map(k => +(recMes[k]||0).toFixed(2));
@@ -2619,7 +2619,7 @@ function renderFl({pag, rec}, prev){
                      .reduce((s,r) => s+(r.valor||0), 0);
 
   const pp = prev;
-  const ppEnt = pp?.rec.reduce((s,r)=>s+(r.valor_recebido||0),0);
+  const ppEnt = pp?.rec.filter(r=>r.status_pagamento==='Pago').reduce((s,r)=>s+(r.valor_recebido||0),0);
   const ppSai = pp?.pag.filter(r=>r.status==='Pago').reduce((s,r)=>s+(r.valor||0),0);
 
   const margem = totEnt > 0 ? (totSal/totEnt*100) : null;
