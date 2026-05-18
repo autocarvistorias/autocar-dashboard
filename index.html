@@ -705,7 +705,7 @@ tailwind.config = {
   <div class="px-5 pb-5 mt-auto">
     <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:14px;">
       <p style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;">Atualizado em</p>
-      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">18/05/2026 16:52</p>
+      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">18/05/2026 16:59</p>
     </div>
   </div>
 </aside>
@@ -1333,7 +1333,7 @@ function getPrev(){
 function byMonth(arr, dKey, valKey){
   const m = {};
   arr.forEach(r => {
-    const d = dKey==='_d' ? r._d : r[dKey];
+    const d = dKey==='_d' ? r._d : dKey==='_dp' ? (r._dp||r._d) : r[dKey];
     if (!d) return;
     const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     m[k] = (m[k]||0) + (valKey ? (r[valKey]||0) : 1);
@@ -2602,6 +2602,7 @@ function renderDep({pag, vis}, prev){
 // ══════════════════════════════════════════════════════════════════════════
 function renderFl({pag, rec}, prev){
   const recMes = byMonth(rec.filter(r=>r.status_pagamento==='Pago'),'_d','valor_recebido');
+  // byMonth com '_dp' usa data_pagamento; fallback para data_vencimento quando nula
   const pagMes = byMonth(pag.filter(r=>r.status==='Pago'),'_dp','valor');
   const allMes = [...new Set([...Object.keys(recMes),...Object.keys(pagMes)])].sort();
   const ent = allMes.map(k => +(recMes[k]||0).toFixed(2));
