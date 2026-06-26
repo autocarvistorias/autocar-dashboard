@@ -708,7 +708,7 @@ tailwind.config = {
   <div class="px-5 pb-5 mt-auto">
     <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:14px;">
       <p style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;">Atualizado em</p>
-      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">26/06/2026 18:03</p>
+      <p style="font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px;font-family:'Space Grotesk',sans-serif;">26/06/2026 18:09</p>
     </div>
   </div>
 </aside>
@@ -1225,10 +1225,14 @@ tailwind.config = {
 
     <!-- ════════ RH ════════ -->
     <section id="rh" class="tab-content space-y-7">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
         <div class="chart-card card-fx" style="padding:18px 20px">
           <div style="font-size:11px;color:#777;text-transform:uppercase;letter-spacing:1px;font-weight:600">Desconto de ponto (período)</div>
           <div id="rh-kpi-desc" style="font-size:26px;font-weight:700;color:#ef4444;font-family:'Space Grotesk',sans-serif;margin-top:6px">R$ 0,00</div>
+        </div>
+        <div class="chart-card card-fx" style="padding:18px 20px">
+          <div style="font-size:11px;color:#777;text-transform:uppercase;letter-spacing:1px;font-weight:600">Vales / adiantamentos (período)</div>
+          <div id="rh-kpi-vales" style="font-size:26px;font-weight:700;color:#f59e0b;font-family:'Space Grotesk',sans-serif;margin-top:6px">R$ 0,00</div>
         </div>
         <div class="chart-card card-fx" style="padding:18px 20px">
           <div style="font-size:11px;color:#777;text-transform:uppercase;letter-spacing:1px;font-weight:600">Faltas (período)</div>
@@ -1252,6 +1256,11 @@ tailwind.config = {
       <div class="chart-card card-fx">
         <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">beach_access</span>Férias</span></div>
         <div style="overflow-x:auto" id="rh-ferias"></div>
+      </div>
+
+      <div class="chart-card card-fx">
+        <div class="card-title"><span class="flex items-center gap-2"><span class="material-symbols-outlined title-glyph" style="font-size:18px">request_quote</span>Vales / Adiantamentos</span><span class="title-meta" id="rh-vales-meta"></span></div>
+        <div style="overflow-x:auto" id="rh-vales"></div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -1297,6 +1306,7 @@ const _RH_FER = [{"colaborador":"VICTOR VALENTIM ALMEIDA DE SOUSA","loja":"Goian
 const _RH_PONTO = [];
 const _RH_PDET = [];
 const _RH_OCO = [{"id":1,"colaborador":"(exemplo) Marcelo Henrique","loja":"Goiania","data":"15/06/2026","tipo":"Atestado","dias_ou_horas":1,"justifica_falta":"Sim","documento":"atestado medico","observacao":"exemplo - pode apagar"}];
+const _RH_VALES = [{"id":1,"colaborador":"(exemplo) Mateus Sabino Borba","loja":"Prime","data":"10/07/2026","valor":200,"tipo":"Vale","forma_pagamento":"PIX","observacao":"exemplo - pode apagar; será descontado do salário"}];
 
 function parseDate(s){ if(!s) return null; const p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
 _VIS.forEach(r => { r._d = parseDate(r.DATA); });
@@ -3184,7 +3194,7 @@ const TAB_INFO = {
 // ══ RH ════════════════════════════════════════════════════════════════════
 function _rhTable(rows, cols, opts){
   opts = opts || {};
-  if (!rows || !rows.length) return '<p style="color:#666;font-size:12px;padding:14px">Sem dados. Importe a planilha de ponto em PONTO/ e rode os scripts.</p>';
+  if (!rows || !rows.length) return '<p style="color:#666;font-size:12px;padding:14px">'+(opts.empty||'Sem dados ainda.')+'</p>';
   const th = cols.map(c=>`<th${c.right?' style="text-align:right"':''}>${c.label}</th>`).join('');
   const body = rows.map(r=>{
     const rowStyle = opts.rowStyle ? opts.rowStyle(r) : '';
@@ -3209,7 +3219,10 @@ function renderRh(){
   const totBanco = _RH_PONTO.reduce((a,r)=>a+_hmToMin(r.saldo_horas),0);
   const ferVenc = _RH_FER.filter(r=>String(r.situacao||'').toUpperCase().includes('VENCIDA')).length;
   const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+  const valesRows = _RH_VALES.filter(r=>!String(r.colaborador||'').startsWith('(exemplo'));
+  const totVales = valesRows.reduce((a,r)=>a+(parseFloat(r.valor)||0),0);
   set('rh-kpi-desc', _brl(totDesc));
+  set('rh-kpi-vales', _brl(totVales));
   set('rh-kpi-faltas', totFalt);
   set('rh-kpi-banco', _minToHm(totBanco));
   set('rh-kpi-ferias', ferVenc);
@@ -3222,8 +3235,16 @@ function renderRh(){
     {key:'atestados',label:'Atestados',right:true},{key:'saldo_horas',label:'Saldo',right:true,
       fmt:v=>`<span style="color:${_hmToMin(v)<0?'#ef4444':'#22c55e'}">${v}</span>`},
     {key:'desconto_R$',label:'Desconto',right:true,fmt:v=>`<strong style="color:${(parseFloat(v)||0)>0?'#ef4444':'#666'}">${_brl(v)}</strong>`},
-  ]);
+  ], {empty:'Sem apuração ainda — a contabilização começa em 01/07/2026. Coloque o ponto em PONTO/ e rode importar_ponto.py.'});
   const meta=document.getElementById('rh-ponto-meta'); if(meta&&_RH_PONTO.length) meta.textContent=_RH_PONTO.length+' colaborador(es)';
+  // Vales / Adiantamentos
+  document.getElementById('rh-vales').innerHTML = _rhTable(valesRows, [
+    {key:'data',label:'Data'},{key:'colaborador',label:'Colaborador'},{key:'loja',label:'Loja',fmt:lojaTag},
+    {key:'tipo',label:'Tipo'},{key:'forma_pagamento',label:'Forma'},
+    {key:'valor',label:'Valor',right:true,fmt:v=>`<strong style="color:#f59e0b">${_brl(v)}</strong>`},
+    {key:'observacao',label:'Obs'},
+  ], {empty:'Nenhum vale lançado. Registre em BASE DE DADOS/rh_vales.xlsx.'});
+  const vm=document.getElementById('rh-vales-meta'); if(vm) vm.textContent = valesRows.length? `${valesRows.length} lançamento(s) · ${_brl(totVales)}` : '';
   // Férias
   document.getElementById('rh-ferias').innerHTML = _rhTable(_RH_FER, [
     {key:'colaborador',label:'Colaborador'},{key:'loja',label:'Loja',fmt:lojaTag},
@@ -3235,7 +3256,7 @@ function renderRh(){
   document.getElementById('rh-oco').innerHTML = _rhTable(_RH_OCO.filter(r=>!String(r.colaborador||'').startsWith('(exemplo')), [
     {key:'colaborador',label:'Colaborador'},{key:'data',label:'Data'},{key:'tipo',label:'Tipo'},
     {key:'justifica_falta',label:'Justifica?'},{key:'observacao',label:'Obs'},
-  ]);
+  ], {empty:'Nenhum atestado/falta justificada. Registre em rh_ocorrencias.xlsx.'});
   // Colaboradores
   document.getElementById('rh-colab').innerHTML = _rhTable(_RH_COL, [
     {key:'nome',label:'Nome'},{key:'loja',label:'Loja',fmt:lojaTag},
@@ -3249,7 +3270,7 @@ function renderRh(){
     {key:'entrada1',label:'Ent.1'},{key:'saida1',label:'Saí.1'},{key:'entrada2',label:'Ent.2'},{key:'saida2',label:'Saí.2'},
     {key:'horas_trab',label:'Horas',right:true},{key:'status',label:'Status',
       fmt:v=>{const s=String(v); const c=s.includes('FALTA')?'#ef4444':(s.includes('almoço')?'#f97316':'#22c55e'); return `<span style="color:${c}">${s}</span>`;}},
-  ]);
+  ], {empty:'Sem registros de ponto no período de apuração (a partir de 01/07/2026).'});
 }
 
 function showTab(name){
